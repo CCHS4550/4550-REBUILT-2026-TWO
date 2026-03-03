@@ -37,7 +37,7 @@ public class RobotContainer {
   private final QuestNav questnav;
 
   private final Superstructure superstructure;
-  private SwerveSubsystem swerveSubsystem;
+  private final SwerveSubsystem swerveSubsystem;
   private final Agitator agitator;
   private final Kicker kicker;
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -74,7 +74,7 @@ public class RobotContainer {
     vision =
         new Vision(
             questnav,
-            new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(1)));
+            new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
     // vision = new Vision ((pose, timestamp, stdDevs) -> {
     //     poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);

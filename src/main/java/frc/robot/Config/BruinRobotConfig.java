@@ -283,9 +283,11 @@ public class BruinRobotConfig {
     // TODO: find and fill
     photonVisionConfig =
         new VisionConfig("Photonvision Camera 1")
-            .withHeightOffset(Units.inchesToMeters(0))
-            .withLengthOffset(Units.inchesToMeters(0))
-            .withWidthOffset(Units.inchesToMeters(0));
+            .withHeightOffset(Units.inchesToMeters(13.29))
+            .withLengthOffset(Units.inchesToMeters(-10.739))
+            .withWidthOffset(Units.inchesToMeters(19.859))
+            .withMountingYaw(Units.degreesToRadians(90))
+            .withMountingPitch(Units.degreesToRadians(110));
     questNavConfig =
         new VisionConfig("Questnav")
             .withHeightOffset(Units.inchesToMeters(0))
