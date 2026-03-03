@@ -258,7 +258,11 @@ public class Turret extends SubsystemBase {
         break;
       case ZERO:
         wantedTurretMeasurables =
-            new TurretMeasurables(Rotation2d.fromDegrees(Constants.TurretConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS), Rotation2d.fromDegrees(0), 0);
+            new TurretMeasurables(
+                Rotation2d.fromDegrees(
+                    Constants.TurretConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS),
+                Rotation2d.fromDegrees(0),
+                0);
         goToWantedState();
         break;
       case STOW:
@@ -367,36 +371,41 @@ public class Turret extends SubsystemBase {
   }
 
   public void convertToBoundedTurretAngle() {
-     double currentTotalRadians = (rotationInputs.totalRotationsUnwrapped * 2 * Math.PI);
-        double closestOffset = wantedTurretMeasurables.rotationAngle.getRadians() - rotationInputs.rotationAngle.getRadians();
-        if (closestOffset > Math.PI) {
+    double currentTotalRadians = (rotationInputs.totalRotationsUnwrapped * 2 * Math.PI);
+    double closestOffset =
+        wantedTurretMeasurables.rotationAngle.getRadians()
+            - rotationInputs.rotationAngle.getRadians();
+    if (closestOffset > Math.PI) {
 
-            closestOffset -= 2 * Math.PI;
+      closestOffset -= 2 * Math.PI;
 
-        } else if (closestOffset < -Math.PI) {
-            closestOffset += 2 * Math.PI;
-        }
+    } else if (closestOffset < -Math.PI) {
+      closestOffset += 2 * Math.PI;
+    }
 
-        double finalOffset = currentTotalRadians + closestOffset;
-        if ((currentTotalRadians + closestOffset) % (2 * Math.PI)
-                == (currentTotalRadians - closestOffset)
-                        % (2 * Math.PI)) { // If the offset can go either way, go closer to zero
-            if (finalOffset > 0) {
-                finalOffset = currentTotalRadians - Math.abs(closestOffset);
-            } else {
-                finalOffset = currentTotalRadians + Math.abs(closestOffset);
-            }
-        }
-        if (finalOffset > Units.degreesToRadians(MAX_ANGLE)) { // if past upper rotation limit
-            finalOffset -= (2 * Math.PI);
-        } else if (finalOffset < Units.degreesToRadians(MIN_ANGLE)) { // if below lower rotation limit
-            finalOffset += (2 * Math.PI);
-        }
-        wantedTurretMeasurables.rotationAngle= Rotation2d.fromRadians(finalOffset);
+    double finalOffset = currentTotalRadians + closestOffset;
+    if ((currentTotalRadians + closestOffset) % (2 * Math.PI)
+        == (currentTotalRadians - closestOffset)
+            % (2 * Math.PI)) { // If the offset can go either way, go closer to zero
+      if (finalOffset > 0) {
+        finalOffset = currentTotalRadians - Math.abs(closestOffset);
+      } else {
+        finalOffset = currentTotalRadians + Math.abs(closestOffset);
+      }
+    }
+    if (finalOffset > Units.degreesToRadians(MAX_ANGLE)) { // if past upper rotation limit
+      finalOffset -= (2 * Math.PI);
+    } else if (finalOffset < Units.degreesToRadians(MIN_ANGLE)) { // if below lower rotation limit
+      finalOffset += (2 * Math.PI);
+    }
+    wantedTurretMeasurables.rotationAngle = Rotation2d.fromRadians(finalOffset);
 
-        double clampedElevation = MathUtil.clamp(wantedTurretMeasurables.elevationAngle.getDegrees(), Constants.TurretConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS, Constants.TurretConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
-        wantedTurretMeasurables.elevationAngle= Rotation2d.fromDegrees(clampedElevation);
-
+    double clampedElevation =
+        MathUtil.clamp(
+            wantedTurretMeasurables.elevationAngle.getDegrees(),
+            Constants.TurretConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
+            Constants.TurretConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
+    wantedTurretMeasurables.elevationAngle = Rotation2d.fromDegrees(clampedElevation);
   }
 
   private double normalize(double angle) {

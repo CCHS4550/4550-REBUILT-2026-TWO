@@ -662,6 +662,6 @@ public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestCons
       Pose2d questRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> questMeasurementStdDevs) {
-    io.addQuestPose(questRobotPoseMeters, timestampSeconds, questMeasurementStdDevs);
+    // io.addQuestPose(questRobotPoseMeters, timestampSeconds, questMeasurementStdDevs);
   }
 }

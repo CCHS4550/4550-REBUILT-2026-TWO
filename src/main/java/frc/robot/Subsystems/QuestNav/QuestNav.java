@@ -81,11 +81,11 @@ public class QuestNav extends SubsystemBase implements Vision.VisionConsumer {
         }
       }
 
-      Logger.recordOutput("Questnav", allPoseFrames.toArray(new Pose2d[allPoseFrames.size()]));
-      Logger.recordOutput(
-          "Questnav", rejectedPoseFrames.toArray(new Pose2d[rejectedPoseFrames.size()]));
-      Logger.recordOutput(
-          "Questnav", acceptedPoseFrames.toArray(new Pose2d[acceptedPoseFrames.size()]));
+      // Logger.recordOutput("Questnav", allPoseFrames.get(allPoseFrames.size()));
+      // Logger.recordOutput(
+      //     "Questnav", rejectedPoseFrames.toArray(new Pose2d[rejectedPoseFrames.size()]));
+      // Logger.recordOutput(
+      //     "Questnav", acceptedPoseFrames.toArray(new Pose2d[acceptedPoseFrames.size()]));
 
       backupOdometrySetter();
 

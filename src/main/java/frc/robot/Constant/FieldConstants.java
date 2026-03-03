@@ -13,9 +13,9 @@ public class FieldConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
   public static Pose2d scoringPoseBlue = new Pose2d(4.6, 4, new Rotation2d());
-  public static Pose2d scoringPoseRed = new Pose2d(12,4, new Rotation2d());
+  public static Pose2d scoringPoseRed = new Pose2d(12, 4, new Rotation2d());
 
-  public static Pose2d passingPoseBlue = new Pose2d(2.5,4, new Rotation2d());
+  public static Pose2d passingPoseBlue = new Pose2d(2.5, 4, new Rotation2d());
   public static Pose2d passingPoseRed = new Pose2d(14.5, 4, new Rotation2d());
 
   public static Pose2d middleStartingPoseBlue = new Pose2d();
