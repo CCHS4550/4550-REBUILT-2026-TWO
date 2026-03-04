@@ -15,20 +15,15 @@ import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
 import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.Kicker.Kicker;
 import frc.robot.Subsystems.Kicker.KickerIOCTRE;
+import frc.robot.Subsystems.Shooter.*;
 import frc.robot.Subsystems.Superstructure;
-import frc.robot.Subsystems.Superstructure.WantedSuperstructureState;
-import frc.robot.Subsystems.Turret.Elevation.ElevationIOCTRE;
-import frc.robot.Subsystems.Turret.Rotation.RotationIOCTRE;
-import frc.robot.Subsystems.Turret.Shooter.ShooterIOCTRE;
-import frc.robot.Subsystems.Turret.Turret;
-import frc.robot.Subsystems.Vision.Vision;
-import frc.robot.Subsystems.Vision.VisionIOPhotonvision;
+import frc.robot.Subsystems.Superstructure.SuperState;
 
 public class RobotContainer {
   // private final SwerveSubsystem swerveSubsystem;
   private final Intake intake;
-  private final Turret turret;
-  private final Vision vision;
+  private final Shooter shooter;
+
   // private final QuestNav questnav;
 
   private final Superstructure superstructure;
@@ -60,16 +55,14 @@ public class RobotContainer {
     intake = new Intake(new IntakeIOCTRE(config));
     kicker = new Kicker(new KickerIOCTRE(config));
     agitator = new Agitator(new AgitatorIOCTRE(config));
-    turret =
-        new Turret(
-            new ElevationIOCTRE(config), new RotationIOCTRE(config), new ShooterIOCTRE(config));
 
-    superstructure = new Superstructure(swerveSubsystem, intake, kicker, turret, agitator);
+    shooter = new Shooter();
+    superstructure = new Superstructure(swerveSubsystem, shooter, intake, kicker, agitator);
     // questnav = new QuestNav(swerveSubsystem, new QuestNavIOQuest(Transform3d.kZero));
-    vision =
-        new Vision(
-            swerveSubsystem,
-            new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
+    // vision =
+    //     new Vision(
+    //         swerveSubsystem,
+    //         new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
     // vision = new Vision ((pose, timestamp, stdDevs) -> {
     //     poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);
@@ -186,31 +179,10 @@ public class RobotContainer {
     // .rightTrigger()
     // .whileTrue(new InstantCommand(() -> superstructure.setIntakeActive(true)))
     // .onFalse(new InstantCommand(() -> superstructure.setIntakeActive(false)));
-
     controller
         .rightBumper()
-        .whileTrue(
-            new InstantCommand(
-                () ->
-                    superstructure.setWantedSuperstructureState(
-                        WantedSuperstructureState.ACTIVE_SHOOT, true)))
-        .whileFalse(
-            new InstantCommand(
-                () ->
-                    superstructure.setWantedSuperstructureState(
-                        WantedSuperstructureState.IDLE, false)));
-    controller
-        .leftBumper()
-        .whileTrue(
-            new InstantCommand(
-                () ->
-                    superstructure.setWantedSuperstructureState(
-                        WantedSuperstructureState.STOW, false)))
-        .whileFalse(
-            new InstantCommand(
-                () ->
-                    superstructure.setWantedSuperstructureState(
-                        WantedSuperstructureState.IDLE, false)));
+        .whileTrue(new InstantCommand(() -> superstructure.setWantedState(SuperState.SHOOT)))
+        .whileFalse(new InstantCommand(() -> superstructure.setWantedState(SuperState.IDLE)));
   }
 
   public SwerveSubsystem getSwerveSubsystem() {

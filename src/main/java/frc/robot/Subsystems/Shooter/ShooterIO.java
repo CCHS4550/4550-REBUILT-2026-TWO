@@ -4,46 +4,50 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 
 interface ShooterIO {
-    void updateInputs();
+  void updateInputs();
 
-    Rotation2d getHoodAngle();
+  Rotation2d getHoodAngle();
 
-    Rotation2d getTurretAngle();
+  Rotation2d getTurretAngle();
 
-    double getFlywheelRPM();
+  double getFlywheelRPM();
 
-    void moveHoodToAngle(Rotation2d angle);
+  void moveHoodToAngle(Rotation2d angle);
 
-    void setTurretAngle(double angle);
+  void setTurretAngle(double angle);
 
-    void setFlywheelRPM(double rpm);
+  void setFlywheelRPM(double rpm);
 
-    void setFlywheelPercent(double percent);
+  void setFlywheelPercent(double percent);
 
-    double getRelativeTurretAngleRadians();
+  double getRelativeTurretAngleRadians();
 
-    void setHoodAngle(Rotation2d angle);
+  void setHoodAngle(Rotation2d angle);
 
-    void zeroTurretToEncoder();
+  void zeroTurretToEncoder();
 
-    double getFlywheelCurrent();
+  double getFlywheelCurrent();
 
-    double getFlywheelAcceleration();
+  double getFlywheelAcceleration();
 
-    double getHoodCurrent();
+  double getHoodCurrent();
 
-    double getTurretCurrent();
+  double getTurretCurrent();
 
-    Rotation2d getTurretAngleSetpointForTrajectory(Translation3d _trajectorySetpoint);
+  Rotation2d getTurretAngleSetpointForTrajectory(Translation3d _trajectorySetpoint);
 
-    Rotation2d getFutureSetpointEstimate(Rotation2d currentSetpoint,
-                                        double driveAngularVelocity, double foresightTime);
+  Rotation2d getFutureSetpointEstimate(
+      Rotation2d currentSetpoint, double driveAngularVelocity, double foresightTime);
 
-                                        Rotation2d hoodAngleToMotorAngle(Rotation2d hoodAngle);
-                                        Rotation2d motorAngleToHoodAngle(Rotation2d motorAngle);
-                                        Rotation2d launchAngleToHoodAngle(Rotation2d launchAngle, double rpm);
-                                        double shooterMPSToRPM(double mps);
-                                        Rotation2d getHoodAngleSetpointForTrajectory(Translation3d trajectory);
-                                        double getFlywheelRPMSetpointForTrajectory(Translation3d _trajectorySetpoint);
+  Rotation2d hoodAngleToMotorAngle(Rotation2d hoodAngle);
 
+  Rotation2d motorAngleToHoodAngle(Rotation2d motorAngle);
+
+  Rotation2d launchAngleToHoodAngle(Rotation2d launchAngle, double rpm);
+
+  double shooterMPSToRPM(double mps);
+
+  Rotation2d getHoodAngleSetpointForTrajectory(Translation3d trajectory);
+
+  double getFlywheelRPMSetpointForTrajectory(Translation3d _trajectorySetpoint);
 }
