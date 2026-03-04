@@ -3,9 +3,6 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
@@ -18,8 +15,6 @@ import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
 import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.Kicker.Kicker;
 import frc.robot.Subsystems.Kicker.KickerIOCTRE;
-import frc.robot.Subsystems.QuestNav.QuestNav;
-import frc.robot.Subsystems.QuestNav.QuestNavIOQuest;
 import frc.robot.Subsystems.Superstructure;
 import frc.robot.Subsystems.Superstructure.WantedSuperstructureState;
 import frc.robot.Subsystems.Turret.Elevation.ElevationIOCTRE;
@@ -34,7 +29,7 @@ public class RobotContainer {
   private final Intake intake;
   private final Turret turret;
   private final Vision vision;
-  private final QuestNav questnav;
+  // private final QuestNav questnav;
 
   private final Superstructure superstructure;
   private final SwerveSubsystem swerveSubsystem;
@@ -70,10 +65,10 @@ public class RobotContainer {
             new ElevationIOCTRE(config), new RotationIOCTRE(config), new ShooterIOCTRE(config));
 
     superstructure = new Superstructure(swerveSubsystem, intake, kicker, turret, agitator);
-    questnav = new QuestNav(swerveSubsystem, new QuestNavIOQuest(Transform3d.kZero));
+    // questnav = new QuestNav(swerveSubsystem, new QuestNavIOQuest(Transform3d.kZero));
     vision =
         new Vision(
-            questnav,
+            swerveSubsystem,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
     // vision = new Vision ((pose, timestamp, stdDevs) -> {
@@ -176,16 +171,16 @@ public class RobotContainer {
     //             }));
 
     // actual button bindings!
-    // controller
-    //     .a()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> swerveSubsystem.resetRotation(swerveSubsystem.getSwerveRotation())));
-
-    // actual button bindings!
     controller
         .a()
-        .onTrue(new InstantCommand(() -> questnav.setPose(new Pose2d(3, 3, new Rotation2d()))));
+        .onTrue(
+            new InstantCommand(
+                () -> swerveSubsystem.resetRotation(swerveSubsystem.getSwerveRotation())));
+
+    // actual button bindings!
+    // controller
+    //     .a()
+    //     .onTrue(new InstantCommand(() -> questnav.setPose(new Pose2d(3, 3, new Rotation2d()))));
 
     // controller
     // .rightTrigger()
@@ -198,7 +193,7 @@ public class RobotContainer {
             new InstantCommand(
                 () ->
                     superstructure.setWantedSuperstructureState(
-                        WantedSuperstructureState.ZERO, true)))
+                        WantedSuperstructureState.ACTIVE_SHOOT, true)))
         .whileFalse(
             new InstantCommand(
                 () ->

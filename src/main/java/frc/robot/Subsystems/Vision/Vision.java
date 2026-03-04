@@ -109,8 +109,7 @@ public class Vision extends SubsystemBase {
         for (var observation : inputs[cameraIndex].poseObservations) {
           boolean rejectPose =
               observation.tagCount() == 0 // Must have at least one tag
-                  || (observation.tagCount() == 1
-                      && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+                  || observation.ambiguity() > maxAmbiguity // Cannot be high ambiguity
                   || Math.abs(observation.pose().getZ())
                       > maxZError // Must have realistic Z coordinate
 
@@ -118,10 +117,10 @@ public class Vision extends SubsystemBase {
                   || observation.pose().getX() < 0.0
                   || observation.pose().getX() > FieldConstants.FIELD_LAYOUT.getFieldLength()
                   || observation.pose().getY() < 0.0
-                  || observation.pose().getY() > FieldConstants.FIELD_LAYOUT.getFieldWidth()
+                  || observation.pose().getY() > FieldConstants.FIELD_LAYOUT.getFieldWidth();
 
-                  // must be from the allowed tags if we are doing precision vision
-                  || rejectTagsFromTagAllowance(observation);
+          // must be from the allowed tags if we are doing precision vision
+          // || rejectTagsFromTagAllowance(observation);
 
           // Add pose to log
           robotPoses.add(observation.pose());

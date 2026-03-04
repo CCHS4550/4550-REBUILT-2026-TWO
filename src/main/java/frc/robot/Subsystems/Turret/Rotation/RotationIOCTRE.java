@@ -29,6 +29,7 @@ public class RotationIOCTRE implements RotationIO {
   private CANcoderConfiguration encoderConfig;
   private MotionMagicVoltage motionMagicVoltage;
   private final StatusSignal<Angle> rotationAngleRotations;
+  private final StatusSignal<Angle> totalRotationsUnwrapped;
   private final StatusSignal<Voltage> rotationAppliedVolts;
   private final StatusSignal<Current> rotationSupplyCurrentAmps;
   private final StatusSignal<Current> rotationStatorCurrentAmps;
@@ -73,13 +74,16 @@ public class RotationIOCTRE implements RotationIO {
     rotationConfig.Feedback.withRemoteCANcoder(rotationEncoder);
     rotationConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     rotationConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    rotationConfig.MotionMagic.MotionMagicCruiseVelocity = 33;
-    rotationConfig.MotionMagic.MotionMagicAcceleration = 55; // some constant idk
+    rotationConfig.MotionMagic.MotionMagicCruiseVelocity = 13;
+    rotationConfig.MotionMagic.MotionMagicAcceleration = 15; // some constant idk
 
     Phoenix6Util.applyAndCheckConfiguration(rotationMotor, rotationConfig, 5);
 
     // PUT THE TURRET IN STOW BEFORE THE BOT IS TURNED ON
-    rotationMotor.setPosition(rotationEncoder.getPosition().getValueAsDouble());
+    rotationMotor.setPosition(
+        (rotationEncoder.getPosition().getValueAsDouble()
+                * Constants.TurretConstants.ROTATION_POSITION_COEFFICIENT_TO_ENCODER)
+            / Constants.TurretConstants.ROTATION_POSITION_COEFFICIENT);
     rotationAngleRotations = rotationEncoder.getPosition();
     rotationAppliedVolts = rotationMotor.getMotorVoltage();
     rotationSupplyCurrentAmps = rotationMotor.getSupplyCurrent();
@@ -87,6 +91,7 @@ public class RotationIOCTRE implements RotationIO {
     rotationVelocityRotationsPerSec = rotationEncoder.getVelocity();
     rotationAccelerationRotationsPerSecSquared = rotationMotor.getAcceleration();
     rotationMotorTemp = rotationMotor.getDeviceTemp();
+    totalRotationsUnwrapped = rotationMotor.getPosition();
   }
 
   @Override
@@ -96,7 +101,8 @@ public class RotationIOCTRE implements RotationIO {
         rotationSupplyCurrentAmps,
         rotationStatorCurrentAmps,
         rotationMotorTemp,
-        rotationAccelerationRotationsPerSecSquared);
+        rotationAccelerationRotationsPerSecSquared,
+        totalRotationsUnwrapped);
     BaseStatusSignal.refreshAll(rotationAngleRotations, rotationVelocityRotationsPerSec);
     inputs.rotationVoltage = rotationAppliedVolts.getValueAsDouble();
     inputs.rotationSupplyCurrent = rotationSupplyCurrentAmps.getValueAsDouble();
@@ -114,6 +120,9 @@ public class RotationIOCTRE implements RotationIO {
         Rotation2d.fromRadians(
             (rotationAngleRotations.getValueAsDouble()
                 * Constants.TurretConstants.ROTATION_POSITION_COEFFICIENT_TO_ENCODER));
+
+    inputs.totalRotationsUnwrapped =
+        totalRotationsUnwrapped.getValueAsDouble() * Constants.TurretConstants.ROTATION_GEAR_RATIO;
   }
 
   @Override

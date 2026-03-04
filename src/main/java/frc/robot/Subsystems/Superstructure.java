@@ -119,13 +119,13 @@ public class Superstructure extends SubsystemBase {
         agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
         break;
       case INTAKING_ACTIVE_SHOOT:
-        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
+        intake.setWantedIntakeState(WantedIntakeState.PUMPING);
         kicker.setWantedKickerState(KickerWantedState.RUNNING);
         turret.setWantedState(TurretWantedState.SHOOT_SCORE);
         agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
         break;
       case ACTIVE_SHOOT:
-        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+        intake.setWantedIntakeState(WantedIntakeState.PUMPING);
         kicker.setWantedKickerState(KickerWantedState.RUNNING);
         turret.setWantedState(TurretWantedState.SHOOT_SCORE);
         agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
@@ -135,6 +135,12 @@ public class Superstructure extends SubsystemBase {
         kicker.setWantedKickerState(KickerWantedState.RUNNING);
         turret.setWantedState(TurretWantedState.SHOOT_SCORE);
         agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+        break;
+      case TESTING:
+        intake.setWantedIntakeState(WantedIntakeState.IDLE);
+        kicker.setWantedKickerState(KickerWantedState.IDLE);
+        turret.setWantedState(TurretWantedState.TESTING);
+        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
         break;
     }
   }
@@ -176,6 +182,8 @@ public class Superstructure extends SubsystemBase {
         return SystemState.TRACKING_PASS;
       case PRACTICE_INDEXING:
         break;
+      case TESTING:
+        return SystemState.TESTING;
     }
     return SystemState.IDLE;
   }
@@ -188,7 +196,8 @@ public class Superstructure extends SubsystemBase {
     PASSIVE_TRACKING,
     ACTIVE_SHOOT,
     ACTIVE_PASS,
-    PRACTICE_INDEXING
+    PRACTICE_INDEXING,
+    TESTING
   }
 
   private enum SystemState {
@@ -205,7 +214,8 @@ public class Superstructure extends SubsystemBase {
     ACTIVE_SHOOT,
     INTAKING_ACTIVE_PASS,
     ACTIVE_PASS,
-    PRACTICE_INDEXING
+    PRACTICE_INDEXING,
+    TESTING
   }
 
   private SystemState returnTrackingTarget() {

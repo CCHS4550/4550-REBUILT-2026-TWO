@@ -1,11 +1,10 @@
 package frc.robot.Subsystems.Intake;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 // This code is Stupid and needs the be cleaned up.
 public class Intake extends SubsystemBase {
@@ -42,13 +41,13 @@ public class Intake extends SubsystemBase {
     STOW_TO_UPPER_PUMP
   }
 
-  private enum Location{
+  private enum Location {
     STOWED,
     UPPER_PUMP,
     LOWER_PUMP,
     EXTENDED
-
   }
+
   private Location location = Location.STOWED;
   private SystemState systemState = SystemState.STOWED;
   private WantedIntakeState wantedState = WantedIntakeState.STOWED;
@@ -114,7 +113,7 @@ public class Intake extends SubsystemBase {
       case EXTENDED_TO_LOWER_PUMP:
         intakeIO.setExtensionVoltage(0.1);
         intakeIO.setSpinnerVoltage(0.0);
-        
+
       case STOW_TO_UPPER_PUMP:
         intakeIO.setExtensionVoltage(-3.0);
         intakeIO.setSpinnerVoltage(-1.5);
@@ -129,15 +128,15 @@ public class Intake extends SubsystemBase {
     this.wantedState = state;
     switch (state) {
       case STOWED:
-        if(location == Location.STOWED){
+        if (location == Location.STOWED) {
           systemState = SystemState.STOWED;
         }
-        if(location == Location.LOWER_PUMP){
+        if (location == Location.LOWER_PUMP) {
           systemState = SystemState.LOWER_PUMP_TO_STOW;
           timer.reset();
           timer.start();
         }
-        if(location == Location.UPPER_PUMP){
+        if (location == Location.UPPER_PUMP) {
           systemState = SystemState.UPPER_PUMP_TO_STOW;
           timer.reset();
           timer.start();
@@ -150,17 +149,17 @@ public class Intake extends SubsystemBase {
         location = Location.STOWED;
         break;
       case EXTENDED_INTAKING:
-        if(location == Location.STOWED){
+        if (location == Location.STOWED) {
           systemState = SystemState.MOVING_TO_EXTENSION_ACTIVE;
           timer.reset();
           timer.start();
         }
-        if(location == Location.LOWER_PUMP){
+        if (location == Location.LOWER_PUMP) {
           systemState = SystemState.LOWER_PUMP_TO_EXTENDED_ACTIVE;
           timer.reset();
           timer.start();
         }
-        if(location == Location.UPPER_PUMP){
+        if (location == Location.UPPER_PUMP) {
           systemState = SystemState.UPPER_PUMP_TO_EXTENDED_ACTIVE;
           timer.reset();
           timer.start();
@@ -171,17 +170,17 @@ public class Intake extends SubsystemBase {
         location = Location.EXTENDED;
         break;
       case EXTENDED_PASSIVE:
-        if(location == Location.STOWED){
+        if (location == Location.STOWED) {
           systemState = SystemState.MOVING_TO_EXTENSION_PASSIVE;
           timer.reset();
           timer.start();
         }
-        if(location == Location.LOWER_PUMP){
+        if (location == Location.LOWER_PUMP) {
           systemState = SystemState.LOWER_PUMP_TO_EXTENDED_PASSIVE;
           timer.reset();
           timer.start();
         }
-        if(location == Location.UPPER_PUMP){
+        if (location == Location.UPPER_PUMP) {
           systemState = SystemState.UPPER_PUMP_TO_EXTENDED_PASSIVE;
           timer.reset();
           timer.start();
@@ -192,15 +191,15 @@ public class Intake extends SubsystemBase {
         location = Location.EXTENDED;
         break;
       case PUMPING:
-        if(location == Location.EXTENDED){
+        if (location == Location.EXTENDED) {
           systemState = SystemState.EXTENDED_TO_LOWER_PUMP;
           location = Location.LOWER_PUMP;
           timer.reset();
           timer.start();
           break;
         }
-        
-        if(location == Location.STOWED){
+
+        if (location == Location.STOWED) {
           systemState = SystemState.STOW_TO_UPPER_PUMP;
           location = Location.UPPER_PUMP;
           timer.reset();
@@ -208,7 +207,7 @@ public class Intake extends SubsystemBase {
           break;
         }
 
-        if(location == Location.UPPER_PUMP){
+        if (location == Location.UPPER_PUMP) {
           systemState = SystemState.MOVING_TO_LOWER_PUMP;
           location = Location.LOWER_PUMP;
           timer.reset();
@@ -216,7 +215,7 @@ public class Intake extends SubsystemBase {
           break;
         }
 
-        if(location == Location.LOWER_PUMP){
+        if (location == Location.LOWER_PUMP) {
           systemState = SystemState.MOVING_TO_UPPER_PUMP;
           location = Location.UPPER_PUMP;
           timer.reset();
@@ -224,24 +223,24 @@ public class Intake extends SubsystemBase {
           break;
         }
       case IDLE:
-        if(location == Location.STOWED){
+        if (location == Location.STOWED) {
           systemState = SystemState.IDLE_AT_STOW;
           timer.stop();
           timer.reset();
         }
-        if(location == Location.LOWER_PUMP){
+        if (location == Location.LOWER_PUMP) {
           systemState = SystemState.IDLE_AT_LOWER_PUMP;
           timer.stop();
           timer.reset();
         }
-        if(location == Location.UPPER_PUMP){
+        if (location == Location.UPPER_PUMP) {
           systemState = SystemState.IDLE_AT_UPPER_PUMP;
           timer.stop();
           timer.reset();
         }
         if (location == Location.EXTENDED) {
           systemState = SystemState.IDLE_AT_EXTENDED;
-           timer.stop();
+          timer.stop();
           timer.reset();
         }
         break;
@@ -287,14 +286,14 @@ public class Intake extends SubsystemBase {
       location = Location.STOWED;
     }
 
-    if (systemState == SystemState.MOVING_TO_LOWER_PUMP && timer.hasElapsed(0.25)){
+    if (systemState == SystemState.MOVING_TO_LOWER_PUMP && timer.hasElapsed(0.25)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.MOVING_TO_UPPER_PUMP;
       timer.start();
       location = Location.UPPER_PUMP;
     }
-    if(systemState == SystemState.MOVING_TO_UPPER_PUMP && timer.hasElapsed(0.25)){
+    if (systemState == SystemState.MOVING_TO_UPPER_PUMP && timer.hasElapsed(0.25)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.MOVING_TO_LOWER_PUMP;
@@ -302,49 +301,49 @@ public class Intake extends SubsystemBase {
       location = Location.LOWER_PUMP;
     }
 
-    if(systemState == SystemState.LOWER_PUMP_TO_EXTENDED_ACTIVE && timer.hasElapsed(0.05)){
+    if (systemState == SystemState.LOWER_PUMP_TO_EXTENDED_ACTIVE && timer.hasElapsed(0.05)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.EXTENDED_INTAKING;
       location = Location.EXTENDED;
     }
 
-    if(systemState == SystemState.LOWER_PUMP_TO_EXTENDED_PASSIVE && timer.hasElapsed(0.05)){
+    if (systemState == SystemState.LOWER_PUMP_TO_EXTENDED_PASSIVE && timer.hasElapsed(0.05)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.EXTENDED_PASSIVE;
       location = Location.EXTENDED;
     }
 
-    if(systemState == SystemState.UPPER_PUMP_TO_EXTENDED_ACTIVE && timer.hasElapsed(0.3)){
+    if (systemState == SystemState.UPPER_PUMP_TO_EXTENDED_ACTIVE && timer.hasElapsed(0.3)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.EXTENDED_INTAKING;
       location = Location.EXTENDED;
     }
 
-    if(systemState == SystemState.UPPER_PUMP_TO_EXTENDED_PASSIVE && timer.hasElapsed(0.3)){
+    if (systemState == SystemState.UPPER_PUMP_TO_EXTENDED_PASSIVE && timer.hasElapsed(0.3)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.EXTENDED_PASSIVE;
       location = Location.EXTENDED;
     }
 
-    if(systemState == SystemState.LOWER_PUMP_TO_STOW && timer.hasElapsed(0.7)){
+    if (systemState == SystemState.LOWER_PUMP_TO_STOW && timer.hasElapsed(0.7)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.STOWED;
       location = Location.STOWED;
     }
 
-    if(systemState == SystemState.UPPER_PUMP_TO_STOW && timer.hasElapsed(0.4)){
+    if (systemState == SystemState.UPPER_PUMP_TO_STOW && timer.hasElapsed(0.4)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.STOWED;
       location = Location.STOWED;
     }
 
-    if(systemState == SystemState.STOW_TO_UPPER_PUMP && timer.hasElapsed(0.4)){
+    if (systemState == SystemState.STOW_TO_UPPER_PUMP && timer.hasElapsed(0.4)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.MOVING_TO_LOWER_PUMP;
@@ -352,7 +351,7 @@ public class Intake extends SubsystemBase {
       location = Location.LOWER_PUMP;
     }
 
-    if(systemState == SystemState.EXTENDED_TO_LOWER_PUMP && timer.hasElapsed(0.0)){
+    if (systemState == SystemState.EXTENDED_TO_LOWER_PUMP && timer.hasElapsed(0.0)) {
       timer.stop();
       timer.reset();
       systemState = SystemState.MOVING_TO_UPPER_PUMP;

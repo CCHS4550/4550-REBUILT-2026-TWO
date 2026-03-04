@@ -96,7 +96,6 @@ package frc.robot.Subsystems.Agitator;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Subsystems.Drive.SwerveSubsystem.WantedState;
 
 public class Agitator extends SubsystemBase {
 
@@ -132,7 +131,7 @@ public class Agitator extends SubsystemBase {
   }
 
   public void setWantedAgitatorState(WantedAgitatorState state) {
-    if(state == WantedAgitatorState.SPINNING){
+    if (state == WantedAgitatorState.SPINNING) {
       timer.reset();
       timer.start();
     }
@@ -147,7 +146,7 @@ public class Agitator extends SubsystemBase {
         return SystemState.IDLE;
 
       case SPINNING:
-        if(!timer.hasElapsed(0.3) && timer.isRunning()){
+        if (!timer.hasElapsed(0.3) && timer.isRunning()) {
           return SystemState.BACK_SPIN;
         }
         timer.stop();
@@ -156,7 +155,7 @@ public class Agitator extends SubsystemBase {
       case BACK_SPIN:
         timer.stop();
         timer.reset();
-      return SystemState.BACK_SPIN;
+        return SystemState.BACK_SPIN;
     }
 
     return SystemState.IDLE;

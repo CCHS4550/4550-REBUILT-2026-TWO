@@ -100,8 +100,8 @@ public final class Constants {
   public static final class VisionConstants {
     public static final double linearStdDevBaseline = 0.02;
     public static final double angularStdDevBaseline = 0.06;
-    public static final double maxAmbiguity = 1.1;
-    public static final double maxZError = 0.75;
+    public static final double maxAmbiguity = 0.01;
+    public static final double maxZError = 6.75;
   }
 
   public static final class ShooterCalculationConstants {

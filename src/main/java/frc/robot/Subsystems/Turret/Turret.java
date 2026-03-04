@@ -185,18 +185,25 @@ public class Turret extends SubsystemBase {
         desiredPose = FieldConstants.getScoringPose();
         desiredHeight = FieldConstants.HUB_HEIGHT;
         // put calc here
-        noInertiaMeasurables =
+        // noInertiaMeasurables =
+        //     new TurretMeasurables(
+        //         calculateElevationAngleNoInertia(desiredPose),
+        //         findFieldCentricAngleToTarget(desiredPose),
+        //         Constants.ShooterCalculationConstants.GEOMETRY_VELOCITY);
+        robotSpeedVector =
+            VecBuilder.fill(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0);
+
+        // wantedTurretMeasurables.updateWithCartesianVector(
+        //     noInertiaMeasurables.getVector().minus(robotSpeedVector));
+
+        wantedTurretMeasurables =
             new TurretMeasurables(
                 calculateElevationAngleNoInertia(desiredPose),
                 findFieldCentricAngleToTarget(desiredPose),
                 Constants.ShooterCalculationConstants.GEOMETRY_VELOCITY);
-        robotSpeedVector =
-            VecBuilder.fill(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0);
-
-        wantedTurretMeasurables.updateWithCartesianVector(
-            noInertiaMeasurables.getVector().minus(robotSpeedVector));
         wantedTurretMeasurables.shooterRadiansPerSec = 1;
         convertToRobotRelativeNonBounded();
+        System.out.println(wantedTurretMeasurables.rotationAngle.getDegrees());
         convertToBoundedTurretAngle();
         goToWantedState();
 
@@ -218,6 +225,8 @@ public class Turret extends SubsystemBase {
                 calculateElevationAngleNoInertia(desiredPose),
                 findFieldCentricAngleToTarget(desiredPose),
                 Constants.ShooterCalculationConstants.GEOMETRY_VELOCITY);
+        System.out.println(noInertiaMeasurables.rotationAngle.getDegrees());
+
         robotSpeedVector =
             VecBuilder.fill(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, 0);
 
@@ -253,7 +262,7 @@ public class Turret extends SubsystemBase {
 
       case TESTING:
         wantedTurretMeasurables =
-            new TurretMeasurables(Rotation2d.fromDegrees(70), Rotation2d.fromDegrees(0), 200);
+            new TurretMeasurables(Rotation2d.fromDegrees(70), Rotation2d.fromDegrees(90), 0);
         goToWantedState();
         break;
       case ZERO:
@@ -324,6 +333,7 @@ public class Turret extends SubsystemBase {
     return targetIsInDeadzoneFlag;
   }
 
+  @AutoLogOutput
   public Rotation2d findFieldCentricAngleToTarget(Pose2d target) {
     var translationToDesiredPoint =
         target.getTranslation().minus(predictedTurretPose.getTranslation());
@@ -331,6 +341,7 @@ public class Turret extends SubsystemBase {
     return translationToDesiredPoint.getAngle();
   }
 
+  @AutoLogOutput
   public Rotation2d calculateElevationAngleNoInertia(Pose2d desiredPose) {
     double lateralDistance =
         desiredPose.getTranslation().getDistance(predictedTurretPose.getTranslation());
