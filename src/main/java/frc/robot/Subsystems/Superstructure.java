@@ -2,6 +2,7 @@ package frc.robot.Subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.FieldConstants;
 import frc.robot.Robotstate;
@@ -22,10 +23,12 @@ public class Superstructure extends SubsystemBase {
   private final Kicker kicker;
   private final Turret turret;
   private final Agitator agitator;
+  private final Timer shootDelayTimer;
   private boolean INTAKE_ACTIVE = false;
 
   @AutoLogOutput private WantedSuperstructureState wantedState1 = WantedSuperstructureState.IDLE;
   @AutoLogOutput private SystemState systemState = SystemState.IDLE;
+  @AutoLogOutput private SystemState previousState = SystemState.IDLE;
 
   public Superstructure(
       SwerveSubsystem swerveSubsystem,
@@ -38,12 +41,22 @@ public class Superstructure extends SubsystemBase {
     this.kicker = kicker;
     this.turret = turret;
     this.agitator = agitator;
+    shootDelayTimer = new Timer();
   }
 
   @Override
   public void periodic() {
     systemState = handleStateTransitions();
+    // detect entering a new state
+    if (systemState != previousState) {
+      shootDelayTimer.reset();
+      shootDelayTimer.start();
+    }
+
     applyStates();
+
+    // update previous state after everything runs
+    previousState = systemState;
   }
 
   public void setWantedSuperstructureState(
@@ -105,9 +118,16 @@ public class Superstructure extends SubsystemBase {
         break;
       case ACTIVE_PASS:
         intake.setWantedIntakeState(WantedIntakeState.PUMPING);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
+
         turret.setWantedState(TurretWantedState.PASS_TO_ALLIANCE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+
+        if (shootDelayTimer.hasElapsed(2.5)) {
+          kicker.setWantedKickerState(KickerWantedState.RUNNING);
+          agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+        } else {
+          kicker.setWantedKickerState(KickerWantedState.IDLE);
+          agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        }
         break;
       case INTAKING_TRACKING_SHOOT:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
@@ -123,21 +143,46 @@ public class Superstructure extends SubsystemBase {
         break;
       case INTAKING_ACTIVE_SHOOT:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
+
         turret.setWantedState(TurretWantedState.SHOOT_SCORE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+
+        if (shootDelayTimer.hasElapsed(2.5)) {
+          kicker.setWantedKickerState(KickerWantedState.RUNNING);
+          agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+        } else {
+          kicker.setWantedKickerState(KickerWantedState.IDLE);
+          agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        }
         break;
       case ACTIVE_SHOOT:
         intake.setWantedIntakeState(WantedIntakeState.PUMPING);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
+
         turret.setWantedState(TurretWantedState.SHOOT_SCORE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+
+        if (shootDelayTimer.hasElapsed(2.5)) {
+          kicker.setWantedKickerState(KickerWantedState.RUNNING);
+          agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+        } else {
+          kicker.setWantedKickerState(KickerWantedState.IDLE);
+          agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        }
         break;
       case PRACTICE_INDEXING:
         intake.setWantedIntakeState(WantedIntakeState.IDLE);
         kicker.setWantedKickerState(KickerWantedState.RUNNING);
         turret.setWantedState(TurretWantedState.SHOOT_SCORE);
         agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+        break;
+      case MANUAL_SHOOTING:
+        turret.setWantedState(TurretWantedState.SHOOT_SCORE);
+
+        if (shootDelayTimer.hasElapsed(2.5)) {
+          kicker.setWantedKickerState(KickerWantedState.RUNNING);
+          agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+        } else {
+          kicker.setWantedKickerState(KickerWantedState.IDLE);
+          agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        }
         break;
       case TESTING:
         intake.setWantedIntakeState(WantedIntakeState.IDLE);
@@ -196,6 +241,8 @@ public class Superstructure extends SubsystemBase {
         break;
       case TESTING:
         return SystemState.TESTING;
+      case MANUAL_SHOOTING:
+        return SystemState.MANUAL_SHOOTING;
     }
     return SystemState.IDLE;
   }
@@ -210,7 +257,8 @@ public class Superstructure extends SubsystemBase {
     ACTIVE_PASS,
     ACTIVE_DECISION,
     PRACTICE_INDEXING,
-    TESTING
+    TESTING,
+    MANUAL_SHOOTING
   }
 
   private enum SystemState {
@@ -228,7 +276,8 @@ public class Superstructure extends SubsystemBase {
     INTAKING_ACTIVE_PASS,
     ACTIVE_PASS,
     PRACTICE_INDEXING,
-    TESTING
+    TESTING,
+    MANUAL_SHOOTING
   }
 
   public boolean isPassingZone(double x) {

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.Subsystems.Superstructure;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,14 @@ public class AutoChooser extends SendableChooser<Auto> {
   private static final List<AutoProgram> AUTO_PROGRAMS =
       List.of(
           new AutoProgram(Auto.IDLE, "IDLE", AutoFactory::createIdleCommand),
-          new AutoProgram(Auto.TEST, "TEST", AutoFactory::createTestAuto));
+          new AutoProgram(Auto.TEST, "TEST", AutoFactory::createTestAuto),
+          new AutoProgram(
+              Auto.LEFT_TRENCH_TO_NEUTRAL_ZONE_TO_RIGHT_TRENCH_SHOOT,
+              "LEFT_TRENCH_TO_NEUTRAL_ZONE_TO_RIGHT_TRENCH_SHOOT",
+              AutoFactory::createLeftTrenchToNeutralZoneToRightTrenchShoot));
+
+  // new AutoProgram(Auto.SHOOT_PRELOAD, "SHOOT_PRELOAD", AutoFactory::createShootPreload));
+  private Superstructure superstructure;
 
   /**
    * Create a new <code>AutoChooser</code>
@@ -47,17 +55,21 @@ public class AutoChooser extends SendableChooser<Auto> {
    * @return A new <code>AutoChooser</code> populated with the programs defined in the private field
    *     {@link AutoChooser#AUTO_PROGRAMS}.
    */
-  public static AutoChooser create(final RobotContainer robotContainer) {
+  public static AutoChooser create(
+      final RobotContainer robotContainer, final Superstructure supero) {
+    ;
     var autoFactories =
         Stream.of(DriverStation.Alliance.values())
-            .map(alliance -> Map.entry(alliance, new AutoFactory(alliance, robotContainer)))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(
+                Collectors.toMap(
+                    alliance -> alliance,
+                    alliance -> new AutoFactory(alliance, robotContainer, supero)));
     var programs =
         AUTO_PROGRAMS.stream()
             .map(program -> Map.entry(program.getAuto(), program))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    var autoChooser = new AutoChooser(programs, autoFactories);
+    var autoChooser = new AutoChooser(programs, autoFactories, supero);
 
     AUTO_PROGRAMS.forEach(
         program -> {
@@ -175,7 +187,9 @@ public class AutoChooser extends SendableChooser<Auto> {
 
   private AutoChooser(
       final Map<Auto, AutoProgram> programs,
-      final Map<DriverStation.Alliance, AutoFactory> autoFactories) {
+      final Map<DriverStation.Alliance, AutoFactory> autoFactories,
+      Superstructure superstructure) {
+    this.superstructure = superstructure;
     this.programs = programs;
     this.autoFactories = autoFactories;
     commandCache =

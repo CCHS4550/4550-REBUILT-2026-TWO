@@ -79,24 +79,21 @@ public class RobotContainer {
             swerveSubsystem,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
+    controller
+        .povLeft()
+        .onTrue(
+            new InstantCommand(
+                () -> swerveSubsystem.setDesiredPoseForDriveToPoint(getLeftTrenchPose())))
+        .onFalse(
+            new InstantCommand(() -> swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE)));
+    controller
+        .povRight()
+        .onTrue(
+            new InstantCommand(
+                () -> swerveSubsystem.setDesiredPoseForDriveToPoint(getRightTrenchPose())))
+        .onFalse(
+            new InstantCommand(() -> swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE)));
 
-    controller.povLeft().onTrue(
-            new InstantCommand(
-                () ->
-                    swerveSubsystem.setDesiredPoseForDriveToPoint(getLeftTrenchPose())))
-        .onFalse(
-            new InstantCommand(
-                () ->
-                    swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE)));
-    controller.povRight().onTrue(
-            new InstantCommand(
-                () ->
-                    swerveSubsystem.setDesiredPoseForDriveToPoint(getRightTrenchPose())))
-        .onFalse(
-            new InstantCommand(
-                () ->
-                    swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE)));
-    
     controller
         .leftTrigger()
         .whileTrue(
@@ -122,33 +119,65 @@ public class RobotContainer {
                 () ->
                     superstructure.setWantedSuperstructureState(
                         WantedSuperstructureState.IDLE, false)));
-    controller.rightTrigger().and(controller.leftTrigger()).whileTrue(new InstantCommand(
+    controller
+        .rightTrigger()
+        .and(controller.leftTrigger())
+        .whileTrue(
+            new InstantCommand(
                 () ->
                     superstructure.setWantedSuperstructureState(
-                        WantedSuperstructureState.ACTIVE_DECISION, true))).onFalse(new InstantCommand(
+                        WantedSuperstructureState.ACTIVE_DECISION, true)))
+        .onFalse(
+            new InstantCommand(
+                () ->
+                    superstructure.setWantedSuperstructureState(
+                        WantedSuperstructureState.IDLE, false)));
+    controller
+        .x()
+        .whileTrue(
+            new InstantCommand(
+                () -> {
+                  swerveSubsystem.setWantedState(WantedState.DRIVE_TO_POINT);
+                  swerveSubsystem.setDesiredPoseForDriveToPoint(
+                      new Pose2d(2.9, 4, Rotation2d.fromDegrees(-90)));
+                }))
+        .whileFalse(
+            new InstantCommand(() -> swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE)));
+
+    controller
+        .rightBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  superstructure.setWantedSuperstructureState(
+                      WantedSuperstructureState.ACTIVE_SHOOT, false);
+                  ;
+                }))
+        .onFalse(
+            new InstantCommand(
                 () ->
                     superstructure.setWantedSuperstructureState(
                         WantedSuperstructureState.IDLE, false)));
   }
 
-
-  private Pose2d getLeftTrenchPose(){
-    if(superstructure.isPassingZone(Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getX())){
-        return FieldConstants.getLeftNeutralZoneTrench();
+  private Pose2d getLeftTrenchPose() {
+    if (superstructure.isPassingZone(
+        Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getX())) {
+      return FieldConstants.getLeftNeutralZoneTrench();
+    } else {
+      return FieldConstants.getLeftAllianceZoneTrench();
     }
-    else{
-        return FieldConstants.getLeftAllianceZoneTrench();
+  }
+
+  private Pose2d getRightTrenchPose() {
+    if (superstructure.isPassingZone(
+        Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getX())) {
+      return FieldConstants.getLeftNeutralZoneTrench();
+    } else {
+      return FieldConstants.getLeftAllianceZoneTrench();
     }
   }
 
-  private Pose2d getRightTrenchPose(){
-    if(superstructure.isPassingZone(Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getX())){
-        return FieldConstants.getLeftNeutralZoneTrench();
-    }
-    else{
-        return FieldConstants.getLeftAllianceZoneTrench();
-    }
-  }
   public SwerveSubsystem getSwerveSubsystem() {
     return swerveSubsystem;
   }
@@ -179,5 +208,4 @@ public class RobotContainer {
         AutoStartingRotation.getDegrees(),
         2);
   }
-
 }

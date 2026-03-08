@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Auto.AutoChooser;
 import frc.robot.Constant.Constants;
 import frc.robot.Subsystems.Drive.SwerveSubsystem.WantedState;
+import frc.robot.Subsystems.Superstructure;
 import frc.robot.Util.DummyLogReceiver;
 import java.lang.reflect.Field;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -39,6 +40,7 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
 
   private AutoChooser autoChooser;
+  private Superstructure superstructure;
 
   public Robot() {
     // Record metadata
@@ -96,8 +98,8 @@ public class Robot extends LoggedRobot {
 
     robotContainer = new RobotContainer();
 
-    autoChooser = AutoChooser.create(robotContainer);
-    SmartDashboard.putData("auto program", autoChooser);
+    autoChooser = AutoChooser.create(robotContainer, superstructure);
+    // SmartDashboard.putData("auto program", autoChooser);
   }
 
   /** This function is called periodically during all modes. */
@@ -151,7 +153,7 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
-       robotContainer.getSwerveSubsystem().setState(WantedState.TELEOP_DRIVE);
+      robotContainer.getSwerveSubsystem().setState(WantedState.TELEOP_DRIVE);
     }
   }
 
