@@ -1,4 +1,4 @@
-package frc.robot.Subsystems.Turret.Elevation;
+package frc.robot.Subsystems.Shooter.Elevation;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -66,11 +66,11 @@ public class ElevationIOCTRE implements ElevationIO {
     elevationConfig.CurrentLimits.SupplyCurrentLimit = 30;
     elevationConfig.CurrentLimits.StatorCurrentLimit = 40.0;
 
-    elevationConfig.Slot0.kP = bruinRobotConfig.getTurretConfig().elevationKp;
-    elevationConfig.Slot0.kI = bruinRobotConfig.getTurretConfig().elevationKi;
-    elevationConfig.Slot0.kD = bruinRobotConfig.getTurretConfig().elevationKd;
-    elevationConfig.Slot0.kS = bruinRobotConfig.getTurretConfig().elevationKs;
-    elevationConfig.Slot0.kV = bruinRobotConfig.getTurretConfig().elevationKv;
+    elevationConfig.Slot0.kP = bruinRobotConfig.getShooterConfig().elevationKp;
+    elevationConfig.Slot0.kI = bruinRobotConfig.getShooterConfig().elevationKi;
+    elevationConfig.Slot0.kD = bruinRobotConfig.getShooterConfig().elevationKd;
+    elevationConfig.Slot0.kS = bruinRobotConfig.getShooterConfig().elevationKs;
+    elevationConfig.Slot0.kV = bruinRobotConfig.getShooterConfig().elevationKv;
     elevationConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     elevationConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 

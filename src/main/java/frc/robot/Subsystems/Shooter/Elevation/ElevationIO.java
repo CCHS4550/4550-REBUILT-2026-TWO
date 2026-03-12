@@ -1,4 +1,4 @@
-package frc.robot.Subsystems.Turret.Elevation;
+package frc.robot.Subsystems.Shooter.Elevation;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
@@ -7,6 +7,7 @@ public interface ElevationIO {
 
   @AutoLog
   public class ElevationIOInputs {
+    
     public double elevationVoltage = 0.0;
     public double elevationSupplyCurrent = 0.0;
     public double elevationStatorCurrent = 0.0;

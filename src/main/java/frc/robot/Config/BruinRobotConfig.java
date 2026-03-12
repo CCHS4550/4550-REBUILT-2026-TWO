@@ -41,8 +41,10 @@ public class BruinRobotConfig {
 
   public final CanDeviceID ROTATION_MOTOR = new CanDeviceID(19, CANIVORE_CANBUS);
   public final CanDeviceID ELEVATION_MOTOR = new CanDeviceID(20, CANIVORE_CANBUS);
-  public final CanDeviceID SHOOTER_MOTOR = new CanDeviceID(17, CANIVORE_CANBUS);
-  public final CanDeviceID SHOOTER_MOTOR_2 = new CanDeviceID(18, CANIVORE_CANBUS);
+ 
+  public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(-1, CANIVORE_CANBUS);
+  public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(-1, CANIVORE_CANBUS);
+  public final CanDeviceID FLYWHEEL_MOTOR_3 = new CanDeviceID(-1, CANIVORE_CANBUS);
 
   public final CanDeviceID ELEVATION_CANCODER = new CanDeviceID(21, CANIVORE_CANBUS);
   public final CanDeviceID ROTATION_CANCODER = new CanDeviceID(22, CANIVORE_CANBUS);
@@ -112,7 +114,7 @@ public class BruinRobotConfig {
       moduleConstants;
   private final VisionConfig photonVisionConfig;
   private final VisionConfig questNavConfig;
-  private final TurretConfig turretConfig;
+  private final ShooterConfig shooterConfig;
   private final IntakeConfig intakeConfig;
 
   // PathPlanner config constants
@@ -295,13 +297,8 @@ public class BruinRobotConfig {
             .withWidthOffset(Units.inchesToMeters(0));
 
     // Turret Constants
-    turretConfig =
-        new TurretConfig()
-            .withRotationKp(5.14)
-            .withRotationKi(0)
-            .withRotationKd(0)
-            .withRotationKs(0.0)
-            .withRotationKv(0)
+    shooterConfig =
+        new ShooterConfig()
             // 51.39646
             .withElevationKp(21)
             .withElevationKi(0)
@@ -341,8 +338,8 @@ public class BruinRobotConfig {
     return List.of(photonVisionConfig, questNavConfig);
   }
 
-  public TurretConfig getTurretConfig() {
-    return turretConfig;
+  public ShooterConfig getShooterConfig() {
+    return shooterConfig;
   }
 
   public IntakeConfig getIntakeConfig() {
