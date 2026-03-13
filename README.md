@@ -1,1 +1,3 @@
-This is the code for our 2026 REBUILT robot!
+The first bot was kinda crap.
+
+But we're back and better than ever boys lock in
