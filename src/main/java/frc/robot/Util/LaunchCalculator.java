@@ -5,9 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package org.littletonrobotics.frc2026.subsystems.launcher;
-
-import static org.littletonrobotics.frc2026.subsystems.launcher.LauncherConstants.*;
+package frc.robot.Util;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.LinearFilter;
@@ -21,23 +19,27 @@ import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import lombok.Getter;
-import lombok.experimental.ExtensionMethod;
-import org.littletonrobotics.frc2026.Constants;
-import org.littletonrobotics.frc2026.FieldConstants;
-import org.littletonrobotics.frc2026.RobotState;
-import org.littletonrobotics.frc2026.subsystems.launcher.hood.Hood;
+
+import frc.robot.Subsystems.Shooter.Elevation.*;
+import frc.robot.Constant.Constants;
+import frc.robot.Constant.FieldConstants;
+
+
+import frc.robot.Robotstate;
+import frc.robot.Subsystems.Shooter.Elevation.*;
+import frc.robot.Subsystems.Shooter.Flywheel.*;
+
 import org.littletonrobotics.frc2026.util.LoggedTunableNumber;
 import org.littletonrobotics.frc2026.util.geometry.AllianceFlipUtil;
 import org.littletonrobotics.frc2026.util.geometry.Bounds;
 import org.littletonrobotics.frc2026.util.geometry.GeomUtil;
 import org.littletonrobotics.junction.Logger;
 
-@ExtensionMethod({GeomUtil.class})
+
 public class LaunchCalculator {
   private static LaunchCalculator instance;
 
-  @Getter private double hoodAngleOffsetDeg = 0.0;
+   private double hoodAngleOffsetDeg = 0.0;
 
   private final LinearFilter hoodAngleFilter =
       LinearFilter.movingAverage((int) (0.1 / Constants.loopPeriodSecs));
@@ -103,7 +105,7 @@ public class LaunchCalculator {
   public static final LaunchPreset hoodMinPreset =
       new LaunchPreset(
           new LoggedTunableNumber(
-              "LaunchCalculator/Presets/HoodMin/HoodAngle", Units.radiansToDegrees(Hood.minAngle)),
+              "LaunchCalculator/Presets/HoodMin/HoodAngle", Units.radiansToDegrees(Constants.minAngle)),
           new LoggedTunableNumber("LaunchCalculator/Presets/HoodMin/FlywheelSpeed", 50));
   public static final LaunchPreset hoodMaxPreset =
       new LaunchPreset(
