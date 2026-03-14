@@ -7,7 +7,9 @@
 
 package frc.robot.Constant;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Time;
@@ -23,7 +25,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
-
+  public static final double loopPeriodSecs = 20.0/1000.0;
   public static enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -81,7 +83,8 @@ public final class Constants {
 
     public static final double TURRET_HEIGHT_METERS = 0.305;
 
-    public static final Transform2d TURRET_TRANSFORM = new Transform2d();
+    public static final Transform3d SHOOTER_TRANSFORM = new Transform3d(0,0,0, new Rotation3d(0,0,0));
+
 
     public static final double MAX_BALL_HEIGHT_METERS = 5.4864;
 
