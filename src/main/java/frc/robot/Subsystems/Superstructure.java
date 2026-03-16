@@ -5,23 +5,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.FieldConstants;
 import frc.robot.Robotstate;
-import frc.robot.Subsystems.Agitator.Agitator;
-import frc.robot.Subsystems.Agitator.Agitator.WantedAgitatorState;
+
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
+import frc.robot.Subsystems.Indexer.Indexer;
 import frc.robot.Subsystems.Intake.Intake;
 import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
-import frc.robot.Subsystems.Kicker.Kicker;
-import frc.robot.Subsystems.Kicker.Kicker.KickerWantedState;
-import frc.robot.Subsystems.Turret.Turret;
-import frc.robot.Subsystems.Turret.Turret.TurretWantedState;
+import frc.robot.Subsystems.Shooter.Shooter;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Superstructure extends SubsystemBase {
   private final SwerveSubsystem swerveSubsystem;
   private final Intake intake;
-  private final Kicker kicker;
-  private final Turret turret;
-  private final Agitator agitator;
+  private final Shooter shooter;
+  private final Indexer indexer;
   private boolean INTAKE_ACTIVE = false;
 
   @AutoLogOutput private WantedSuperstructureState wantedState1 = WantedSuperstructureState.IDLE;
@@ -30,14 +27,12 @@ public class Superstructure extends SubsystemBase {
   public Superstructure(
       SwerveSubsystem swerveSubsystem,
       Intake intake,
-      Kicker kicker,
-      Turret turret,
-      Agitator agitator) {
+      Shooter shooter,
+      Indexer indexer) {
     this.swerveSubsystem = swerveSubsystem;
     this.intake = intake;
-    this.kicker = kicker;
-    this.turret = turret;
-    this.agitator = agitator;
+    this.indexer = indexer;
+    this.shooter = shooter;
   }
 
   @Override

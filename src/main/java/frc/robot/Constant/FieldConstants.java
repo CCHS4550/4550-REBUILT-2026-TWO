@@ -15,8 +15,7 @@ public class FieldConstants {
   public static final AprilTagFieldLayout FIELD_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
-
-  public static  double fieldWidth = FIELD_LAYOUT.getFieldWidth();
+  public static double fieldWidth = FIELD_LAYOUT.getFieldWidth();
   public static double fieldLength = FIELD_LAYOUT.getFieldLength();
 
   public static Pose2d scoringPoseBlue = new Pose2d(4.6, 4, new Rotation2d());
@@ -51,10 +50,10 @@ public class FieldConstants {
   public static Pose2d getMiddleStartingPose() {
     return isBlueAlliance() ? middleStartingPoseBlue : middleStartingPoseRed;
   }
+
   public static class LinesVertical {
     public static final double center = fieldLength / 2.0;
-    public static final double starting =
-        FIELD_LAYOUT.getTagPose(26).get().getX();
+    public static final double starting = FIELD_LAYOUT.getTagPose(26).get().getX();
     public static final double allianceZone = starting;
     public static final double hubCenter =
         FIELD_LAYOUT.getTagPose(26).get().getX() + Hub.width / 2.0;
@@ -62,8 +61,7 @@ public class FieldConstants {
     public static final double neutralZoneFar = center + Units.inchesToMeters(120);
     public static final double oppHubCenter =
         FIELD_LAYOUT.getTagPose(4).get().getX() + Hub.width / 2.0;
-    public static final double oppAllianceZone =
-        FIELD_LAYOUT.getTagPose(10).get().getX();
+    public static final double oppAllianceZone = FIELD_LAYOUT.getTagPose(10).get().getX();
   }
 
   /**
@@ -103,14 +101,10 @@ public class FieldConstants {
     // Relevant reference points on alliance side
     public static final Translation3d topCenterPoint =
         new Translation3d(
-            FIELD_LAYOUT.getTagPose(26).get().getX() + width / 2.0,
-            fieldWidth / 2.0,
-            height);
+            FIELD_LAYOUT.getTagPose(26).get().getX() + width / 2.0, fieldWidth / 2.0, height);
     public static final Translation3d innerCenterPoint =
         new Translation3d(
-            FIELD_LAYOUT.getTagPose(26).get().getX() + width / 2.0,
-            fieldWidth / 2.0,
-            innerHeight);
+            FIELD_LAYOUT.getTagPose(26).get().getX() + width / 2.0, fieldWidth / 2.0, innerHeight);
 
     public static final Translation2d nearLeftCorner =
         new Translation2d(topCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 + width / 2.0);
@@ -124,9 +118,7 @@ public class FieldConstants {
     // Relevant reference points on the opposite side
     public static final Translation3d oppTopCenterPoint =
         new Translation3d(
-            FIELD_LAYOUT.getTagPose(4).get().getX() + width / 2.0,
-            fieldWidth / 2.0,
-            height);
+            FIELD_LAYOUT.getTagPose(4).get().getX() + width / 2.0, fieldWidth / 2.0, height);
     public static final Translation2d oppNearLeftCorner =
         new Translation2d(oppTopCenterPoint.getX() - width / 2.0, fieldWidth / 2.0 + width / 2.0);
     public static final Translation2d oppNearRightCorner =
@@ -137,14 +129,10 @@ public class FieldConstants {
         new Translation2d(oppTopCenterPoint.getX() + width / 2.0, fieldWidth / 2.0 - width / 2.0);
 
     // Hub faces
-    public static final Pose2d nearFace =
-        FIELD_LAYOUT.getTagPose(26).get().toPose2d();
-    public static final Pose2d farFace =
-        FIELD_LAYOUT.getTagPose(20).get().toPose2d();
-    public static final Pose2d rightFace =
-        FIELD_LAYOUT.getTagPose(18).get().toPose2d();
-    public static final Pose2d leftFace =
-        FIELD_LAYOUT.getTagPose(21).get().toPose2d();
+    public static final Pose2d nearFace = FIELD_LAYOUT.getTagPose(26).get().toPose2d();
+    public static final Pose2d farFace = FIELD_LAYOUT.getTagPose(20).get().toPose2d();
+    public static final Pose2d rightFace = FIELD_LAYOUT.getTagPose(18).get().toPose2d();
+    public static final Pose2d leftFace = FIELD_LAYOUT.getTagPose(21).get().toPose2d();
   }
 
   /** Left Bump related constants */
@@ -258,8 +246,7 @@ public class FieldConstants {
 
     // Relevant reference points on alliance side
     public static final Translation2d centerPoint =
-        new Translation2d(
-            frontFaceX, FIELD_LAYOUT.getTagPose(31).get().getY());
+        new Translation2d(frontFaceX, FIELD_LAYOUT.getTagPose(31).get().getY());
     public static final Translation2d leftUpright =
         new Translation2d(
             frontFaceX,
@@ -275,9 +262,7 @@ public class FieldConstants {
 
     // Relevant reference points on opposing side
     public static final Translation2d oppCenterPoint =
-        new Translation2d(
-            fieldLength - frontFaceX,
-            FIELD_LAYOUT.getTagPose(15).get().getY());
+        new Translation2d(fieldLength - frontFaceX, FIELD_LAYOUT.getTagPose(15).get().getY());
     public static final Translation2d oppLeftUpright =
         new Translation2d(
             fieldLength - frontFaceX,
@@ -334,5 +319,4 @@ public class FieldConstants {
     public static final Translation2d rightCenter =
         new Translation2d(fieldLength / 2.0, fieldWidth / 2.0 - width / 2.0);
   }
-
 }

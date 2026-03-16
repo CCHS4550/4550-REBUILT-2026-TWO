@@ -7,7 +7,7 @@ public interface ElevationIO {
 
   @AutoLog
   public class ElevationIOInputs {
-    
+
     public double elevationVoltage = 0.0;
     public double elevationSupplyCurrent = 0.0;
     public double elevationStatorCurrent = 0.0;

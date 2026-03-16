@@ -14,8 +14,6 @@ public class ShooterConfig {
   public double shooterKs;
   public double shooterKv;
 
-  
-
   public ShooterConfig withElevationKp(double elevationKp) {
     this.elevationKp = elevationKp;
     return this;
