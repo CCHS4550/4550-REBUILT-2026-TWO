@@ -36,7 +36,6 @@ public class ElevationIOCTRE implements ElevationIO {
   private final StatusSignal<Temperature> elevationMotorTemp;
 
   public ElevationIOCTRE(BruinRobotConfig bruinRobotConfig) {
-    motionMagicVoltage = new MotionMagicVoltage(0.0);
     elevationMotor =
         new TalonFX(
             bruinRobotConfig.ELEVATION_MOTOR.getDeviceNumber(),
@@ -54,9 +53,9 @@ public class ElevationIOCTRE implements ElevationIO {
     encoderConfig
         .MagnetSensor
         .withMagnetOffset(
-            ((-(Constants.TurretConstants.ELEVATION_DEFAULT_ENCODER_READING_AT_SHALLOWEST_ANGLE)))
-                + (Constants.TurretConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS
-                    / Constants.TurretConstants.ELEVATION_ENCODER_POSITION_COEFFICIENT))
+            ((-(Constants.ShooterConstants.ELEVATION_DEFAULT_ENCODER_READING_AT_SHALLOWEST_ANGLE)))
+                + (Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS
+                    / Constants.ShooterConstants.ELEVATION_ENCODER_POSITION_COEFFICIENT))
         // 0.0)
         .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive);
     elevationEncoder.getConfigurator().apply(encoderConfig);
@@ -80,8 +79,8 @@ public class ElevationIOCTRE implements ElevationIO {
     Phoenix6Util.applyAndCheckConfiguration(elevationMotor, elevationConfig, 5);
 
     elevationMotor.setPosition(
-        Constants.TurretConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS
-            / Constants.TurretConstants.ELEVATION_POSITION_COEFFICIENT);
+        Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS
+            / Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT);
     elevationAngleRotations = elevationMotor.getPosition();
     elevationAppliedVolts = elevationMotor.getMotorVoltage();
     elevationSupplyCurrentAmps = elevationMotor.getSupplyCurrent();
@@ -107,41 +106,41 @@ public class ElevationIOCTRE implements ElevationIO {
 
     inputs.elevationVelocityRadPerSec =
         elevationVelocityRotationsPerSec.getValueAsDouble()
-            * Constants.TurretConstants.ELEVATION_POSITION_COEFFICIENT;
+            * Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT;
     inputs.elevationAccelRadPerSecSquared =
         elevationAccelerationRotationsPerSecSquared.getValueAsDouble()
-            * Constants.TurretConstants.ELEVATION_POSITION_COEFFICIENT;
+            * Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT;
 
     inputs.elevationAngle =
         Rotation2d.fromRadians(
             elevationAngleRotations.getValueAsDouble()
-                * Constants.TurretConstants.ELEVATION_POSITION_COEFFICIENT);
+                * Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT);
     // Rotation2d.fromRadians(
     //     mapRange(
     //         (Math.PI)
     //             - (elevationAngleRotations.getValueAsDouble()
-    //                 * Constants.TurretConstants.ELEVATION_ENCODER_POSITION_COEFFICIENT)
+    //                 * Constants.ShooterConstants.ELEVATION_ENCODER_POSITION_COEFFICIENT)
     //             - Units.degreesToRadians(77.312)));
   }
 
   @Override
   public void setElevationAngle(Rotation2d angle) {
 
-    if (angle.getRadians() > Constants.TurretConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS) {
+    if (angle.getRadians() > Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS) {
       angle =
           Rotation2d.fromRadians(
-              Constants.TurretConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
+              Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
     }
     if (angle.getRadians()
-        < Constants.TurretConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS) {
+        < Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS) {
       angle =
           Rotation2d.fromRadians(
-              Constants.TurretConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
+              Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
     }
 
     elevationMotor.setControl(
         motionMagicVoltage.withPosition(
-            angle.getRadians() / Constants.TurretConstants.ELEVATION_POSITION_COEFFICIENT));
+            angle.getRadians() / Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT));
   }
 
   @Override

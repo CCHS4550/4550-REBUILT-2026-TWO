@@ -3,6 +3,8 @@ package frc.robot.Subsystems.Intake;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -26,7 +28,7 @@ public class IntakeIOCTRE implements IntakeIO {
   private TalonFXConfiguration spinnerConfig;
   private TalonFXConfiguration extensionConfig;
 
-  private MotionMagicVoltage extensionController = new MotionMagicVoltage(0).withSlot(0);
+  private DynamicMotionMagicVoltage extensionController = new DynamicMotionMagicVoltage(0, 100, 50).withSlot(0);
 
   private final StatusSignal<Voltage> spinnerAppliedVolts;
   private final StatusSignal<Current> spinnerSupplyCurrentAmps;
@@ -74,8 +76,8 @@ public class IntakeIOCTRE implements IntakeIO {
     extensionConfig.Slot0.kS = robotConfig.getIntakeConfig().extensionkS;
     extensionConfig.Slot0.kV = robotConfig.getIntakeConfig().extensionkS;
     extensionConfig.Slot0.kG = robotConfig.getIntakeConfig().extensionkG;
-    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = 10000;
-    extensionConfig.MotionMagic.MotionMagicAcceleration = 1000;
+    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = 100;
+    extensionConfig.MotionMagic.MotionMagicAcceleration = 50;
 
     extensionConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     extensionConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -90,7 +92,7 @@ public class IntakeIOCTRE implements IntakeIO {
     spinnerAccelerationRotationsPerSecSquared = spinnerIntakeMotor.getAcceleration();
     spinnerMotorTemp = spinnerIntakeMotor.getDeviceTemp();
 
-    extensionIntakeMotor.setPosition(6.25);
+    extensionIntakeMotor.setPosition(Constants.IntakeConstants.INTAKE_STOWED_RADS / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT);
     extensionAppliedVolts = extensionIntakeMotor.getMotorVoltage();
     extensionPosRot = extensionIntakeMotor.getPosition();
     extensionSupplyCurrentAmps = extensionIntakeMotor.getSupplyCurrent();
@@ -145,9 +147,9 @@ public class IntakeIOCTRE implements IntakeIO {
   }
 
   @Override
-  public void setExtensionMotorPositionRad(double rad) {
+  public void setExtensionMotorPositionRad(double rad, double veloRotPerSec, double accelRotPerSec) {
     extensionIntakeMotor.setControl(
-        extensionController.withPosition(Units.radiansToRotations(rad)));
+        extensionController.withPosition(Units.radiansToRotations(rad)).withVelocity(veloRotPerSec).withAcceleration(accelRotPerSec));
   }
 
   @Override
@@ -158,10 +160,5 @@ public class IntakeIOCTRE implements IntakeIO {
   @Override
   public void setSpinnerVoltage(double voltage) {
     spinnerIntakeMotor.setVoltage(voltage);
-  }
-
-  @Override
-  public void setExtensionNeutralMode(NeutralModeValue neutralMode) {
-    extensionIntakeMotor.setNeutralMode(neutralMode);
   }
 }

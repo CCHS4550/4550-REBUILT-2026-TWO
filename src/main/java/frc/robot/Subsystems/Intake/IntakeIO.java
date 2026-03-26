@@ -28,11 +28,9 @@ public interface IntakeIO {
 
   public default void updateInputs(IntakeIOInputs inputs) {}
 
-  public default void setExtensionMotorPositionRad(double rad) {}
+  public default void setExtensionMotorPositionRad(double rad, double veloRotPerSec, double accelRotPerSec) {}
 
   public default void setExtensionVoltage(double voltage) {}
 
   public default void setSpinnerVoltage(double voltage) {}
-
-  default void setExtensionNeutralMode(NeutralModeValue neutralMode) {}
 }

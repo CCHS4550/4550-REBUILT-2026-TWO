@@ -8,7 +8,6 @@
 package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Watchdog;
@@ -16,7 +15,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Auto.AutoChooser;
+// import frc.robot.Auto.AutoChooser;
 import frc.robot.Constant.Constants;
 import frc.robot.Util.DummyLogReceiver;
 import java.lang.reflect.Field;
@@ -34,10 +33,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-  private RobotContainer robotContainer;
+  // private RobotContainer robotContainer;
   private Command autonomousCommand;
 
-  private AutoChooser autoChooser;
+  // private AutoChooser autoChooser;
 
   public Robot() {
     // Record metadata
@@ -93,10 +92,10 @@ public class Robot extends LoggedRobot {
     }
     CommandScheduler.getInstance().setPeriod(0.2);
 
-    robotContainer = new RobotContainer();
+    // robotContainer = new RobotContainer();
 
-    autoChooser = AutoChooser.create(robotContainer);
-    SmartDashboard.putData("auto program", autoChooser);
+    // autoChooser = AutoChooser.create(robotContainer);
+    // SmartDashboard.putData("auto program", autoChooser);
   }
 
   /** This function is called periodically during all modes. */
@@ -108,33 +107,33 @@ public class Robot extends LoggedRobot {
     if (Robot.isSimulation()) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
-    SmartDashboard.putString("Selected Auto", autoChooser.getSelected().name());
+    // SmartDashboard.putString("Selected Auto", autoChooser.getSelected().name());
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    autoChooser.reset(null);
+    // autoChooser.reset(null);
   }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    autoChooser.update();
-    SmartDashboard.putBoolean("Quest Pose Established", robotContainer.questPoseEstablished());
-    SmartDashboard.putBoolean(
-        "At Auto Starting Pose",
-        robotContainer.isAtAutoStartingPose(autoChooser.getStartingPose().orElse(new Pose2d())));
-    SmartDashboard.putBoolean(
-        "At Auto Starting Rotation",
-        robotContainer.isAtAutoStartingRotation(
-            autoChooser.getStartingPose().orElse(new Pose2d()).getRotation()));
+    // autoChooser.update();
+    // SmartDashboard.putBoolean("Quest Pose Established", robotContainer.questPoseEstablished());
+    // SmartDashboard.putBoolean(
+    //     "At Auto Starting Pose",
+    //     robotContainer.isAtAutoStartingPose(autoChooser.getStartingPose().orElse(new Pose2d())));
+    // SmartDashboard.putBoolean(
+    //     "At Auto Starting Rotation",
+    //     robotContainer.isAtAutoStartingRotation(
+    //         autoChooser.getStartingPose().orElse(new Pose2d()).getRotation()));
   }
 
   /** This autonomous runs the autonomous command selected by your {@link Robotstate} class. */
   @Override
   public void autonomousInit() {
-    autonomousCommand = autoChooser.getSelectedCommand().orElse(null);
+    // autonomousCommand = autoChooser.getSelectedCommand().orElse(null);
 
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);

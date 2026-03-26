@@ -314,6 +314,10 @@ public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestCons
     return swerveInputs.Pose.getRotation();
   }
 
+  public SystemState getSystemState(){
+    return systemState;
+  }
+
   private void applyStates() {
     switch (systemState) { // case something something the very basic python things -- shirly 2026
         // (i was held hostage mb)
@@ -497,10 +501,6 @@ public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestCons
     synchronized (moduleIOLock) {
       io.updateSimState();
     }
-  }
-
-  public void setState(WantedState state) {
-    this.wantedState = state;
   }
 
   public void setDesiredChoreoTrajectory(Trajectory<SwerveSample> trajectory) {

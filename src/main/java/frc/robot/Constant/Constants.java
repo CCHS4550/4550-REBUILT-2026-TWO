@@ -56,7 +56,7 @@ public final class Constants {
     public static final double DRIVE_GEAR_RATIO = 6.38;
   }
 
-  public static final class TurretConstants {
+  public static final class ShooterConstants {
     public static final double ELEVATION_GEAR_RATIO = 1.0 / 149.08; // fill
     public static final double ELEVATION_ENCODER_GEAR_RATIO = 1.0 / 8.80;
     public static final double ELEVATION_POSITION_COEFFICIENT = 2 * Math.PI * ELEVATION_GEAR_RATIO;
@@ -97,6 +97,11 @@ public final class Constants {
   public static final class IntakeConstants {
     public static final double EXTENSION_GEAR_RATIO = 1.0 / 25.0; // fill
     public static final double EXTENSION_POSITION_COEFFICIENT = 2 * Math.PI * EXTENSION_GEAR_RATIO;
+
+    public static final double INTAKE_BOTTOM_RADS = 0.0;
+    public static final double INTAKE_STOWED_RADS = 99999999; //fill
+    public static final double INTAKE_TOP_PUMP_RADS = 99999999; //fill
+    public static final double INTAKE_BOTTOM_PUMP_RADS = 999999; // fill
   }
 
   public static final class LowerChassisConstants {

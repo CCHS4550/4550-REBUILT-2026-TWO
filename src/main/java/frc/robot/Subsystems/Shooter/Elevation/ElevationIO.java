@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevationIO {
 
   @AutoLog
-  public class ElevationIOInputs {
+  public static class ElevationIOInputs {
 
     public double elevationVoltage = 0.0;
     public double elevationSupplyCurrent = 0.0;

@@ -28,7 +28,6 @@ import frc.robot.Robotstate;
 import frc.robot.Subsystems.Shooter.Elevation.*;
 import frc.robot.Subsystems.Shooter.Flywheel.*;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.Util.ShooterMeasurables;
 
 public class LaunchCalculator {
   private static LaunchCalculator instance;
@@ -227,10 +226,10 @@ public class LaunchCalculator {
     Pose2d launcherPosition =
         estimatedPose.transformBy(
             new Transform2d(
-                Constants.TurretConstants.SHOOTER_TRANSFORM.getX(),
-                Constants.TurretConstants.SHOOTER_TRANSFORM.getY(),
+                Constants.ShooterConstants.SHOOTER_TRANSFORM.getX(),
+                Constants.ShooterConstants.SHOOTER_TRANSFORM.getY(),
                 Rotation2d.fromRadians(
-                    Constants.TurretConstants.SHOOTER_TRANSFORM
+                    Constants.ShooterConstants.SHOOTER_TRANSFORM
                         .getRotation()
                         .getMeasureZ()
                         .magnitude())));
@@ -244,7 +243,7 @@ public class LaunchCalculator {
             ? robotVelocity
             : GeomUtil.transformVelocity(
                 robotVelocity,
-                Constants.TurretConstants.SHOOTER_TRANSFORM.getTranslation().toTranslation2d(),
+                Constants.ShooterConstants.SHOOTER_TRANSFORM.getTranslation().toTranslation2d(),
                 robotAngle);
 
     // Account for imparted velocity by robot (launcher) to offset
@@ -273,10 +272,10 @@ public class LaunchCalculator {
     Pose2d lookaheadRobotPose =
         lookaheadPose.transformBy(
             new Transform2d(
-                    Constants.TurretConstants.SHOOTER_TRANSFORM.getX(),
-                    Constants.TurretConstants.SHOOTER_TRANSFORM.getY(),
+                    Constants.ShooterConstants.SHOOTER_TRANSFORM.getX(),
+                    Constants.ShooterConstants.SHOOTER_TRANSFORM.getY(),
                     Rotation2d.fromRadians(
-                        Constants.TurretConstants.SHOOTER_TRANSFORM
+                        Constants.ShooterConstants.SHOOTER_TRANSFORM
                             .getRotation()
                             .getMeasureZ()
                             .magnitude()))
@@ -343,14 +342,14 @@ public class LaunchCalculator {
         new Rotation2d(
             Math.asin(
                 MathUtil.clamp(
-                    Constants.TurretConstants.SHOOTER_TRANSFORM.getTranslation().getY()
+                    Constants.ShooterConstants.SHOOTER_TRANSFORM.getTranslation().getY()
                         / target.getDistance(robotPose.getTranslation()),
                     -1.0,
                     1.0)));
     Rotation2d driveAngle =
         fieldToHubAngle
             .plus(hubAngle)
-            .plus(Constants.TurretConstants.SHOOTER_TRANSFORM.getRotation().toRotation2d());
+            .plus(Constants.ShooterConstants.SHOOTER_TRANSFORM.getRotation().toRotation2d());
     return driveAngle;
   }
 

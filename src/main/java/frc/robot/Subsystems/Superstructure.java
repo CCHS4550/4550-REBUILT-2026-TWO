@@ -2,33 +2,41 @@ package frc.robot.Subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.FieldConstants;
 import frc.robot.Robotstate;
-
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
+import frc.robot.Subsystems.Drive.SwerveSubsystem.WantedState;
 import frc.robot.Subsystems.Indexer.Indexer;
+import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
 import frc.robot.Subsystems.Intake.Intake;
 import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
 import frc.robot.Subsystems.Shooter.Shooter;
+import frc.robot.Subsystems.Shooter.Shooter.ShooterSystemState;
+import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
+import frc.robot.Util.LaunchCalculator;
+import frc.robot.Util.ShooterMeasurables;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
   private final SwerveSubsystem swerveSubsystem;
   private final Intake intake;
   private final Shooter shooter;
   private final Indexer indexer;
-  private boolean INTAKE_ACTIVE = false;
 
   @AutoLogOutput private WantedSuperstructureState wantedState1 = WantedSuperstructureState.IDLE;
   @AutoLogOutput private SystemState systemState = SystemState.IDLE;
 
+
+  private ShooterMeasurables shooterCalcs = new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
+
+
   public Superstructure(
-      SwerveSubsystem swerveSubsystem,
-      Intake intake,
-      Shooter shooter,
-      Indexer indexer) {
+      SwerveSubsystem swerveSubsystem, Intake intake, Shooter shooter, Indexer indexer) {
     this.swerveSubsystem = swerveSubsystem;
     this.intake = intake;
     this.indexer = indexer;
@@ -37,162 +45,117 @@ public class Superstructure extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Log launching parameters TODO: fix logging bugs later
+    var launchCalculator = LaunchCalculator.getInstance();
+
+    shooterCalcs = launchCalculator.getParameters();
+    shooter.setShooterMeasurables(shooterCalcs);
+    
     systemState = handleStateTransitions();
     applyStates();
+
+    // Clear launching parameters
+    launchCalculator.clearLaunchingParameters();
   }
 
   public void setWantedSuperstructureState(
-      WantedSuperstructureState wantedState, boolean INTAKE_ACTIVE) {
-    this.INTAKE_ACTIVE = INTAKE_ACTIVE;
-    this.wantedState1 = wantedState;
-  }
+      WantedSuperstructureState wantedState) {
+    if(!DriverStation.isAutonomous() && wantedState != WantedSuperstructureState.SHOOT && swerveSubsystem.getSystemState() != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.DRIVE_TO_POINT){
+      swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE);
+    }
 
-  public void setIntakeActive(boolean INTAKE_ACTIVE) {
-    this.INTAKE_ACTIVE = INTAKE_ACTIVE;
+    if(DriverStation.isAutonomous()){
+      if(wantedState != WantedSuperstructureState.SHOOT){
+        if(swerveSubsystem.getSystemState() != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.CHOREO_PATH && swerveSubsystem.getSystemState() != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.DRIVE_TO_POINT){
+          swerveSubsystem.setWantedState(WantedState.IDLE);
+        }
+      }
+    }
+
+    // swervedrive state has been automatically reset for safety, but this will be overrun if we are in auto aim
+    this.wantedState1 = wantedState;
   }
 
   private void applyStates() {
     switch (systemState) {
       case IDLE:
+        if(DriverStation.isDisabled()){
+          swerveSubsystem.setWantedState(WantedState.IDLE);
+        }
         intake.setWantedIntakeState(WantedIntakeState.IDLE);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.IDLE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
-        break;
-      case EXTEND_INTAKE:
-        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
-        break;
-      case ZERO:
-        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.ZERO);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
-        break;
-      case INTAKING_ZERO:
-        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.ZERO);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        shooter.setWantedState(ShooterWantedState.IDLE);
         break;
       case STOW:
         intake.setWantedIntakeState(WantedIntakeState.STOWED);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.STOW);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        if(shooter.getSystemState() != ShooterSystemState.ZERO){
+          shooter.setWantedState(ShooterWantedState.IDLE);
+        }
         break;
-      case INTAKING_TRACKING_PASS:
-        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.PASS_TO_ALLIANCE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+      case ZERO:
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        shooter.setWantedState(ShooterWantedState.ZERO);
         break;
-      case TRACKING_PASS:
+      case EXTEND_INTAKE:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.PASS_TO_ALLIANCE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        if(shooter.getSystemState() != ShooterSystemState.ZERO){
+          shooter.setWantedState(ShooterWantedState.IDLE);
+        }
         break;
-      case INTAKING_ACTIVE_PASS:
+      case INTAKING:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
-        turret.setWantedState(TurretWantedState.PASS_TO_ALLIANCE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        if(shooter.getSystemState() != ShooterSystemState.ZERO){
+          shooter.setWantedState(ShooterWantedState.IDLE);
+        }
         break;
-      case ACTIVE_PASS:
-        intake.setWantedIntakeState(WantedIntakeState.PUMPING);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
-        turret.setWantedState(TurretWantedState.PASS_TO_ALLIANCE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
-        break;
-      case INTAKING_TRACKING_SHOOT:
+      case INTAKING_PRE_AIM:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.SHOOT_SCORE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
         break;
-      case TRACKING_SHOOT:
+      case PASSIVE_PRE_AIM:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.SHOOT_SCORE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
         break;
-      case INTAKING_ACTIVE_SHOOT:
-        intake.setWantedIntakeState(WantedIntakeState.PUMPING);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
-        turret.setWantedState(TurretWantedState.SHOOT_SCORE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
+      case AIMING:
+        swerveSubsystem.setTargetRotation(shooterCalcs.getDriveAngle());
+        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
         break;
-      case ACTIVE_SHOOT:
-        intake.setWantedIntakeState(WantedIntakeState.PUMPING);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
-        turret.setWantedState(TurretWantedState.SHOOT_SCORE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
-        break;
-      case PRACTICE_INDEXING:
-        intake.setWantedIntakeState(WantedIntakeState.IDLE);
-        kicker.setWantedKickerState(KickerWantedState.RUNNING);
-        turret.setWantedState(TurretWantedState.SHOOT_SCORE);
-        agitator.setWantedAgitatorState(WantedAgitatorState.SPINNING);
-        break;
-      case TESTING:
-        intake.setWantedIntakeState(WantedIntakeState.IDLE);
-        kicker.setWantedKickerState(KickerWantedState.IDLE);
-        turret.setWantedState(TurretWantedState.TESTING);
-        agitator.setWantedAgitatorState(WantedAgitatorState.IDLE);
+      case SHOOT:
+        swerveSubsystem.setTargetRotation(shooterCalcs.getDriveAngle());
+        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+        indexer.setWantedState(IndexerWantedState.RUNNING);
+        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
         break;
     }
   }
 
   private SystemState handleStateTransitions() {
-    if (handleTrenchSafety()) {
-      if (INTAKE_ACTIVE) {
-        return SystemState.INTAKING_ZERO;
-      } else {
-        return SystemState.ZERO;
+    if(wantedState1 == WantedSuperstructureState.SHOOT && !shooterCalcs.getIsValid()){
+      return SystemState.IDLE;
+    }
+
+    switch(wantedState1){
+      case IDLE: return SystemState.IDLE;
+      case STOW: return SystemState.STOW;
+      case ZERO: return SystemState.ZERO;
+      case EXTEND_INTAKE: return SystemState.EXTEND_INTAKE;
+      case INTAKING: return SystemState.INTAKING;
+      case SHOOT: if(shooter.atSetpoint() && swerveSubsystem.isAtDesiredRotation(0.2)){
+        return SystemState.SHOOT;
       }
+      return SystemState.AIMING;
+      case PRE_AIM: return SystemState.PASSIVE_PRE_AIM;
+      case PRE_AIM_INTAKING: return SystemState.INTAKING_PRE_AIM;
+      default: return SystemState.IDLE;
     }
-    switch (wantedState1) {
-      case IDLE:
-        return SystemState.IDLE;
-      case STOW:
-        return SystemState.STOW;
-      case ZERO:
-        if (INTAKE_ACTIVE) {
-          return SystemState.INTAKING_ZERO;
-        }
-        return SystemState.ZERO;
-      case EXTEND_INTAKE:
-        return SystemState.EXTEND_INTAKE;
-      case PASSIVE_TRACKING:
-        return returnTrackingTarget();
-      case ACTIVE_SHOOT:
-        if (INTAKE_ACTIVE) {
-          if (turret.getAtGoal()) {
-            return SystemState.INTAKING_ACTIVE_SHOOT;
-          }
-          return SystemState.INTAKING_TRACKING_SHOOT;
-        } else if (turret.getAtGoal()) {
-          return SystemState.ACTIVE_SHOOT;
-        }
-        return SystemState.TRACKING_SHOOT;
-      case ACTIVE_PASS:
-        if (INTAKE_ACTIVE) {
-          if (turret.getAtGoal()) {
-            return SystemState.INTAKING_ACTIVE_PASS;
-          }
-          return SystemState.INTAKING_TRACKING_PASS;
-        } else if (turret.getAtGoal()) {
-          return SystemState.ACTIVE_PASS;
-        }
-        return SystemState.TRACKING_PASS;
-      case ACTIVE_DECISION:
-        return returnActiveTarget();
-      case PRACTICE_INDEXING:
-        break;
-      case TESTING:
-        return SystemState.TESTING;
-    }
-    return SystemState.IDLE;
+    
   }
 
   public enum WantedSuperstructureState {
@@ -200,62 +163,42 @@ public class Superstructure extends SubsystemBase {
     STOW,
     ZERO,
     EXTEND_INTAKE,
-    PASSIVE_TRACKING,
-    ACTIVE_SHOOT,
-    ACTIVE_PASS,
-    ACTIVE_DECISION,
-    PRACTICE_INDEXING,
-    TESTING
+    INTAKING,
+    SHOOT,
+    PRE_AIM,
+    PRE_AIM_INTAKING
+    
   }
 
   private enum SystemState {
     IDLE,
     STOW,
-    INTAKING_ZERO,
     ZERO,
     EXTEND_INTAKE,
-    INTAKING_TRACKING_PASS,
-    TRACKING_PASS,
-    INTAKING_TRACKING_SHOOT,
-    TRACKING_SHOOT,
-    INTAKING_ACTIVE_SHOOT,
-    ACTIVE_SHOOT,
-    INTAKING_ACTIVE_PASS,
-    ACTIVE_PASS,
-    PRACTICE_INDEXING,
-    TESTING
+    INTAKING,
+    INTAKING_PRE_AIM,
+    PASSIVE_PRE_AIM,
+    AIMING,
+    SHOOT
   }
 
   private boolean isPassingZone(double x) {
     return FieldConstants.isBlueAlliance() ? x > 4.75 : x < 11.75;
   }
 
-  private SystemState returnTrackingTarget() {
-    double x = Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getX();
-    boolean isPassing = isPassingZone(x);
-
-    if (isPassing)
-      return INTAKE_ACTIVE ? SystemState.INTAKING_TRACKING_PASS : SystemState.TRACKING_PASS;
-    else return INTAKE_ACTIVE ? SystemState.INTAKING_TRACKING_SHOOT : SystemState.TRACKING_SHOOT;
-  }
-
-  private SystemState returnActiveTarget() {
-    double x = Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getX();
-    boolean isPassing = isPassingZone(x);
-
-    if (isPassing)
-      return INTAKE_ACTIVE ? SystemState.INTAKING_ACTIVE_PASS : SystemState.ACTIVE_PASS;
-    else return INTAKE_ACTIVE ? SystemState.INTAKING_ACTIVE_SHOOT : SystemState.ACTIVE_SHOOT;
-  }
 
   private boolean isInsideRectangle(Pose2d pose, Pose2d leftCorner, Pose2d rightCorner) {
     double x = pose.getTranslation().getX();
     double y = pose.getTranslation().getY();
 
-    double minX = Math.min(leftCorner.getTranslation().getX(), rightCorner.getTranslation().getX());
-    double maxX = Math.max(leftCorner.getTranslation().getX(), rightCorner.getTranslation().getX());
-    double minY = Math.min(leftCorner.getTranslation().getY(), rightCorner.getTranslation().getY());
-    double maxY = Math.max(leftCorner.getTranslation().getY(), rightCorner.getTranslation().getY());
+    double minX = Math.min(leftCorner.getTranslation().getX(),
+rightCorner.getTranslation().getX());
+    double maxX = Math.max(leftCorner.getTranslation().getX(),
+rightCorner.getTranslation().getX());
+    double minY = Math.min(leftCorner.getTranslation().getY(),
+rightCorner.getTranslation().getY());
+    double maxY = Math.max(leftCorner.getTranslation().getY(),
+rightCorner.getTranslation().getY());
 
     return x >= minX && x <= maxX && y >= minY && y <= maxY;
   }
@@ -269,7 +212,8 @@ public class Superstructure extends SubsystemBase {
         || isInsideRectangle(
             pose, new Pose2d(11.3, 6.8, new Rotation2d()), new Pose2d(12.5, 8, new Rotation2d()))
         || isInsideRectangle(
-            pose, new Pose2d(11.3, 0.2, new Rotation2d()), new Pose2d(12.5, 1, new Rotation2d()))) {
+            pose, new Pose2d(11.3, 0.2, new Rotation2d()), new Pose2d(12.5, 1, new
+Rotation2d()))) {
       return true;
     }
     return false;

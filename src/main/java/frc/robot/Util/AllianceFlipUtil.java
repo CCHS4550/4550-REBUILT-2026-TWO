@@ -50,10 +50,7 @@ public class AllianceFlipUtil {
   public static Bounds apply(Bounds bounds) {
     if (shouldFlip()) {
       return new Bounds(
-          applyX(bounds.maxX()),
-          applyX(bounds.minX()),
-          applyY(bounds.maxY()),
-          applyY(bounds.minY()));
+          applyX(bounds.maxX), applyX(bounds.minX), applyY(bounds.maxY), applyY(bounds.minY));
     } else {
       return bounds;
     }
