@@ -4,8 +4,6 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -28,7 +26,8 @@ public class IntakeIOCTRE implements IntakeIO {
   private TalonFXConfiguration spinnerConfig;
   private TalonFXConfiguration extensionConfig;
 
-  private DynamicMotionMagicVoltage extensionController = new DynamicMotionMagicVoltage(0, 100, 50).withSlot(0);
+  private DynamicMotionMagicVoltage extensionController =
+      new DynamicMotionMagicVoltage(0, 100, 50).withSlot(0);
 
   private final StatusSignal<Voltage> spinnerAppliedVolts;
   private final StatusSignal<Current> spinnerSupplyCurrentAmps;
@@ -92,7 +91,9 @@ public class IntakeIOCTRE implements IntakeIO {
     spinnerAccelerationRotationsPerSecSquared = spinnerIntakeMotor.getAcceleration();
     spinnerMotorTemp = spinnerIntakeMotor.getDeviceTemp();
 
-    extensionIntakeMotor.setPosition(Constants.IntakeConstants.INTAKE_STOWED_RADS / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT);
+    extensionIntakeMotor.setPosition(
+        Constants.IntakeConstants.INTAKE_STOWED_RADS
+            / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT);
     extensionAppliedVolts = extensionIntakeMotor.getMotorVoltage();
     extensionPosRot = extensionIntakeMotor.getPosition();
     extensionSupplyCurrentAmps = extensionIntakeMotor.getSupplyCurrent();
@@ -147,9 +148,13 @@ public class IntakeIOCTRE implements IntakeIO {
   }
 
   @Override
-  public void setExtensionMotorPositionRad(double rad, double veloRotPerSec, double accelRotPerSec) {
+  public void setExtensionMotorPositionRad(
+      double rad, double veloRotPerSec, double accelRotPerSec) {
     extensionIntakeMotor.setControl(
-        extensionController.withPosition(Units.radiansToRotations(rad)).withVelocity(veloRotPerSec).withAcceleration(accelRotPerSec));
+        extensionController
+            .withPosition(Units.radiansToRotations(rad))
+            .withVelocity(veloRotPerSec)
+            .withAcceleration(accelRotPerSec));
   }
 
   @Override

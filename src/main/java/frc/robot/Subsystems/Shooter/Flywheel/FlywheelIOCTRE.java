@@ -141,7 +141,9 @@ public class FlywheelIOCTRE implements FlywheelIO {
   }
 
   @Override
-  public void setVoltage(Voltage voltage) { //why is this voltage and not just an int, what other unit would this be? TODO: fix
+  public void setVoltage(
+      Voltage voltage) { // why is this voltage and not just an int, what other unit would this be?
+    // TODO: fix
     flywheelMotor1.setVoltage(voltage.magnitude());
   }
 

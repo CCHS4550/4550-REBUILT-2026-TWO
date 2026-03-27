@@ -3,7 +3,6 @@ package frc.robot.Subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.FieldConstants;
 import frc.robot.Robotstate;
@@ -18,9 +17,7 @@ import frc.robot.Subsystems.Shooter.Shooter.ShooterSystemState;
 import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
 import frc.robot.Util.LaunchCalculator;
 import frc.robot.Util.ShooterMeasurables;
-
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class Superstructure extends SubsystemBase {
   private final SwerveSubsystem swerveSubsystem;
@@ -31,9 +28,8 @@ public class Superstructure extends SubsystemBase {
   @AutoLogOutput private WantedSuperstructureState wantedState1 = WantedSuperstructureState.IDLE;
   @AutoLogOutput private SystemState systemState = SystemState.IDLE;
 
-
-  private ShooterMeasurables shooterCalcs = new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
-
+  private ShooterMeasurables shooterCalcs =
+      new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
 
   public Superstructure(
       SwerveSubsystem swerveSubsystem, Intake intake, Shooter shooter, Indexer indexer) {
@@ -50,7 +46,7 @@ public class Superstructure extends SubsystemBase {
 
     shooterCalcs = launchCalculator.getParameters();
     shooter.setShooterMeasurables(shooterCalcs);
-    
+
     systemState = handleStateTransitions();
     applyStates();
 
@@ -58,28 +54,34 @@ public class Superstructure extends SubsystemBase {
     launchCalculator.clearLaunchingParameters();
   }
 
-  public void setWantedSuperstructureState(
-      WantedSuperstructureState wantedState) {
-    if(!DriverStation.isAutonomous() && wantedState != WantedSuperstructureState.SHOOT && swerveSubsystem.getSystemState() != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.DRIVE_TO_POINT){
+  public void setWantedSuperstructureState(WantedSuperstructureState wantedState) {
+    if (!DriverStation.isAutonomous()
+        && wantedState != WantedSuperstructureState.SHOOT
+        && swerveSubsystem.getSystemState()
+            != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.DRIVE_TO_POINT) {
       swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE);
     }
 
-    if(DriverStation.isAutonomous()){
-      if(wantedState != WantedSuperstructureState.SHOOT){
-        if(swerveSubsystem.getSystemState() != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.CHOREO_PATH && swerveSubsystem.getSystemState() != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.DRIVE_TO_POINT){
+    if (DriverStation.isAutonomous()) {
+      if (wantedState != WantedSuperstructureState.SHOOT) {
+        if (swerveSubsystem.getSystemState()
+                != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.CHOREO_PATH
+            && swerveSubsystem.getSystemState()
+                != frc.robot.Subsystems.Drive.SwerveSubsystem.SystemState.DRIVE_TO_POINT) {
           swerveSubsystem.setWantedState(WantedState.IDLE);
         }
       }
     }
 
-    // swervedrive state has been automatically reset for safety, but this will be overrun if we are in auto aim
+    // swervedrive state has been automatically reset for safety, but this will be overrun if we are
+    // in auto aim
     this.wantedState1 = wantedState;
   }
 
   private void applyStates() {
     switch (systemState) {
       case IDLE:
-        if(DriverStation.isDisabled()){
+        if (DriverStation.isDisabled()) {
           swerveSubsystem.setWantedState(WantedState.IDLE);
         }
         intake.setWantedIntakeState(WantedIntakeState.IDLE);
@@ -89,7 +91,7 @@ public class Superstructure extends SubsystemBase {
       case STOW:
         intake.setWantedIntakeState(WantedIntakeState.STOWED);
         indexer.setWantedState(IndexerWantedState.IDLE);
-        if(shooter.getSystemState() != ShooterSystemState.ZERO){
+        if (shooter.getSystemState() != ShooterSystemState.ZERO) {
           shooter.setWantedState(ShooterWantedState.IDLE);
         }
         break;
@@ -100,14 +102,14 @@ public class Superstructure extends SubsystemBase {
       case EXTEND_INTAKE:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
         indexer.setWantedState(IndexerWantedState.IDLE);
-        if(shooter.getSystemState() != ShooterSystemState.ZERO){
+        if (shooter.getSystemState() != ShooterSystemState.ZERO) {
           shooter.setWantedState(ShooterWantedState.IDLE);
         }
         break;
       case INTAKING:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
         indexer.setWantedState(IndexerWantedState.IDLE);
-        if(shooter.getSystemState() != ShooterSystemState.ZERO){
+        if (shooter.getSystemState() != ShooterSystemState.ZERO) {
           shooter.setWantedState(ShooterWantedState.IDLE);
         }
         break;
@@ -137,25 +139,33 @@ public class Superstructure extends SubsystemBase {
   }
 
   private SystemState handleStateTransitions() {
-    if(wantedState1 == WantedSuperstructureState.SHOOT && !shooterCalcs.getIsValid()){
+    if (wantedState1 == WantedSuperstructureState.SHOOT && !shooterCalcs.getIsValid()) {
       return SystemState.IDLE;
     }
 
-    switch(wantedState1){
-      case IDLE: return SystemState.IDLE;
-      case STOW: return SystemState.STOW;
-      case ZERO: return SystemState.ZERO;
-      case EXTEND_INTAKE: return SystemState.EXTEND_INTAKE;
-      case INTAKING: return SystemState.INTAKING;
-      case SHOOT: if(shooter.atSetpoint() && swerveSubsystem.isAtDesiredRotation(0.2)){
-        return SystemState.SHOOT;
-      }
-      return SystemState.AIMING;
-      case PRE_AIM: return SystemState.PASSIVE_PRE_AIM;
-      case PRE_AIM_INTAKING: return SystemState.INTAKING_PRE_AIM;
-      default: return SystemState.IDLE;
+    switch (wantedState1) {
+      case IDLE:
+        return SystemState.IDLE;
+      case STOW:
+        return SystemState.STOW;
+      case ZERO:
+        return SystemState.ZERO;
+      case EXTEND_INTAKE:
+        return SystemState.EXTEND_INTAKE;
+      case INTAKING:
+        return SystemState.INTAKING;
+      case SHOOT:
+        if (shooter.atSetpoint() && swerveSubsystem.isAtDesiredRotation(0.2)) {
+          return SystemState.SHOOT;
+        }
+        return SystemState.AIMING;
+      case PRE_AIM:
+        return SystemState.PASSIVE_PRE_AIM;
+      case PRE_AIM_INTAKING:
+        return SystemState.INTAKING_PRE_AIM;
+      default:
+        return SystemState.IDLE;
     }
-    
   }
 
   public enum WantedSuperstructureState {
@@ -167,7 +177,6 @@ public class Superstructure extends SubsystemBase {
     SHOOT,
     PRE_AIM,
     PRE_AIM_INTAKING
-    
   }
 
   private enum SystemState {
@@ -186,19 +195,14 @@ public class Superstructure extends SubsystemBase {
     return FieldConstants.isBlueAlliance() ? x > 4.75 : x < 11.75;
   }
 
-
   private boolean isInsideRectangle(Pose2d pose, Pose2d leftCorner, Pose2d rightCorner) {
     double x = pose.getTranslation().getX();
     double y = pose.getTranslation().getY();
 
-    double minX = Math.min(leftCorner.getTranslation().getX(),
-rightCorner.getTranslation().getX());
-    double maxX = Math.max(leftCorner.getTranslation().getX(),
-rightCorner.getTranslation().getX());
-    double minY = Math.min(leftCorner.getTranslation().getY(),
-rightCorner.getTranslation().getY());
-    double maxY = Math.max(leftCorner.getTranslation().getY(),
-rightCorner.getTranslation().getY());
+    double minX = Math.min(leftCorner.getTranslation().getX(), rightCorner.getTranslation().getX());
+    double maxX = Math.max(leftCorner.getTranslation().getX(), rightCorner.getTranslation().getX());
+    double minY = Math.min(leftCorner.getTranslation().getY(), rightCorner.getTranslation().getY());
+    double maxY = Math.max(leftCorner.getTranslation().getY(), rightCorner.getTranslation().getY());
 
     return x >= minX && x <= maxX && y >= minY && y <= maxY;
   }
@@ -212,8 +216,7 @@ rightCorner.getTranslation().getY());
         || isInsideRectangle(
             pose, new Pose2d(11.3, 6.8, new Rotation2d()), new Pose2d(12.5, 8, new Rotation2d()))
         || isInsideRectangle(
-            pose, new Pose2d(11.3, 0.2, new Rotation2d()), new Pose2d(12.5, 1, new
-Rotation2d()))) {
+            pose, new Pose2d(11.3, 0.2, new Rotation2d()), new Pose2d(12.5, 1, new Rotation2d()))) {
       return true;
     }
     return false;

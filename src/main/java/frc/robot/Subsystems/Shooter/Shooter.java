@@ -1,11 +1,10 @@
 package frc.robot.Subsystems.Shooter;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +29,6 @@ public class Shooter extends SubsystemBase {
   private boolean atGoal;
 
   private ShooterMeasurables wantedShooterMeasurables;
-
 
   public enum ShooterSystemState {
     IDLE,
@@ -83,12 +81,14 @@ public class Shooter extends SubsystemBase {
         elevationIO.setVoltage(0);
         flywheelIO.setVoltage(Voltage.ofBaseUnits(0, Volts));
         break;
-     case GOTO_WANTED_MEASURABLES:
-      setElevationAngle(Rotation2d.fromRadians(wantedShooterMeasurables.getHoodAngle()));
-      setFlywheelSpeed(RadiansPerSecond.of(wantedShooterMeasurables.getFlywheelSpeed()));
-      break;
+      case GOTO_WANTED_MEASURABLES:
+        setElevationAngle(Rotation2d.fromRadians(wantedShooterMeasurables.getHoodAngle()));
+        setFlywheelSpeed(RadiansPerSecond.of(wantedShooterMeasurables.getFlywheelSpeed()));
+        break;
       case ZERO:
-        setElevationAngle(Rotation2d.fromRadians(Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS));
+        setElevationAngle(
+            Rotation2d.fromRadians(
+                Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS));
         setFlywheelSpeed(RadiansPerSecond.of(0));
         break;
     }
@@ -102,15 +102,15 @@ public class Shooter extends SubsystemBase {
     flywheelIO.setVelo(velo);
   }
 
-  public void setShooterMeasurables(ShooterMeasurables shooterMeasurables){
+  public void setShooterMeasurables(ShooterMeasurables shooterMeasurables) {
     this.wantedShooterMeasurables = shooterMeasurables;
   }
 
-  public void setWantedState(ShooterWantedState wantedState){
+  public void setWantedState(ShooterWantedState wantedState) {
     this.wantedState = wantedState;
   }
 
-  public ShooterSystemState getSystemState(){
+  public ShooterSystemState getSystemState() {
     return systemState;
   }
 
@@ -118,7 +118,8 @@ public class Shooter extends SubsystemBase {
     return MathUtil.isNear(
             flywheelInputs.flywheelVelocityRadPerSec,
             wantedShooterMeasurables.getFlywheelSpeed(),
-            wantedShooterMeasurables.getFlywheelSpeed() * 0.05) //Allowance is 5% of wanted velocity
+            wantedShooterMeasurables.getFlywheelSpeed()
+                * 0.05) // Allowance is 5% of wanted velocity
         && MathUtil.isNear(
             elevationInputs.elevationAngle.getRadians(),
             wantedShooterMeasurables.getHoodAngle(),

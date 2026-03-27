@@ -314,7 +314,7 @@ public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestCons
     return swerveInputs.Pose.getRotation();
   }
 
-  public SystemState getSystemState(){
+  public SystemState getSystemState() {
     return systemState;
   }
 

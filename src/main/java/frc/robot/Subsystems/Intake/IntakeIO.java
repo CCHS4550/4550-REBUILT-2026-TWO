@@ -1,6 +1,5 @@
 package frc.robot.Subsystems.Intake;
 
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
@@ -28,7 +27,8 @@ public interface IntakeIO {
 
   public default void updateInputs(IntakeIOInputs inputs) {}
 
-  public default void setExtensionMotorPositionRad(double rad, double veloRotPerSec, double accelRotPerSec) {}
+  public default void setExtensionMotorPositionRad(
+      double rad, double veloRotPerSec, double accelRotPerSec) {}
 
   public default void setExtensionVoltage(double voltage) {}
 

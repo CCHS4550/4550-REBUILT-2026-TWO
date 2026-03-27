@@ -1,11 +1,10 @@
 package frc.robot.Subsystems.Intake;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.Constants;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
 
@@ -26,7 +25,7 @@ public class Intake extends SubsystemBase {
     STOWED,
     STOW_SLOW,
     UPPER_PUMP,
-    LOWER_PUMP, 
+    LOWER_PUMP,
     IDLE
   }
 
@@ -44,26 +43,31 @@ public class Intake extends SubsystemBase {
     switch (systemState) {
       case EXTENDED_INTAKING:
         intakeIO.setSpinnerVoltage(5.0);
-        intakeIO.setExtensionMotorPositionRad(Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
+        intakeIO.setExtensionMotorPositionRad(
+            Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
         break;
       case EXTENDED_PASSIVE:
         intakeIO.setExtensionVoltage(0.0);
-        intakeIO.setExtensionMotorPositionRad(Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
+        intakeIO.setExtensionMotorPositionRad(
+            Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
         break;
       case STOWED:
         intakeIO.setExtensionVoltage(0.0);
-        intakeIO.setExtensionMotorPositionRad(Constants.IntakeConstants.INTAKE_STOWED_RADS, 100, 50);
+        intakeIO.setExtensionMotorPositionRad(
+            Constants.IntakeConstants.INTAKE_STOWED_RADS, 100, 50);
         break;
       case STOW_SLOW:
         intakeIO.setExtensionVoltage(0.0);
         intakeIO.setExtensionMotorPositionRad(Constants.IntakeConstants.INTAKE_STOWED_RADS, 30, 25);
       case UPPER_PUMP:
         intakeIO.setExtensionVoltage(0.0);
-        intakeIO.setExtensionMotorPositionRad(Constants.IntakeConstants.INTAKE_TOP_PUMP_RADS, 30, 25);
+        intakeIO.setExtensionMotorPositionRad(
+            Constants.IntakeConstants.INTAKE_TOP_PUMP_RADS, 30, 25);
         break;
       case LOWER_PUMP:
         intakeIO.setExtensionVoltage(0.0);
-        intakeIO.setExtensionMotorPositionRad(Constants.IntakeConstants.INTAKE_BOTTOM_PUMP_RADS, 30, 25);
+        intakeIO.setExtensionMotorPositionRad(
+            Constants.IntakeConstants.INTAKE_BOTTOM_PUMP_RADS, 30, 25);
         break;
       default:
         intakeIO.setExtensionVoltage(0.0);
@@ -72,8 +76,8 @@ public class Intake extends SubsystemBase {
     }
   }
 
-  private SystemState handleStateTransitions(){
-    switch(wantedState){
+  private SystemState handleStateTransitions() {
+    switch (wantedState) {
       case EXTENDED_INTAKING:
         return SystemState.EXTENDED_INTAKING;
       case EXTENDED_PASSIVE:
@@ -84,17 +88,17 @@ public class Intake extends SubsystemBase {
         return SystemState.STOW_SLOW;
       case PUMPING:
         if (systemState == SystemState.UPPER_PUMP) {
-                return atWantedAngle() ? SystemState.LOWER_PUMP : SystemState.UPPER_PUMP;
-            } else if (systemState == SystemState.LOWER_PUMP) {
-                return atWantedAngle() ? SystemState.UPPER_PUMP : SystemState.LOWER_PUMP;
-            } else {
-                return SystemState.LOWER_PUMP;
-      }
+          return atWantedAngle() ? SystemState.LOWER_PUMP : SystemState.UPPER_PUMP;
+        } else if (systemState == SystemState.LOWER_PUMP) {
+          return atWantedAngle() ? SystemState.UPPER_PUMP : SystemState.LOWER_PUMP;
+        } else {
+          return SystemState.LOWER_PUMP;
+        }
       case IDLE:
         return SystemState.IDLE;
       default:
         return SystemState.IDLE;
-  }
+    }
   }
 
   public void setWantedIntakeState(WantedIntakeState state) {
@@ -103,22 +107,36 @@ public class Intake extends SubsystemBase {
     // the mechanism has actually moved, immediately skipping timed transitions.
     if (state == this.wantedState) return;
     this.wantedState = state;
-
   }
 
   @AutoLogOutput(key = "Subsystems/Intake/AtWantedAngle")
   public boolean atWantedAngle() {
     switch (systemState) {
       case EXTENDED_INTAKING:
-        return MathUtil.isNear(Constants.IntakeConstants.INTAKE_BOTTOM_RADS, inputs.extensionPosRadians, intakeTolerance);
+        return MathUtil.isNear(
+            Constants.IntakeConstants.INTAKE_BOTTOM_RADS,
+            inputs.extensionPosRadians,
+            intakeTolerance);
       case EXTENDED_PASSIVE:
-        return MathUtil.isNear(Constants.IntakeConstants.INTAKE_BOTTOM_RADS, inputs.extensionPosRadians, intakeTolerance);
+        return MathUtil.isNear(
+            Constants.IntakeConstants.INTAKE_BOTTOM_RADS,
+            inputs.extensionPosRadians,
+            intakeTolerance);
       case STOWED:
-        return MathUtil.isNear(Constants.IntakeConstants.INTAKE_BOTTOM_RADS, inputs.extensionPosRadians, intakeTolerance);
+        return MathUtil.isNear(
+            Constants.IntakeConstants.INTAKE_BOTTOM_RADS,
+            inputs.extensionPosRadians,
+            intakeTolerance);
       case UPPER_PUMP:
-        return MathUtil.isNear(Constants.IntakeConstants.INTAKE_TOP_PUMP_RADS, inputs.extensionPosRadians, intakeTolerance);
+        return MathUtil.isNear(
+            Constants.IntakeConstants.INTAKE_TOP_PUMP_RADS,
+            inputs.extensionPosRadians,
+            intakeTolerance);
       case LOWER_PUMP:
-        return MathUtil.isNear(Constants.IntakeConstants.INTAKE_BOTTOM_PUMP_RADS, inputs.extensionPosRadians, intakeTolerance);
+        return MathUtil.isNear(
+            Constants.IntakeConstants.INTAKE_BOTTOM_PUMP_RADS,
+            inputs.extensionPosRadians,
+            intakeTolerance);
       case IDLE:
         return true;
       default:
