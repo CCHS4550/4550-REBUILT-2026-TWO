@@ -21,8 +21,8 @@ import frc.robot.Util.Phoenix6Util;
 
 public class FlywheelIOCTRE implements FlywheelIO {
   private TalonFX flywheelMotor1;
-  private TalonFX flywheelMotor2;
-  private TalonFX flywheelMotor3;
+  // private TalonFX flywheelMotor2;
+  // private TalonFX flywheelMotor3;
 
   private MotionMagicVelocityVoltage flywheelControl;
 
@@ -33,15 +33,15 @@ public class FlywheelIOCTRE implements FlywheelIO {
   private final StatusSignal<Current> flywheel1StatorCurrent;
   private final StatusSignal<Temperature> flywheel1Temperature;
 
-  private final StatusSignal<Voltage> flywheel2AppliedVoltage;
-  private final StatusSignal<Current> flywheel2SupplyCurrent;
-  private final StatusSignal<Current> flywheel2StatorCurrent;
-  private final StatusSignal<Temperature> flywheel2Temperature;
+  // private final StatusSignal<Voltage> flywheel2AppliedVoltage;
+  // private final StatusSignal<Current> flywheel2SupplyCurrent;
+  // private final StatusSignal<Current> flywheel2StatorCurrent;
+  // private final StatusSignal<Temperature> flywheel2Temperature;
 
-  private final StatusSignal<Voltage> flywheel3AppliedVoltage;
-  private final StatusSignal<Current> flywheel3SupplyCurrent;
-  private final StatusSignal<Current> flywheel3StatorCurrent;
-  private final StatusSignal<Temperature> flywheel3Temperature;
+  // private final StatusSignal<Voltage> flywheel3AppliedVoltage;
+  // private final StatusSignal<Current> flywheel3SupplyCurrent;
+  // private final StatusSignal<Current> flywheel3StatorCurrent;
+  // private final StatusSignal<Temperature> flywheel3Temperature;
 
   private final StatusSignal<AngularVelocity> flywheelVelocityRotationsPerSec;
   private final StatusSignal<AngularAcceleration> flywheelAccelerationRotationsPerSecSquared;
@@ -49,10 +49,10 @@ public class FlywheelIOCTRE implements FlywheelIO {
   public FlywheelIOCTRE(BruinRobotConfig config) {
     flywheelMotor1 =
         new TalonFX(config.FLYWHEEL_MOTOR_1.getDeviceNumber(), config.FLYWHEEL_MOTOR_1.getBus());
-    flywheelMotor2 =
-        new TalonFX(config.FLYWHEEL_MOTOR_2.getDeviceNumber(), config.FLYWHEEL_MOTOR_2.getBus());
-    flywheelMotor3 =
-        new TalonFX(config.FLYWHEEL_MOTOR_3.getDeviceNumber(), config.FLYWHEEL_MOTOR_3.getBus());
+    // flywheelMotor2 =
+    //     new TalonFX(config.FLYWHEEL_MOTOR_2.getDeviceNumber(), config.FLYWHEEL_MOTOR_2.getBus());
+    // flywheelMotor3 =
+    //     new TalonFX(config.FLYWHEEL_MOTOR_3.getDeviceNumber(), config.FLYWHEEL_MOTOR_3.getBus());
 
     Follower follower =
         new Follower(config.FLYWHEEL_MOTOR_1.getDeviceNumber(), MotorAlignmentValue.Aligned);
@@ -77,26 +77,26 @@ public class FlywheelIOCTRE implements FlywheelIO {
     shooterConfig.MotionMagic.MotionMagicExpo_kV = 8.0;
 
     Phoenix6Util.applyAndCheckConfiguration(flywheelMotor1, shooterConfig, 5);
-    Phoenix6Util.applyAndCheckConfiguration(flywheelMotor2, shooterConfig, 5);
-    Phoenix6Util.applyAndCheckConfiguration(flywheelMotor3, shooterConfig, 5);
+    // Phoenix6Util.applyAndCheckConfiguration(flywheelMotor2, shooterConfig, 5);
+    // Phoenix6Util.applyAndCheckConfiguration(flywheelMotor3, shooterConfig, 5);
 
-    flywheelMotor2.setControl(follower);
-    flywheelMotor3.setControl(follower);
+    // flywheelMotor2.setControl(follower);
+    // flywheelMotor3.setControl(follower);
 
     flywheel1AppliedVoltage = flywheelMotor1.getMotorVoltage();
     flywheel1StatorCurrent = flywheelMotor1.getStatorCurrent();
     flywheel1SupplyCurrent = flywheelMotor1.getSupplyCurrent();
     flywheel1Temperature = flywheelMotor1.getDeviceTemp();
 
-    flywheel2AppliedVoltage = flywheelMotor2.getMotorVoltage();
-    flywheel2StatorCurrent = flywheelMotor2.getStatorCurrent();
-    flywheel2SupplyCurrent = flywheelMotor2.getSupplyCurrent();
-    flywheel2Temperature = flywheelMotor2.getDeviceTemp();
+    // flywheel2AppliedVoltage = flywheelMotor2.getMotorVoltage();
+    // flywheel2StatorCurrent = flywheelMotor2.getStatorCurrent();
+    // flywheel2SupplyCurrent = flywheelMotor2.getSupplyCurrent();
+    // flywheel2Temperature = flywheelMotor2.getDeviceTemp();
 
-    flywheel3AppliedVoltage = flywheelMotor3.getMotorVoltage();
-    flywheel3StatorCurrent = flywheelMotor3.getStatorCurrent();
-    flywheel3SupplyCurrent = flywheelMotor3.getSupplyCurrent();
-    flywheel3Temperature = flywheelMotor3.getDeviceTemp();
+    // flywheel3AppliedVoltage = flywheelMotor3.getMotorVoltage();
+    // flywheel3StatorCurrent = flywheelMotor3.getStatorCurrent();
+    // flywheel3SupplyCurrent = flywheelMotor3.getSupplyCurrent();
+    // flywheel3Temperature = flywheelMotor3.getDeviceTemp();
 
     flywheelVelocityRotationsPerSec = flywheelMotor1.getVelocity();
     flywheelAccelerationRotationsPerSecSquared = flywheelMotor1.getAcceleration();
@@ -108,31 +108,31 @@ public class FlywheelIOCTRE implements FlywheelIO {
         flywheel1AppliedVoltage,
         flywheel1StatorCurrent,
         flywheel1SupplyCurrent,
-        flywheel1Temperature,
-        flywheel2AppliedVoltage,
-        flywheel2StatorCurrent,
-        flywheel2SupplyCurrent,
-        flywheel2Temperature,
-        flywheel3AppliedVoltage,
-        flywheel3StatorCurrent,
-        flywheel3SupplyCurrent,
-        flywheel3Temperature,
-        flywheelVelocityRotationsPerSec,
-        flywheelAccelerationRotationsPerSecSquared);
+        flywheel1Temperature);
+    // flywheel2AppliedVoltage,
+    // flywheel2StatorCurrent,
+    // flywheel2SupplyCurrent,
+    // flywheel2Temperature,
+    // flywheel3AppliedVoltage,
+    // flywheel3StatorCurrent,
+    // flywheel3SupplyCurrent,
+    // flywheel3Temperature,
+    // flywheelVelocityRotationsPerSec,
+    // flywheelAccelerationRotationsPerSecSquared);
 
     inputs.flywheel1AppliedVoltage = flywheel1AppliedVoltage.getValueAsDouble();
     inputs.flywheel1StatorCurrent = flywheel1StatorCurrent.getValueAsDouble();
     inputs.flywheel1SupplyCurrent = flywheel1SupplyCurrent.getValueAsDouble();
     inputs.flywheel1Temperature = flywheel1Temperature.getValueAsDouble();
 
-    inputs.flywheel2AppliedVoltage = flywheel2AppliedVoltage.getValueAsDouble();
-    inputs.flywheel2StatorCurrent = flywheel2StatorCurrent.getValueAsDouble();
-    inputs.flywheel2SupplyCurrent = flywheel2SupplyCurrent.getValueAsDouble();
-    inputs.flywheel2Temperature = flywheel2Temperature.getValueAsDouble();
+    // inputs.flywheel2AppliedVoltage = flywheel2AppliedVoltage.getValueAsDouble();
+    // inputs.flywheel2StatorCurrent = flywheel2StatorCurrent.getValueAsDouble();
+    // inputs.flywheel2SupplyCurrent = flywheel2SupplyCurrent.getValueAsDouble();
+    // inputs.flywheel2Temperature = flywheel2Temperature.getValueAsDouble();
 
-    inputs.flywheel3AppliedVoltage = flywheel3AppliedVoltage.getValueAsDouble();
-    inputs.flywheel3StatorCurrent = flywheel3StatorCurrent.getValueAsDouble();
-    inputs.flywheel3SupplyCurrent = flywheel3SupplyCurrent.getValueAsDouble();
+    // inputs.flywheel3AppliedVoltage = flywheel3AppliedVoltage.getValueAsDouble();
+    // inputs.flywheel3StatorCurrent = flywheel3StatorCurrent.getValueAsDouble();
+    // inputs.flywheel3SupplyCurrent = flywheel3SupplyCurrent.getValueAsDouble();
 
     inputs.flywheelVelocityRadPerSec =
         Units.rotationsToRadians(flywheelVelocityRotationsPerSec.getValueAsDouble());

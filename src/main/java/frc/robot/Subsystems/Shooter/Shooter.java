@@ -33,12 +33,14 @@ public class Shooter extends SubsystemBase {
   public enum ShooterSystemState {
     IDLE,
     GOTO_WANTED_MEASURABLES,
+    FLYWHEEL_TEST,
     ZERO
   }
 
   public enum ShooterWantedState {
     IDLE,
     ACTIVE_SHOOT,
+    FLYWHEEL_TEST,
     ZERO
   }
 
@@ -68,6 +70,8 @@ public class Shooter extends SubsystemBase {
         return ShooterSystemState.IDLE;
       case ACTIVE_SHOOT:
         return ShooterSystemState.GOTO_WANTED_MEASURABLES;
+      case FLYWHEEL_TEST:
+        return ShooterSystemState.FLYWHEEL_TEST;
       case ZERO:
         return ShooterSystemState.ZERO;
       default:
@@ -90,6 +94,8 @@ public class Shooter extends SubsystemBase {
             Rotation2d.fromRadians(
                 Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS));
         setFlywheelSpeed(RadiansPerSecond.of(0));
+      case FLYWHEEL_TEST:
+        setFlywheelSpeed(RadiansPerSecond.of(150));
         break;
     }
   }
