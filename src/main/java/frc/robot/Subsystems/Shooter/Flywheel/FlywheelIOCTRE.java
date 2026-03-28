@@ -71,10 +71,7 @@ public class FlywheelIOCTRE implements FlywheelIO {
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     // change this later!
-    shooterConfig.MotionMagic.MotionMagicCruiseVelocity = 100;
     shooterConfig.MotionMagic.MotionMagicAcceleration = 50;
-
-    shooterConfig.MotionMagic.MotionMagicExpo_kV = 8.0;
 
     Phoenix6Util.applyAndCheckConfiguration(flywheelMotor1, shooterConfig, 5);
     // Phoenix6Util.applyAndCheckConfiguration(flywheelMotor2, shooterConfig, 5);

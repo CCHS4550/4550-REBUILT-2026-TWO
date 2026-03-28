@@ -33,7 +33,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-  // private RobotContainer robotContainer;
+  private RobotContainer robotContainer;
   private Command autonomousCommand;
 
   // private AutoChooser autoChooser;
@@ -92,7 +92,7 @@ public class Robot extends LoggedRobot {
     }
     CommandScheduler.getInstance().setPeriod(0.2);
 
-    // robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
 
     // autoChooser = AutoChooser.create(robotContainer);
     // SmartDashboard.putData("auto program", autoChooser);
