@@ -59,7 +59,7 @@ public class BruinRobotConfig {
   private final double WHEEL_RADIUS_METERS = Units.inchesToMeters(2);
 
   /** Ratio between the drive motor shaft and the output shaft the wheel is mounted on. */
-  private final double DRIVE_GEAR_RATIO = 6.026785714285714;
+  private final double DRIVE_GEAR_RATIO = 5.27;
 
   /** Ratio between the steer motor shaft and the steer output shaft. */
   private final double STEER_GEAR_RATIO = 26;
@@ -294,7 +294,8 @@ public class BruinRobotConfig {
         new VisionConfig("Questnav")
             .withHeightOffset(Units.inchesToMeters(0))
             .withLengthOffset(Units.inchesToMeters(0))
-            .withWidthOffset(Units.inchesToMeters(0));
+            .withWidthOffset(Units.inchesToMeters(0))
+            .withMountingYaw(Units.degreesToRadians(0));
 
     // Turret Constants
     shooterConfig =
