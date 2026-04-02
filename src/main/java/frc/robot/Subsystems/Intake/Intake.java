@@ -70,6 +70,9 @@ public class Intake extends SubsystemBase {
     return runOnce(() -> intakeIO.setExtensionMotorPositionRad(angleRad, 100, 50));
   }
 
+  /// private final CommandXboxController driverController = new CommandXboxController(0);
+  /// driverController.a().onTrue(intake.setExtensionToAngle(1.0));
+
   private void applyStates() {
     switch (systemState) {
       case EXTENDED_INTAKING:
