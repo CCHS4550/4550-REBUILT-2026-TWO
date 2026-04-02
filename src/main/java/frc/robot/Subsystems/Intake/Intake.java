@@ -1,6 +1,7 @@
 package frc.robot.Subsystems.Intake;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.Constants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -37,6 +38,36 @@ public class Intake extends SubsystemBase {
 
   public Intake(IntakeIO intakeIO) {
     this.intakeIO = intakeIO;
+  }
+
+  private boolean runningSysId = false;
+
+  // So the big GPT said to do this, but I don't really know how it works and I hate converting
+  // units so ts deprecated ig
+  /*
+    private final SysIdRoutine sysIdRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> intakeIO.setExtensionVoltage(voltage.in(Volts)),
+                log -> {
+                  log.motor("extension")
+                      .voltage(inputs.extensionIntakeVoltage.in(Volts))
+                      .angularPosition(inputs.extensionPosRadians)
+                      .angularVelocity(inputs.extensionIntakeVelocityRadPerSec);
+                },
+                this));
+
+    public Command sysIdQuasistaticForward() {
+      return sysIdRoutine
+          .quasistatic(SysIdRoutine.Direction.kForward)
+          .beforeStarting(() -> runningSysId = true)
+          .finallyDo(() -> runningSysId = false);
+    }
+  */
+
+  public Command setExtensionToAngle(double angleRad) {
+    return runOnce(() -> intakeIO.setExtensionMotorPositionRad(angleRad, 100, 50));
   }
 
   private void applyStates() {
@@ -150,7 +181,12 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Subsystems/Intake", inputs);
     Logger.recordOutput("Subsystems/Intake/SystemState", systemState);
     Logger.recordOutput("Subsystems/Intake/DesiredState", wantedState);
-    systemState = handleStateTransitions();
-    applyStates();
+    Logger.recordOutput("Intake/AngleRad", inputs.extensionPosRadians);
+    Logger.recordOutput("Intake/VelocityRadPerSec", inputs.extensionIntakeVelocityRadPerSec);
+    Logger.recordOutput("Intake/AppliedVolts", inputs.extensionIntakeVoltage);
+    if (!runningSysId) {
+      systemState = handleStateTransitions();
+      applyStates();
+    }
   }
 }

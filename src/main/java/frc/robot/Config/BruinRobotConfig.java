@@ -313,7 +313,7 @@ public class BruinRobotConfig {
 
     intakeConfig =
         new IntakeConfig()
-            .withExtensionkP(0.7)
+            .withExtensionkP(0.0)
             .withExtensionkI(0.0)
             .withExtensionkD(0.0)
             .withExtensionkS(0.0)

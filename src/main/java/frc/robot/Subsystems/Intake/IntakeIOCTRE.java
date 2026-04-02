@@ -73,10 +73,12 @@ public class IntakeIOCTRE implements IntakeIO {
     extensionConfig.Slot0.kD = robotConfig.getIntakeConfig().extensionkD;
     extensionConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
     extensionConfig.Slot0.kS = robotConfig.getIntakeConfig().extensionkS;
-    extensionConfig.Slot0.kV = robotConfig.getIntakeConfig().extensionkS;
+    extensionConfig.Slot0.kV = robotConfig.getIntakeConfig().extensionkV;
     extensionConfig.Slot0.kG = robotConfig.getIntakeConfig().extensionkG;
+    /*
     extensionConfig.MotionMagic.MotionMagicCruiseVelocity = 100;
     extensionConfig.MotionMagic.MotionMagicAcceleration = 50;
+    */
 
     extensionConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     extensionConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -124,7 +126,7 @@ public class IntakeIOCTRE implements IntakeIO {
         extensionVelocityRotationsPerSec.getValueAsDouble()
             * Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT; // Update with constant
     inputs.extensionIntakeAccelRadPerSecSquared =
-        extensionVelocityRotationsPerSec.getValueAsDouble()
+        extensionAccelerationRotationsPerSecSquared.getValueAsDouble()
             * Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT;
     inputs.extensionIntakeTemperature = extensionMotorTemp.getValueAsDouble();
 
@@ -142,8 +144,7 @@ public class IntakeIOCTRE implements IntakeIO {
     inputs.spinnerIntakeVelocityRadPerSec =
         Units.rotationsToRadians(
             spinnerVelocityRotationsPerSec.getValueAsDouble()); // Update with constant
-    inputs.spinnerIntakeAccelRadPerSecSquared =
-        Units.rotationsToRadians(spinnerAccelerationRotationsPerSecSquared.getValueAsDouble());
+    Units.rotationsToRadians(spinnerAccelerationRotationsPerSecSquared.getValueAsDouble());
     inputs.spinnerIntakeTemperature = spinnerMotorTemp.getValueAsDouble();
   }
 
