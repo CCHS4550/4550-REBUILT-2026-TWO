@@ -148,8 +148,16 @@ public class IntakeIOCTRE implements IntakeIO {
   public void setExtensionMotorPositionRad(
       double rad, double veloRotPerSec, double accelRotPerSec) {
     extensionIntakeMotor.setControl(
-        extensionController.withPosition(
-            rad / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT));
+        extensionController
+            .withPosition(rad / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT)
+            .withFeedForward(
+                Constants.IntakeConstants.extensionkG
+                    * Math.cos(
+                        extensionPosRot.getValueAsDouble()
+                            * Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT)));
+    // extensionIntakeMotor.setControl(
+    //     extensionController.withPosition(
+    //         rad / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT));
   }
 
   @Override
@@ -160,5 +168,10 @@ public class IntakeIOCTRE implements IntakeIO {
   @Override
   public void setSpinnerVoltage(double voltage) {
     // spinnerIntakeMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void tareExtensionPosition() {
+    extensionIntakeMotor.setPosition(0);
   }
 }

@@ -33,4 +33,6 @@ public interface IntakeIO {
   public default void setExtensionVoltage(double voltage) {}
 
   public default void setSpinnerVoltage(double voltage) {}
+
+  public default void tareExtensionPosition() {}
 }

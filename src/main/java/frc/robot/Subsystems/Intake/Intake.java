@@ -70,6 +70,10 @@ public class Intake extends SubsystemBase {
   /// private final CommandXboxController driverController = new CommandXboxController(0);
   /// driverController.a().onTrue(intake.setExtensionToAngle(1.0));
 
+  public void tare() {
+    intakeIO.tareExtensionPosition();
+  }
+
   private void applyStates() {
     switch (systemState) {
       case EXTENDED_INTAKING:
@@ -118,13 +122,16 @@ public class Intake extends SubsystemBase {
       case BALL_STUFFING:
         return SystemState.STOW_SLOW;
       case PUMPING:
-        if (systemState == SystemState.UPPER_PUMP) {
-          return atWantedAngle() ? SystemState.LOWER_PUMP : SystemState.UPPER_PUMP;
-        } else if (systemState == SystemState.LOWER_PUMP) {
-          return atWantedAngle() ? SystemState.UPPER_PUMP : SystemState.LOWER_PUMP;
-        } else {
-          return SystemState.LOWER_PUMP;
-        }
+        /*
+          if (systemState == SystemState.UPPER_PUMP) {
+            return atWantedAngle() ? SystemState.LOWER_PUMP : SystemState.UPPER_PUMP;
+          } else if (systemState == SystemState.LOWER_PUMP) {
+            return atWantedAngle() ? SystemState.UPPER_PUMP : SystemState.LOWER_PUMP;
+          } else {
+            return SystemState.LOWER_PUMP;
+          }
+        */
+        return SystemState.LOWER_PUMP;
       case IDLE:
         return SystemState.IDLE;
       default:

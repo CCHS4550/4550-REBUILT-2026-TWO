@@ -40,6 +40,16 @@ public class RobotContainer {
     controller
         .b()
         .onFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
+
+    controller.x().onTrue(new InstantCommand(() -> intake.tare()));
+
+    controller
+        .y()
+        .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)));
+
+    controller
+        .y()
+        .onFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
   }
 
   // public SwerveSubsystem getSwerveSubsystem() {
