@@ -62,8 +62,8 @@ public class IntakeIOCTRE implements IntakeIO {
     extensionConfig = new TalonFXConfiguration();
     extensionConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     extensionConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    extensionConfig.CurrentLimits.SupplyCurrentLimit = 60.0;
-    extensionConfig.CurrentLimits.StatorCurrentLimit = 90.0;
+    extensionConfig.CurrentLimits.SupplyCurrentLimit = 25.0;
+    extensionConfig.CurrentLimits.StatorCurrentLimit = 30.0;
 
     extensionConfig.Slot0.kP = robotConfig.getIntakeConfig().extensionkP;
     extensionConfig.Slot0.kI = robotConfig.getIntakeConfig().extensionkI;
