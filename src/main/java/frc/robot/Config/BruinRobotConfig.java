@@ -50,7 +50,7 @@ public class BruinRobotConfig {
   public final CanDeviceID ROTATION_CANCODER = new CanDeviceID(22, CANIVORE_CANBUS);
 
   public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(14, CANIVORE_CANBUS);
-  public final CanDeviceID INTAKE_EXTENSION = new CanDeviceID(15, CANIVORE_CANBUS);
+  public final CanDeviceID INTAKE_EXTENSION = new CanDeviceID(15);
 
   /**
    * Wheel radius in meters. Accuracy in these measurements affects wheel odometry which measures
@@ -314,7 +314,7 @@ public class BruinRobotConfig {
 
     intakeConfig =
         new IntakeConfig()
-            .withExtensionkP(0.0)
+            .withExtensionkP(10.0)
             .withExtensionkI(0.0)
             .withExtensionkD(0.0)
             .withExtensionkS(0.0)

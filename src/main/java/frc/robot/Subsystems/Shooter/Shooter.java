@@ -13,15 +13,12 @@ import frc.robot.Subsystems.Shooter.Elevation.ElevationIO;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOInputsAutoLogged;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIO;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOInputsAutoLogged;
-import frc.robot.Util.LaunchCalculator;
 import frc.robot.Util.ShooterMeasurables;
 
 public class Shooter extends SubsystemBase {
 
   private FlywheelIO flywheelIO;
   private ElevationIO elevationIO;
-
-  private LaunchCalculator calculator;
 
   private ElevationIOInputsAutoLogged elevationInputs = new ElevationIOInputsAutoLogged();
   private FlywheelIOInputsAutoLogged flywheelInputs = new FlywheelIOInputsAutoLogged();
@@ -45,16 +42,14 @@ public class Shooter extends SubsystemBase {
   private ShooterSystemState systemState = ShooterSystemState.IDLE;
   private ShooterWantedState wantedState = ShooterWantedState.IDLE;
 
-  public Shooter(ElevationIO elevationIO, FlywheelIO flywheelIO, LaunchCalculator calculator) {
+  public Shooter(ElevationIO elevationIO, FlywheelIO flywheelIO) {
     this.elevationIO = elevationIO;
     this.flywheelIO = flywheelIO;
-    this.calculator = calculator;
     atGoal = false;
   }
 
   @Override
   public void periodic() {
-    wantedShooterMeasurables = calculator.getParameters();
 
     atGoal = atSetpoint();
 

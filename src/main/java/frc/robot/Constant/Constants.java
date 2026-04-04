@@ -99,9 +99,9 @@ public final class Constants {
     public static final double EXTENSION_POSITION_COEFFICIENT = 2 * Math.PI * EXTENSION_GEAR_RATIO;
 
     public static final double INTAKE_BOTTOM_RADS = 0.0;
-    public static final double INTAKE_STOWED_RADS = 99999999; // fill
-    public static final double INTAKE_TOP_PUMP_RADS = 99999999; // fill
-    public static final double INTAKE_BOTTOM_PUMP_RADS = 999999; // fill
+    public static final double INTAKE_STOWED_RADS = 2.27; // fill
+    public static final double INTAKE_TOP_PUMP_RADS = 1.7; // fill
+    public static final double INTAKE_BOTTOM_PUMP_RADS = 1; // fill
   }
 
   public static final class LowerChassisConstants {

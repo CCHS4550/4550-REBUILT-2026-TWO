@@ -1,7 +1,6 @@
 package frc.robot.Subsystems.Intake;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.Constants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -40,8 +39,6 @@ public class Intake extends SubsystemBase {
     this.intakeIO = intakeIO;
   }
 
-  private boolean runningSysId = false;
-
   // So the big GPT said to do this, but I don't really know how it works and I hate converting
   // units so ts deprecated ig
   /*
@@ -66,9 +63,9 @@ public class Intake extends SubsystemBase {
     }
   */
 
-  public Command setExtensionToAngle(double angleRad) {
-    return runOnce(() -> intakeIO.setExtensionMotorPositionRad(angleRad, 100, 50));
-  }
+  // public Command setExtensionToAngle(double angleRad) {
+  //   return runOnce(() -> intakeIO.setExtensionMotorPositionRad(angleRad, 100, 50));
+  // }
 
   /// private final CommandXboxController driverController = new CommandXboxController(0);
   /// driverController.a().onTrue(intake.setExtensionToAngle(1.0));
@@ -187,9 +184,7 @@ public class Intake extends SubsystemBase {
     Logger.recordOutput("Intake/AngleRad", inputs.extensionPosRadians);
     Logger.recordOutput("Intake/VelocityRadPerSec", inputs.extensionIntakeVelocityRadPerSec);
     Logger.recordOutput("Intake/AppliedVolts", inputs.extensionIntakeVoltage);
-    if (!runningSysId) {
-      systemState = handleStateTransitions();
-      applyStates();
-    }
+    systemState = handleStateTransitions();
+    applyStates();
   }
 }
