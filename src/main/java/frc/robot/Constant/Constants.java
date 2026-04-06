@@ -57,29 +57,19 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final double ELEVATION_GEAR_RATIO = 1.0 / 149.08; // fill
-    public static final double ELEVATION_ENCODER_GEAR_RATIO = 1.0 / 8.80;
+    public static final double ELEVATION_GEAR_RATIO = 1.0 / 66.54; // fill
     public static final double ELEVATION_POSITION_COEFFICIENT = 2 * Math.PI * ELEVATION_GEAR_RATIO;
 
-    public static final double ELEVATION_ENCODER_POSITION_COEFFICIENT =
-        2 * Math.PI * ELEVATION_ENCODER_GEAR_RATIO;
+    public static final double SHOOTER_ONE_GEAR_RATIO = 1.0 / 1.0;
+    public static final double SHOOTER_ONE_POSITION_COEFFICIENT =
+        2 * Math.PI * SHOOTER_ONE_GEAR_RATIO;
 
-    public static final double ROTATION_GEAR_RATIO = 1.0 / 37;
-    public static final double ROTATION_GEAR_RATIO_TO_ENCODER = 1.0 / 7.41;
-    public static final double ROTATION_POSITION_COEFFICIENT = 2 * Math.PI * ROTATION_GEAR_RATIO;
-    public static final double ROTATION_POSITION_COEFFICIENT_TO_ENCODER =
-        2 * Math.PI * ROTATION_GEAR_RATIO_TO_ENCODER;
+    public static final double SHOOTER_TWO_GEAR_RATIO = 1.0 / 1.0;
+    public static final double SHOOTER_TWO_POSITION_COEFFICIENT =
+        2 * Math.PI * SHOOTER_TWO_GEAR_RATIO;
 
-    // public static final double ELEVATION_DEFAULT_ENCODER_READING_AT_SHALLOWEST_ANGLE = -0.48;
-    public static final double ELEVATION_DEFAULT_ENCODER_READING_AT_SHALLOWEST_ANGLE = 0.35;
-    public static final double SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(45);
-    public static final double STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(78);
-
-    public static final double SHOOTER_CLOSE_RADIANS_PER_SEC = 300.0;
-
-    public static final double SHOOTER_FAR_RADIANS_PER_SEC = 400;
-
-    public static final double SHOOTER_ULTRA_FAR_RADIANS_PER_SEC = 500;
+    public static final double SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(29);
+    public static final double STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(61);
 
     public static final double TURRET_HEIGHT_METERS = 0.305;
 
@@ -87,11 +77,6 @@ public final class Constants {
         new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
 
     public static final double MAX_BALL_HEIGHT_METERS = 5.4864;
-
-    public static final double FORWARD_ROTATION_LIMIT_RADIANS = 0.0;
-
-    public static final double BACKWARDS_ROTATION_LIMIT_RADIANS = 0.0;
-    public static final double SHOOTER_PASSING_SLOW_RADIANS_PER_SEC = 421;
   }
 
   public static final class IntakeConstants {

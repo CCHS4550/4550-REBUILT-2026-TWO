@@ -36,18 +36,13 @@ public class BruinRobotConfig {
   public final CanDeviceID BACK_RIGHT_STEER_MOTOR = new CanDeviceID(11);
   public final CanDeviceID BACK_RIGHT_STEER_ENCODER = new CanDeviceID(12);
 
-  public final CanDeviceID KICKER_MOTOR = new CanDeviceID(16, CANIVORE_CANBUS);
-  public final CanDeviceID INDEXER_MOTOR = new CanDeviceID(23, CANIVORE_CANBUS);
+  public final CanDeviceID INDEXER_MOTOR_1 = new CanDeviceID(16, CANIVORE_CANBUS);
+  public final CanDeviceID INDEXER_MOTOR_2 = new CanDeviceID(17, CANIVORE_CANBUS);
 
-  public final CanDeviceID ROTATION_MOTOR = new CanDeviceID(19, CANIVORE_CANBUS);
   public final CanDeviceID ELEVATION_MOTOR = new CanDeviceID(20, CANIVORE_CANBUS);
 
-  public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(-1, CANIVORE_CANBUS);
-  public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(-1, CANIVORE_CANBUS);
-  public final CanDeviceID FLYWHEEL_MOTOR_3 = new CanDeviceID(-1, CANIVORE_CANBUS);
-
-  public final CanDeviceID ELEVATION_CANCODER = new CanDeviceID(21, CANIVORE_CANBUS);
-  public final CanDeviceID ROTATION_CANCODER = new CanDeviceID(22, CANIVORE_CANBUS);
+  public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(21, CANIVORE_CANBUS);
+  public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(22, CANIVORE_CANBUS);
 
   public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(14, CANIVORE_CANBUS);
   public final CanDeviceID INTAKE_EXTENSION = new CanDeviceID(15, CANIVORE_CANBUS);
@@ -306,15 +301,15 @@ public class BruinRobotConfig {
             .withElevationKd(0.1)
             .withElevationKs(0.0)
             .withElevationKv(0.5)
-            .withShooterKp(5.6)
+            .withShooterKp(3.14)
             .withShooterKi(0)
-            .withShooterKd(0)
+            .withShooterKd(0.1)
             .withShooterKs(0.0)
-            .withShooterKv(0.0);
+            .withShooterKv(0.6);
 
     intakeConfig =
         new IntakeConfig()
-            .withExtensionkP(0.7)
+            .withExtensionkP(5.7)
             .withExtensionkI(0.0)
             .withExtensionkD(0.0)
             .withExtensionkS(0.0)

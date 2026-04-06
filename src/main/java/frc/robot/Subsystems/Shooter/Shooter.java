@@ -1,7 +1,6 @@
 package frc.robot.Subsystems.Shooter;
 
 import static edu.wpi.first.units.Units.*;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,48 +12,52 @@ import frc.robot.Subsystems.Shooter.Elevation.ElevationIO;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOInputsAutoLogged;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIO;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOInputsAutoLogged;
-import frc.robot.Util.LaunchCalculator;
 import frc.robot.Util.ShooterMeasurables;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
   private FlywheelIO flywheelIO;
   private ElevationIO elevationIO;
 
-  private LaunchCalculator calculator;
-
   private ElevationIOInputsAutoLogged elevationInputs = new ElevationIOInputsAutoLogged();
   private FlywheelIOInputsAutoLogged flywheelInputs = new FlywheelIOInputsAutoLogged();
 
   private boolean atGoal;
 
-  private ShooterMeasurables wantedShooterMeasurables;
+  private ShooterMeasurables wantedShooterMeasurables =
+      new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
 
   public enum ShooterSystemState {
     IDLE,
     GOTO_WANTED_MEASURABLES,
-    ZERO
+    ZERO,
+    TEST
   }
 
   public enum ShooterWantedState {
     IDLE,
     ACTIVE_SHOOT,
-    ZERO
+    ZERO,
+    TEST
   }
 
   private ShooterSystemState systemState = ShooterSystemState.IDLE;
   private ShooterWantedState wantedState = ShooterWantedState.IDLE;
 
-  public Shooter(ElevationIO elevationIO, FlywheelIO flywheelIO, LaunchCalculator calculator) {
+  public Shooter(ElevationIO elevationIO, FlywheelIO flywheelIO) {
     this.elevationIO = elevationIO;
     this.flywheelIO = flywheelIO;
-    this.calculator = calculator;
     atGoal = false;
   }
 
   @Override
   public void periodic() {
-    wantedShooterMeasurables = calculator.getParameters();
+    flywheelIO.updateInputs(flywheelInputs);
+    Logger.processInputs("Subsystems/flywheels", flywheelInputs);
+
+    elevationIO.updateInputs(elevationInputs);
+    Logger.processInputs("Subsystems/elevation", elevationInputs);
 
     atGoal = atSetpoint();
 
@@ -70,6 +73,8 @@ public class Shooter extends SubsystemBase {
         return ShooterSystemState.GOTO_WANTED_MEASURABLES;
       case ZERO:
         return ShooterSystemState.ZERO;
+      case TEST:
+        return ShooterSystemState.TEST;
       default:
         return ShooterSystemState.IDLE;
     }
@@ -78,7 +83,7 @@ public class Shooter extends SubsystemBase {
   public void applyStates() {
     switch (systemState) {
       case IDLE:
-        elevationIO.setVoltage(0);
+        elevationIO.setVoltage(-0.3);
         flywheelIO.setVoltage(Voltage.ofBaseUnits(0, Volts));
         break;
       case GOTO_WANTED_MEASURABLES:
@@ -90,6 +95,9 @@ public class Shooter extends SubsystemBase {
             Rotation2d.fromRadians(
                 Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS));
         setFlywheelSpeed(RadiansPerSecond.of(0));
+        break;
+      case TEST:
+        setFlywheelSpeed(RadiansPerSecond.of(200));
         break;
     }
   }
@@ -116,7 +124,7 @@ public class Shooter extends SubsystemBase {
 
   public boolean atSetpoint() {
     return MathUtil.isNear(
-            flywheelInputs.flywheelVelocityRadPerSec,
+            flywheelInputs.flywheel1VelocityRadPerSec,
             wantedShooterMeasurables.getFlywheelSpeed(),
             wantedShooterMeasurables.getFlywheelSpeed()
                 * 0.05) // Allowance is 5% of wanted velocity

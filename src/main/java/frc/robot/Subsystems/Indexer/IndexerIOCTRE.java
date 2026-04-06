@@ -17,10 +17,10 @@ import frc.robot.Util.Phoenix6Util;
 public class IndexerIOCTRE implements IndexerIO {
   private TalonFX indexerMotor;
 
-  private TalonFX kickerMotor;
+  private TalonFX indexerTwoMotor;
 
   private TalonFXConfiguration indexerConfig;
-  private TalonFXConfiguration kickerConfig;
+  private TalonFXConfiguration indexerTwoConfig;
 
   private final StatusSignal<Voltage> indexerAppliedVolts;
   private final StatusSignal<Current> indexerSupplyCurrentAmps;
@@ -29,18 +29,18 @@ public class IndexerIOCTRE implements IndexerIO {
   private final StatusSignal<AngularVelocity> indexerVelocityRadPerSec;
   private final StatusSignal<AngularAcceleration> indexerAccelradPerSecSquared;
 
-  private final StatusSignal<Voltage> kickerAppliedVolts;
-  private final StatusSignal<Current> kickerSupplyCurrentAmps;
-  private final StatusSignal<Current> kickerStatorCurrentAmps;
-  private final StatusSignal<Temperature> kickerMotorTemp;
-  private final StatusSignal<AngularVelocity> kickerVelocityRadPerSec;
-  private final StatusSignal<AngularAcceleration> kickerAccelradPerSecSquared;
+  private final StatusSignal<Voltage> indexerTwoAppliedVolts;
+  private final StatusSignal<Current> indexerTwoSupplyCurrentAmps;
+  private final StatusSignal<Current> indexerTwoStatorCurrentAmps;
+  private final StatusSignal<Temperature> indexerTwoMotorTemp;
+  private final StatusSignal<AngularVelocity> indexerTwoVelocityRadPerSec;
+  private final StatusSignal<AngularAcceleration> indexerTwoAccelradPerSecSquared;
 
   public IndexerIOCTRE(BruinRobotConfig bruinRobotConfig) {
     indexerMotor =
         new TalonFX(
-            bruinRobotConfig.INDEXER_MOTOR.getDeviceNumber(),
-            bruinRobotConfig.INDEXER_MOTOR.getBus());
+            bruinRobotConfig.INDEXER_MOTOR_1.getDeviceNumber(),
+            bruinRobotConfig.INDEXER_MOTOR_1.getBus());
 
     indexerConfig = new TalonFXConfiguration();
 
@@ -50,7 +50,7 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerConfig.CurrentLimits.StatorCurrentLimit = 90.0;
 
     indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    indexerConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     Phoenix6Util.applyAndCheckConfiguration(indexerMotor, indexerConfig, 5);
 
@@ -62,30 +62,30 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerAccelradPerSecSquared = indexerMotor.getAcceleration();
     indexerMotorTemp = indexerMotor.getDeviceTemp();
 
-    kickerMotor =
+    indexerTwoMotor =
         new TalonFX(
-            bruinRobotConfig.KICKER_MOTOR.getDeviceNumber(),
-            bruinRobotConfig.KICKER_MOTOR.getBus());
+            bruinRobotConfig.INDEXER_MOTOR_1.getDeviceNumber(),
+            bruinRobotConfig.INDEXER_MOTOR_2.getBus());
 
-    kickerConfig = new TalonFXConfiguration();
+    indexerTwoConfig = new TalonFXConfiguration();
 
-    kickerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    kickerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    kickerConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
-    kickerConfig.CurrentLimits.StatorCurrentLimit = 90.0;
+    indexerTwoConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    indexerTwoConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    indexerTwoConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    indexerTwoConfig.CurrentLimits.StatorCurrentLimit = 90.0;
 
-    kickerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    kickerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    indexerTwoConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    Phoenix6Util.applyAndCheckConfiguration(kickerMotor, kickerConfig, 5);
+    Phoenix6Util.applyAndCheckConfiguration(indexerTwoMotor, indexerTwoConfig, 5);
 
-    kickerMotor.setPosition(0.0);
-    kickerAppliedVolts = kickerMotor.getMotorVoltage();
-    kickerSupplyCurrentAmps = kickerMotor.getSupplyCurrent();
-    kickerStatorCurrentAmps = kickerMotor.getStatorCurrent();
-    kickerVelocityRadPerSec = kickerMotor.getVelocity();
-    kickerAccelradPerSecSquared = kickerMotor.getAcceleration();
-    kickerMotorTemp = kickerMotor.getDeviceTemp();
+    indexerTwoMotor.setPosition(0.0);
+    indexerTwoAppliedVolts = indexerTwoMotor.getMotorVoltage();
+    indexerTwoSupplyCurrentAmps = indexerTwoMotor.getSupplyCurrent();
+    indexerTwoStatorCurrentAmps = indexerTwoMotor.getStatorCurrent();
+    indexerTwoVelocityRadPerSec = indexerTwoMotor.getVelocity();
+    indexerTwoAccelradPerSecSquared = indexerTwoMotor.getAcceleration();
+    indexerTwoMotorTemp = indexerTwoMotor.getDeviceTemp();
   }
 
   @Override
@@ -99,12 +99,12 @@ public class IndexerIOCTRE implements IndexerIO {
         indexerMotorTemp);
 
     BaseStatusSignal.refreshAll(
-        kickerAppliedVolts,
-        kickerSupplyCurrentAmps,
-        kickerStatorCurrentAmps,
-        kickerVelocityRadPerSec,
-        kickerAccelradPerSecSquared,
-        kickerMotorTemp);
+        indexerTwoAppliedVolts,
+        indexerTwoSupplyCurrentAmps,
+        indexerTwoStatorCurrentAmps,
+        indexerTwoVelocityRadPerSec,
+        indexerTwoAccelradPerSecSquared,
+        indexerTwoMotorTemp);
 
     inputs.indexerVoltage = indexerAppliedVolts.getValueAsDouble();
     inputs.indexerSupplyCurrent = indexerSupplyCurrentAmps.getValueAsDouble();
@@ -113,20 +113,20 @@ public class IndexerIOCTRE implements IndexerIO {
     inputs.indexerAccelRadPerSecSquared = indexerAccelradPerSecSquared.getValueAsDouble();
     inputs.indexerTemperature = indexerMotorTemp.getValueAsDouble();
 
-    inputs.kickerVoltage = kickerAppliedVolts.getValueAsDouble();
-    inputs.kickerSupplyCurrent = kickerSupplyCurrentAmps.getValueAsDouble();
-    inputs.kickerStatorCurrent = kickerStatorCurrentAmps.getValueAsDouble();
-    inputs.kickerVelocityRadPerSec = kickerVelocityRadPerSec.getValueAsDouble();
-    inputs.kickerAccelRadPerSecSquared =
-        kickerAccelradPerSecSquared.getValueAsDouble()
+    inputs.indexerTwoVoltage = indexerTwoAppliedVolts.getValueAsDouble();
+    inputs.indexerTwoSupplyCurrent = indexerTwoSupplyCurrentAmps.getValueAsDouble();
+    inputs.indexerTwoStatorCurrent = indexerTwoStatorCurrentAmps.getValueAsDouble();
+    inputs.indexerTwoVelocityRadPerSec = indexerTwoVelocityRadPerSec.getValueAsDouble();
+    inputs.indexerTwoAccelRadPerSecSquared =
+        indexerTwoAccelradPerSecSquared.getValueAsDouble()
             * 2
             * Math.PI; // TODO: Update this later with a total gear reduction in constants
-    inputs.kickerTemperature = kickerMotorTemp.getValueAsDouble();
+    inputs.indexerTwoTemperature = indexerTwoMotorTemp.getValueAsDouble();
   }
 
   @Override
   public void setVoltage(double voltage) {
     indexerMotor.setVoltage(voltage);
-    kickerMotor.setVoltage(voltage);
+    indexerTwoMotor.setVoltage(voltage);
   }
 }
