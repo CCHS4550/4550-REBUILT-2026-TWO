@@ -60,7 +60,7 @@ public class Indexer extends SubsystemBase {
     }
   }
 
-  public void setWantedState(IndexerWantedState wantedState) {
-    this.wantedState = wantedState;
+  public void setWantedState(IndexerWantedState state) {
+    this.wantedState = state;
   }
 }

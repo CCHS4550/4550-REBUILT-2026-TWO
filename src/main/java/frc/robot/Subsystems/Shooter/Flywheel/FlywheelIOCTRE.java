@@ -66,7 +66,7 @@ public class FlywheelIOCTRE implements FlywheelIO {
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-    shooterConfig.MotionMagic.MotionMagicAcceleration = 15;
+    shooterConfig.MotionMagic.MotionMagicAcceleration = 5;
 
     // change this later!
 
@@ -127,7 +127,7 @@ public class FlywheelIOCTRE implements FlywheelIO {
 
     inputs.flywheel2VelocityRadPerSec =
         Units.rotationsToRadians(flywheel2VelocityRotationsPerSec.getValueAsDouble())
-            * Constants.ShooterConstants.SHOOTER_TWO_GEAR_RATIO;
+            * Constants.ShooterConstants.SHOOTER_ONE_GEAR_RATIO;
     inputs.flywheel2AccelRadPerSecPerSec =
         Units.rotationsToRadians(
             flywheel2AccelerationRotationsPerSecSquared.getValueAsDouble()

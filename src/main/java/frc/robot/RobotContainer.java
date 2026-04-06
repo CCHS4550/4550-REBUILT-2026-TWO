@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
+import frc.robot.Subsystems.Indexer.Indexer;
+import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
+import frc.robot.Subsystems.Indexer.IndexerIOCTRE;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
@@ -21,6 +24,7 @@ public class RobotContainer {
   // private final QuestNav questnav;
 
   private final Shooter shooter;
+  private final Indexer indexer;
   private final SwerveSubsystem swerveSubsystem;
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -28,6 +32,7 @@ public class RobotContainer {
     BruinRobotConfig config = new BruinRobotConfig();
 
     shooter = new Shooter(new ElevationIOCTRE(config), new FlywheelIOCTRE(config));
+    indexer = new Indexer(new IndexerIOCTRE(config));
     SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>[]
         moduleConstants = config.getModuleConstants();
 
@@ -53,6 +58,13 @@ public class RobotContainer {
     controller
         .a()
         .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
+
+    controller
+        .a()
+        .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)));
+    controller
+        .a()
+        .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
   }
 
   public SwerveSubsystem getSwerveSubsystem() {

@@ -301,11 +301,11 @@ public class BruinRobotConfig {
             .withElevationKd(0.1)
             .withElevationKs(0.0)
             .withElevationKv(0.5)
-            .withShooterKp(3.14)
+            .withShooterKp(0.5)
             .withShooterKi(0)
-            .withShooterKd(0.1)
+            .withShooterKd(0.00)
             .withShooterKs(0.0)
-            .withShooterKv(0.6);
+            .withShooterKv(0.13);
 
     intakeConfig =
         new IntakeConfig()

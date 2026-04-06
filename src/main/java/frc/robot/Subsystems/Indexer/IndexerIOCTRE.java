@@ -75,7 +75,7 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerTwoConfig.CurrentLimits.StatorCurrentLimit = 90.0;
 
     indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    indexerTwoConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    indexerTwoConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     Phoenix6Util.applyAndCheckConfiguration(indexerTwoMotor, indexerTwoConfig, 5);
 
