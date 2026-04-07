@@ -12,7 +12,6 @@ import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
 import frc.robot.Subsystems.Indexer.Indexer;
-import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
 import frc.robot.Subsystems.Indexer.IndexerIOCTRE;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
@@ -59,19 +58,12 @@ public class RobotContainer {
         .a()
         .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
 
-    controller
-        .a()
-        .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)));
-    controller
-        .a()
-        .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
-    /// for yall retards that are reading this
     /// "P" = kP
     /// "I" = kI
     /// and so on
     double changeMagnitude = 0.01;
     String slot = "P";
-    int adjustedModule = 0; //0 is flywheels, 1 or any other number ig is elevator
+    int adjustedModule = 0; // 0 is flywheels, 1 or any other number ig is elevator
     // These should print out the new slot value, if that doesn't happen, thats not good
     // btw ur welcom for this readable code, it should work
     controller

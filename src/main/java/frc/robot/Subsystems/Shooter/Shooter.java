@@ -97,8 +97,7 @@ public class Shooter extends SubsystemBase {
         setFlywheelSpeed(RadiansPerSecond.of(0));
         break;
       case TEST:
-        setFlywheelSpeed(RadiansPerSecond.of(200));
-        elevationIO.setVoltage(-0.3);
+        elevationIO.setElevationAngle(Rotation2d.fromDegrees(45));
         break;
     }
   }
