@@ -26,4 +26,6 @@ public interface ElevationIO {
   default void setVoltage(double voltage) {}
 
   default void setEncoderPositionAtBottom() {}
+
+  default void adjustElevationKSlotValue(double value, String slot) {}
 }

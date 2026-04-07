@@ -131,12 +131,40 @@ public class ElevationIOCTRE implements ElevationIO {
     elevationMotor.setVoltage(volts);
   }
 
-  public static double mapRange(double value) {
-    // Check to prevent division by zero if the old range is invalid
+  @Override
+  public void adjustElevationKSlotValue(double value, String slot) {
+    System.out.print("Elevation k" + slot + " value: ");
+    switch (slot) {
+      case "P":
+        elevationConfig.Slot0.kP += value;
+        System.out.println(elevationConfig.Slot0.kP);
+        break;
 
-    // Perform the linear mapping
-    double oldRange = 2.3643 - 1.3024;
-    double newRange = 1.3788 - 0.7505;
-    return 0.7505 + ((value - 1.3024) * newRange / oldRange);
+      case "I":
+        elevationConfig.Slot0.kI += value;
+        System.out.println(elevationConfig.Slot0.kI);
+        break;
+
+      case "D":
+        elevationConfig.Slot0.kD += value;
+        System.out.println(elevationConfig.Slot0.kD);
+        break;
+
+      case "S":
+        elevationConfig.Slot0.kS += value;
+        System.out.println(elevationConfig.Slot0.kS);
+        break;
+
+      case "V":
+        elevationConfig.Slot0.kV += value;
+        System.out.println(elevationConfig.Slot0.kV);
+        break;
+
+      default:
+        System.out.println("Invalid slot!!!!!");
+        break;
+    }
+
+    Phoenix6Util.applyAndCheckConfiguration(elevationMotor, elevationConfig, 5);
   }
 }
