@@ -30,4 +30,6 @@ public interface FlywheelIO {
   default void setVoltage(Voltage voltage) {}
 
   default void setVelo(AngularVelocity velo) {}
+
+  default void adjustFlywheelKSlotValue(double value, String slot) {}
 }

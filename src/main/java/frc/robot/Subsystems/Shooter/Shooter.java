@@ -133,4 +133,12 @@ public class Shooter extends SubsystemBase {
             wantedShooterMeasurables.getHoodAngle(),
             0.3);
   }
+
+  public void adjustFlywheelKSlotValue(double value, String slot) {
+    flywheelIO.adjustFlywheelKSlotValue(value, slot);
+  }
+
+  public void adjustElevationKSlotValue(double value, String slot) {
+    elevationIO.adjustElevationKSlotValue(value, slot);
+  }
 }

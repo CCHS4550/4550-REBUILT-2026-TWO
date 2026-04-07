@@ -157,4 +157,42 @@ public class FlywheelIOCTRE implements FlywheelIO {
             .withSlot(0)
             .withEnableFOC(true));
   }
+
+  @Override
+  public void adjustFlywheelKSlotValue(double value, String slot) {
+    System.out.print("Flywheel k" + slot + " value: ");
+    switch (slot) {
+      case "P":
+        shooterConfig.Slot0.kP += value;
+        System.out.println(shooterConfig.Slot0.kP);
+        break;
+
+      case "I":
+        shooterConfig.Slot0.kI += value;
+        System.out.println(shooterConfig.Slot0.kI);
+        break;
+
+      case "D":
+        shooterConfig.Slot0.kD += value;
+        System.out.println(shooterConfig.Slot0.kD);
+        break;
+
+      case "S":
+        shooterConfig.Slot0.kS += value;
+        System.out.println(shooterConfig.Slot0.kS);
+        break;
+
+      case "V":
+        shooterConfig.Slot0.kV += value;
+        System.out.println(shooterConfig.Slot0.kV);
+        break;
+
+      default:
+        System.out.println("Invalid slot!!!!!");
+        break;
+    }
+
+    Phoenix6Util.applyAndCheckConfiguration(flywheelMotor1, shooterConfig, 5);
+    Phoenix6Util.applyAndCheckConfiguration(flywheelMotor2, shooterConfig, 5);
+  }
 }

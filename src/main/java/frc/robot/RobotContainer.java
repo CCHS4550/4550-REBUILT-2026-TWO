@@ -53,6 +53,32 @@ public class RobotContainer {
     controller
         .a()
         .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
+
+    /// for yall retards that are reading this
+    /// "P" = kP
+    /// "I" = kI
+    /// and so on
+    double changeMagnitude = 0.01;
+    String slot = "P";
+    int adjustedModule = 0; //0 is flywheels, 1 or any other number ig is elevator
+    // These should print out the new slot value, if that doesn't happen, thats not good
+    // btw ur welcom for this readable code, it should work
+    controller
+        .rightBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  if (adjustedModule == 0) shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
+                  else shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
+                }));
+    controller
+        .leftBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  if (adjustedModule == 0) shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
+                  else shooter.adjustFlywheelKSlotValue(-1 * changeMagnitude, slot);
+                }));
   }
 
   public SwerveSubsystem getSwerveSubsystem() {
