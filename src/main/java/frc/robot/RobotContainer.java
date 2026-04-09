@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
+import frc.robot.Subsystems.Intake.Intake;
+import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
+import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
@@ -21,13 +24,17 @@ public class RobotContainer {
   // private final QuestNav questnav;
 
   private final Shooter shooter;
+  private final Intake intake;
   private final SwerveSubsystem swerveSubsystem;
   private final CommandXboxController controller = new CommandXboxController(0);
 
   public RobotContainer() {
     BruinRobotConfig config = new BruinRobotConfig();
 
-    shooter = new Shooter(new ElevationIOCTRE(config), new FlywheelIOCTRE(config));
+    intake = new Intake(new IntakeIOCTRE(config));
+
+    shooter = new Shooter(new ElevationIOCTRE(config), new FlywheelIOCTRE(config), controller);
+
     SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>[]
         moduleConstants = config.getModuleConstants();
 
@@ -39,6 +46,7 @@ public class RobotContainer {
             moduleConstants[0].SpeedAt12Volts,
             moduleConstants[0].SpeedAt12Volts
                 / Math.hypot(moduleConstants[0].LocationX, moduleConstants[0].LocationY));
+
     // questnav =
     //     new QuestNav(swerveSubsystem, new
     // QuestNavIOQuest(config.getVisionConfigurations().get(1)));
@@ -48,19 +56,34 @@ public class RobotContainer {
     //         new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
     controller
-        .a()
-        .onTrue(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.TEST)));
+        .rightStick()
+        .onTrue(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.MANUAL_SHOOT)));
+
+    controller.rightTrigger().onTrue(new InstantCommand(() -> shooter.setFlywheelState(true)));
+    controller.rightTrigger().onFalse(new InstantCommand(() -> shooter.setFlywheelState(false)));
+
     controller
         .a()
-        .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
+        .onTrue(
+            new InstantCommand(
+                () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)));
+    controller
+        .b()
+        .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+    controller
+        .x()
+        .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)));
+    controller
+        .x()
+        .onFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
 
-    /// for yall retards that are reading this
+    /// for yall that are reading this
     /// "P" = kP
     /// "I" = kI
     /// and so on
     double changeMagnitude = 0.01;
     String slot = "P";
-    int adjustedModule = 0; //0 is flywheels, 1 or any other number ig is elevator
+    int adjustedModule = 0; // 0 is flywheels, 1 is elevator, could add more later
     // These should print out the new slot value, if that doesn't happen, thats not good
     // btw ur welcom for this readable code, it should work
     controller
@@ -68,16 +91,34 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  if (adjustedModule == 0) shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
-                  else shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
+                  switch (adjustedModule) {
+                    case (0):
+                      shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
+                      break;
+                    case (1):
+                      shooter.adjustElevationKSlotValue(changeMagnitude, slot);
+                      break;
+                    default:
+                      System.out.println("Invalid module!!!!");
+                      break;
+                  }
                 }));
     controller
         .leftBumper()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  if (adjustedModule == 0) shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
-                  else shooter.adjustFlywheelKSlotValue(-1 * changeMagnitude, slot);
+                  switch (adjustedModule) {
+                    case (0):
+                      shooter.adjustFlywheelKSlotValue(-1 * changeMagnitude, slot);
+                      break;
+                    case (1):
+                      shooter.adjustElevationKSlotValue(-1 * changeMagnitude, slot);
+                      break;
+                    default:
+                      System.out.println("Invalid module!!!!");
+                      break;
+                  }
                 }));
   }
 

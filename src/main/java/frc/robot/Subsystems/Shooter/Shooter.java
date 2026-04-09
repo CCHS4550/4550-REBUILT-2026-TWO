@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constant.Constants;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIO;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOInputsAutoLogged;
@@ -23,14 +24,19 @@ public class Shooter extends SubsystemBase {
   private ElevationIOInputsAutoLogged elevationInputs = new ElevationIOInputsAutoLogged();
   private FlywheelIOInputsAutoLogged flywheelInputs = new FlywheelIOInputsAutoLogged();
 
+  private CommandXboxController controller;
+
   private boolean atGoal;
 
   private ShooterMeasurables wantedShooterMeasurables =
       new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
 
+  private boolean wantedFlywheelState;
+
   public enum ShooterSystemState {
     IDLE,
     GOTO_WANTED_MEASURABLES,
+    MANUAL_SHOOT,
     ZERO,
     TEST
   }
@@ -38,6 +44,7 @@ public class Shooter extends SubsystemBase {
   public enum ShooterWantedState {
     IDLE,
     ACTIVE_SHOOT,
+    MANUAL_SHOOT,
     ZERO,
     TEST
   }
@@ -45,10 +52,13 @@ public class Shooter extends SubsystemBase {
   private ShooterSystemState systemState = ShooterSystemState.IDLE;
   private ShooterWantedState wantedState = ShooterWantedState.IDLE;
 
-  public Shooter(ElevationIO elevationIO, FlywheelIO flywheelIO) {
+  public Shooter(ElevationIO elevationIO, FlywheelIO flywheelIO, CommandXboxController controller) {
     this.elevationIO = elevationIO;
     this.flywheelIO = flywheelIO;
+    this.controller = controller;
     atGoal = false;
+
+    wantedFlywheelState = false;
   }
 
   @Override
@@ -71,6 +81,8 @@ public class Shooter extends SubsystemBase {
         return ShooterSystemState.IDLE;
       case ACTIVE_SHOOT:
         return ShooterSystemState.GOTO_WANTED_MEASURABLES;
+      case MANUAL_SHOOT:
+        return ShooterSystemState.MANUAL_SHOOT;
       case ZERO:
         return ShooterSystemState.ZERO;
       case TEST:
@@ -89,6 +101,27 @@ public class Shooter extends SubsystemBase {
       case GOTO_WANTED_MEASURABLES:
         setElevationAngle(Rotation2d.fromRadians(wantedShooterMeasurables.getHoodAngle()));
         setFlywheelSpeed(RadiansPerSecond.of(wantedShooterMeasurables.getFlywheelSpeed()));
+        break;
+      case MANUAL_SHOOT:
+        double elevationInput = controller.getRightY();
+        elevationInput = MathUtil.applyDeadband(elevationInput, 0.1);
+
+        double currentAngle = elevationInputs.elevationAngle.getRadians();
+        double adjustmentRate = 1.5; // hopefully is in rad/sec
+
+        double newAngle = currentAngle + elevationInput * adjustmentRate * 0.02;
+
+        newAngle =
+            MathUtil.clamp(
+                newAngle,
+                Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
+                Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
+
+        setElevationAngle(Rotation2d.fromRadians(newAngle));
+        if (wantedFlywheelState) {
+          setFlywheelSpeed(RadiansPerSecond.of(200));
+        }
+
         break;
       case ZERO:
         setElevationAngle(
@@ -140,5 +173,9 @@ public class Shooter extends SubsystemBase {
 
   public void adjustElevationKSlotValue(double value, String slot) {
     elevationIO.adjustElevationKSlotValue(value, slot);
+  }
+
+  public void setFlywheelState(boolean state) {
+    wantedFlywheelState = state;
   }
 }
