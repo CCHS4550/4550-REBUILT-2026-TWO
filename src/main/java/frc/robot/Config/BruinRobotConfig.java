@@ -45,7 +45,7 @@ public class BruinRobotConfig {
   public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(22, CANIVORE_CANBUS);
 
   public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(14, CANIVORE_CANBUS);
-  public final CanDeviceID INTAKE_EXTENSION = new CanDeviceID(15, CANIVORE_CANBUS);
+  public final CanDeviceID INTAKE_EXTENSION = new CanDeviceID(15);
 
   /**
    * Wheel radius in meters. Accuracy in these measurements affects wheel odometry which measures
@@ -309,9 +309,9 @@ public class BruinRobotConfig {
 
     intakeConfig =
         new IntakeConfig()
-            .withExtensionkP(5.7)
+            .withExtensionkP(8.0)
             .withExtensionkI(0.0)
-            .withExtensionkD(0.0)
+            .withExtensionkD(0.1)
             .withExtensionkS(0.0)
             .withExtensionkV(0.0)
             .withExtensionkG(0.0);

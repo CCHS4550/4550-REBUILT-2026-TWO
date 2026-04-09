@@ -1,11 +1,8 @@
 package frc.robot.Subsystems;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constant.FieldConstants;
-import frc.robot.Robotstate;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
 import frc.robot.Subsystems.Drive.SwerveSubsystem.WantedState;
 import frc.robot.Subsystems.Indexer.Indexer;
@@ -189,36 +186,5 @@ public class Superstructure extends SubsystemBase {
     PASSIVE_PRE_AIM,
     AIMING,
     SHOOT
-  }
-
-  private boolean isPassingZone(double x) {
-    return FieldConstants.isBlueAlliance() ? x > 4.75 : x < 11.75;
-  }
-
-  private boolean isInsideRectangle(Pose2d pose, Pose2d leftCorner, Pose2d rightCorner) {
-    double x = pose.getTranslation().getX();
-    double y = pose.getTranslation().getY();
-
-    double minX = Math.min(leftCorner.getTranslation().getX(), rightCorner.getTranslation().getX());
-    double maxX = Math.max(leftCorner.getTranslation().getX(), rightCorner.getTranslation().getX());
-    double minY = Math.min(leftCorner.getTranslation().getY(), rightCorner.getTranslation().getY());
-    double maxY = Math.max(leftCorner.getTranslation().getY(), rightCorner.getTranslation().getY());
-
-    return x >= minX && x <= maxX && y >= minY && y <= maxY;
-  }
-
-  private boolean handleTrenchSafety() {
-    var pose = Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry();
-    if (isInsideRectangle(
-            pose, new Pose2d(4, 6.8, new Rotation2d()), new Pose2d(5.2, 8, new Rotation2d()))
-        || isInsideRectangle(
-            pose, new Pose2d(4, 0.2, new Rotation2d()), new Pose2d(5.2, 1, new Rotation2d()))
-        || isInsideRectangle(
-            pose, new Pose2d(11.3, 6.8, new Rotation2d()), new Pose2d(12.5, 8, new Rotation2d()))
-        || isInsideRectangle(
-            pose, new Pose2d(11.3, 0.2, new Rotation2d()), new Pose2d(12.5, 1, new Rotation2d()))) {
-      return true;
-    }
-    return false;
   }
 }

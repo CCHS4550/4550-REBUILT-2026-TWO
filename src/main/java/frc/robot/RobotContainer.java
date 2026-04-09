@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
@@ -122,13 +123,13 @@ public class RobotContainer {
                 }));
   }
 
-  public SwerveSubsystem getSwerveSubsystem() {
-    return swerveSubsystem;
-  }
+  // public SwerveSubsystem getSwerveSubsystem() {
+  //   return swerveSubsystem;
+  // }
 
-  public void setTestPose() {
-    swerveSubsystem.resetTranslationAndRotation(new Pose2d(3, 3, new Rotation2d()));
-  }
+  // public void setTestPose() {
+  //   swerveSubsystem.resetTranslationAndRotation(new Pose2d(3, 3, new Rotation2d()));
+  // }
 
   public boolean questPoseEstablished() {
     // return questnav.questPoseEstablished();

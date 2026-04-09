@@ -39,6 +39,41 @@ public class Intake extends SubsystemBase {
     this.intakeIO = intakeIO;
   }
 
+  // So the big GPT said to do this, but I don't really know how it works and I hate converting
+  // units so ts deprecated ig
+  /*
+    private final SysIdRoutine sysIdRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> intakeIO.setExtensionVoltage(voltage.in(Volts)),
+                log -> {
+                  log.motor("extension")
+                      .voltage(inputs.extensionIntakeVoltage.in(Volts))
+                      .angularPosition(inputs.extensionPosRadians)
+                      .angularVelocity(inputs.extensionIntakeVelocityRadPerSec);
+                },
+                this));
+
+    public Command sysIdQuasistaticForward() {
+      return sysIdRoutine
+          .quasistatic(SysIdRoutine.Direction.kForward)
+          .beforeStarting(() -> runningSysId = true)
+          .finallyDo(() -> runningSysId = false);
+    }
+  */
+
+  // public Command setExtensionToAngle(double angleRad) {
+  //   return runOnce(() -> intakeIO.setExtensionMotorPositionRad(angleRad, 100, 50));
+  // }
+
+  /// private final CommandXboxController driverController = new CommandXboxController(0);
+  /// driverController.a().onTrue(intake.setExtensionToAngle(1.0));
+
+  public void tare() {
+    intakeIO.tareExtensionPosition();
+  }
+
   private void applyStates() {
     switch (systemState) {
       case EXTENDED_INTAKING:
@@ -94,6 +129,7 @@ public class Intake extends SubsystemBase {
         } else {
           return SystemState.LOWER_PUMP;
         }
+        // return SystemState.LOWER_PUMP;
       case IDLE:
         return SystemState.IDLE;
       default:
@@ -150,6 +186,9 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("Subsystems/Intake", inputs);
     Logger.recordOutput("Subsystems/Intake/SystemState", systemState);
     Logger.recordOutput("Subsystems/Intake/DesiredState", wantedState);
+    Logger.recordOutput("Intake/AngleRad", inputs.extensionPosRadians);
+    Logger.recordOutput("Intake/VelocityRadPerSec", inputs.extensionIntakeVelocityRadPerSec);
+    Logger.recordOutput("Intake/AppliedVolts", inputs.extensionIntakeVoltage);
     systemState = handleStateTransitions();
     applyStates();
   }
