@@ -60,11 +60,11 @@ public final class Constants {
     public static final double ELEVATION_GEAR_RATIO = 1.0 / 66.54; // fill
     public static final double ELEVATION_POSITION_COEFFICIENT = 2 * Math.PI * ELEVATION_GEAR_RATIO;
 
-    public static final double SHOOTER_ONE_GEAR_RATIO = 1.0 / 1.0;
+    public static final double SHOOTER_ONE_GEAR_RATIO = 24.0 / 18.0;
     public static final double SHOOTER_ONE_POSITION_COEFFICIENT =
         2 * Math.PI * SHOOTER_ONE_GEAR_RATIO;
 
-    public static final double SHOOTER_TWO_GEAR_RATIO = 1.0 / 1.0;
+    public static final double SHOOTER_TWO_GEAR_RATIO = 24.0 / 18.0;
     public static final double SHOOTER_TWO_POSITION_COEFFICIENT =
         2 * Math.PI * SHOOTER_TWO_GEAR_RATIO;
 

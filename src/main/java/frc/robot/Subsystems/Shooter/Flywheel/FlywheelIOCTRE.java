@@ -64,13 +64,14 @@ public class FlywheelIOCTRE implements FlywheelIO {
     shooterConfig.Slot0.kS = config.getShooterConfig().shooterKs;
     shooterConfig.Slot0.kV = config.getShooterConfig().shooterKv;
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    shooterConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     shooterConfig.MotionMagic.MotionMagicAcceleration = 15;
 
     // change this later!
 
     Phoenix6Util.applyAndCheckConfiguration(flywheelMotor1, shooterConfig, 5);
+    shooterConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     Phoenix6Util.applyAndCheckConfiguration(flywheelMotor2, shooterConfig, 5);
 
     flywheel1AppliedVoltage = flywheelMotor1.getMotorVoltage();

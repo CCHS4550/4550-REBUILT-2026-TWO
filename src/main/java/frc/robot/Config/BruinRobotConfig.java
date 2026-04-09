@@ -36,12 +36,12 @@ public class BruinRobotConfig {
   public final CanDeviceID BACK_RIGHT_STEER_MOTOR = new CanDeviceID(11);
   public final CanDeviceID BACK_RIGHT_STEER_ENCODER = new CanDeviceID(12);
 
-  public final CanDeviceID INDEXER_MOTOR_1 = new CanDeviceID(16, CANIVORE_CANBUS);
+  public final CanDeviceID INDEXER_MOTOR_1 = new CanDeviceID(21, CANIVORE_CANBUS);
   public final CanDeviceID INDEXER_MOTOR_2 = new CanDeviceID(17, CANIVORE_CANBUS);
 
   public final CanDeviceID ELEVATION_MOTOR = new CanDeviceID(20, CANIVORE_CANBUS);
 
-  public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(21, CANIVORE_CANBUS);
+  public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(16, CANIVORE_CANBUS);
   public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(22, CANIVORE_CANBUS);
 
   public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(14, CANIVORE_CANBUS);

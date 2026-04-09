@@ -7,7 +7,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
@@ -58,10 +57,24 @@ public class RobotContainer {
 
     controller
         .rightStick()
-        .onTrue(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.MANUAL_SHOOT)));
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  shooter.setWantedState(ShooterWantedState.MANUAL_SHOOT);
+                }));
 
-    controller.rightTrigger().onTrue(new InstantCommand(() -> shooter.setFlywheelState(true)));
-    controller.rightTrigger().onFalse(new InstantCommand(() -> shooter.setFlywheelState(false)));
+    controller
+        .rightTrigger()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  shooter.setWantedState(ShooterWantedState.TEST);
+                  ;
+                  System.out.println("Shooting!");
+                }));
+    controller
+        .rightTrigger()
+        .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
 
     controller
         .a()

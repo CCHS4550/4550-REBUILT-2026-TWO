@@ -130,7 +130,8 @@ public class Shooter extends SubsystemBase {
         setFlywheelSpeed(RadiansPerSecond.of(0));
         break;
       case TEST:
-        setFlywheelSpeed(RadiansPerSecond.of(200));
+        // setFlywheelSpeed(RadiansPerSecond.of(200));
+        setFlywheelVoltage(2);
         break;
     }
   }
@@ -141,6 +142,10 @@ public class Shooter extends SubsystemBase {
 
   private void setFlywheelSpeed(AngularVelocity velo) {
     flywheelIO.setVelo(velo);
+  }
+
+  private void setFlywheelVoltage(double voltage) {
+    flywheelIO.setVoltage(Voltage.ofBaseUnits(voltage, Volt));
   }
 
   public void setShooterMeasurables(ShooterMeasurables shooterMeasurables) {
