@@ -27,11 +27,10 @@ public class Shooter extends SubsystemBase {
   private CommandXboxController controller;
 
   private boolean atGoal;
+  public boolean testing;
 
   private ShooterMeasurables wantedShooterMeasurables =
       new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
-
-  private boolean wantedFlywheelState;
 
   public enum ShooterSystemState {
     IDLE,
@@ -57,8 +56,7 @@ public class Shooter extends SubsystemBase {
     this.flywheelIO = flywheelIO;
     this.controller = controller;
     atGoal = false;
-
-    wantedFlywheelState = false;
+    testing = false;
   }
 
   @Override
@@ -71,8 +69,10 @@ public class Shooter extends SubsystemBase {
 
     atGoal = atSetpoint();
 
-    systemState = handleStateTransitions();
-    applyStates();
+    if (!testing) {
+      systemState = handleStateTransitions();
+      applyStates();
+    }
   }
 
   public ShooterSystemState handleStateTransitions() {
@@ -81,8 +81,8 @@ public class Shooter extends SubsystemBase {
         return ShooterSystemState.IDLE;
       case ACTIVE_SHOOT:
         return ShooterSystemState.GOTO_WANTED_MEASURABLES;
-      case MANUAL_SHOOT:
-        return ShooterSystemState.MANUAL_SHOOT;
+        // case MANUAL_SHOOT:
+        //   return ShooterSystemState.MANUAL_SHOOT;
       case ZERO:
         return ShooterSystemState.ZERO;
       case TEST:
@@ -102,27 +102,27 @@ public class Shooter extends SubsystemBase {
         setElevationAngle(Rotation2d.fromRadians(wantedShooterMeasurables.getHoodAngle()));
         setFlywheelSpeed(RadiansPerSecond.of(wantedShooterMeasurables.getFlywheelSpeed()));
         break;
-      case MANUAL_SHOOT:
-        double elevationInput = controller.getRightY();
-        elevationInput = MathUtil.applyDeadband(elevationInput, 0.1);
+        // case MANUAL_SHOOT:
+        //   double elevationInput = controller.getRightY();
+        //   elevationInput = MathUtil.applyDeadband(elevationInput, 0.1);
 
-        double currentAngle = elevationInputs.elevationAngle.getRadians();
-        double adjustmentRate = 1.5; // hopefully is in rad/sec
+        //   double currentAngle = elevationInputs.elevationAngle.getRadians();
+        //   double adjustmentRate = 1.5; // hopefully is in rad/sec
 
-        double newAngle = currentAngle + elevationInput * adjustmentRate * 0.02;
+        //   double newAngle = currentAngle + elevationInput * adjustmentRate * 0.02;
 
-        newAngle =
-            MathUtil.clamp(
-                newAngle,
-                Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
-                Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
+        //   newAngle =
+        //       MathUtil.clamp(
+        //           newAngle,
+        //           Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
+        //           Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
 
-        setElevationAngle(Rotation2d.fromRadians(newAngle));
-        if (wantedFlywheelState) {
-          setFlywheelSpeed(RadiansPerSecond.of(200));
-        }
+        //   setElevationAngle(Rotation2d.fromRadians(newAngle));
+        //   if (wantedFlywheelState) {
+        //     setFlywheelSpeed(RadiansPerSecond.of(200));
+        //   }
 
-        break;
+        //   break;
       case ZERO:
         setElevationAngle(
             Rotation2d.fromRadians(
@@ -144,8 +144,17 @@ public class Shooter extends SubsystemBase {
     flywheelIO.setVelo(velo);
   }
 
-  private void setFlywheelVoltage(double voltage) {
+  public void setFlywheelVoltage(double voltage) {
     flywheelIO.setVoltage(Voltage.ofBaseUnits(voltage, Volt));
+  }
+
+  public void testPIDFWithValues(double targetRPM, double kP, double kS, double kV) {
+    double feedforward = (kV * targetRPM) + kS;
+    double error = targetRPM - flywheelInputs.flywheel1VelocityRadPerSec;
+    double feedback = error * kP;
+
+    setFlywheelVoltage(feedback + feedforward);
+    testing = true;
   }
 
   public void setShooterMeasurables(ShooterMeasurables shooterMeasurables) {
@@ -178,9 +187,5 @@ public class Shooter extends SubsystemBase {
 
   public void adjustElevationKSlotValue(double value, String slot) {
     elevationIO.adjustElevationKSlotValue(value, slot);
-  }
-
-  public void setFlywheelState(boolean state) {
-    wantedFlywheelState = state;
   }
 }

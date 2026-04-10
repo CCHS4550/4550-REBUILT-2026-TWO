@@ -12,12 +12,10 @@ import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
 import frc.robot.Subsystems.Intake.Intake;
-import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
 import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
-import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
 
 public class RobotContainer {
   // private final Vision vision;
@@ -55,42 +53,54 @@ public class RobotContainer {
     //         questnav,
     //         new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    controller
-        .rightStick()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  shooter.setWantedState(ShooterWantedState.MANUAL_SHOOT);
-                }));
+    double targetRPM = 500;
+    double kP = 0;
+    double kS = 0;
+    double kV = 0;
 
     controller
         .rightTrigger()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  shooter.setWantedState(ShooterWantedState.TEST);
-                  ;
-                  System.out.println("Shooting!");
-                }));
+        .whileTrue(new InstantCommand(() -> shooter.testPIDFWithValues(targetRPM, kP, kS, kV)));
     controller
         .rightTrigger()
-        .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
-
-    controller
-        .a()
-        .onTrue(
+        .whileFalse(
             new InstantCommand(
-                () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)));
-    controller
-        .b()
-        .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
-    controller
-        .x()
-        .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)));
-    controller
-        .x()
-        .onFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+                () -> {
+                  shooter.setFlywheelVoltage(0);
+                  shooter.testing = false;
+                }));
 
+    // controller
+    //     .rightTrigger()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               shooter.setWantedState(ShooterWantedState.TEST);
+    //               ;
+    //               System.out.println("Shooting!");
+    //             }));
+    // controller
+    //     .rightTrigger()
+    //     .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
+
+    // controller
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)));
+    // controller
+    //     .b()
+    //     .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+    // controller
+    //     .x()
+    //     .onTrue(new InstantCommand(() ->
+    // intake.setWantedIntakeState(WantedIntakeState.PUMPING)));
+    // controller
+    //     .x()
+    //     .onFalse(new InstantCommand(() ->
+    // intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+
+    /* on second thought i don't like the way its written but ill keep it here for now ig
     /// for yall that are reading this
     /// "P" = kP
     /// "I" = kI
@@ -134,6 +144,7 @@ public class RobotContainer {
                       break;
                   }
                 }));
+                */
   }
 
   // public SwerveSubsystem getSwerveSubsystem() {
