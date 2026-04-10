@@ -9,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
@@ -29,6 +30,11 @@ public class RobotContainer {
   private final Intake intake;
   private final SwerveSubsystem swerveSubsystem;
   private final CommandXboxController controller = new CommandXboxController(0);
+
+  private double targetRPM;
+  private double kP;
+  private double kS;
+  private double kV;
 
   public RobotContainer() {
     BruinRobotConfig config = new BruinRobotConfig();
@@ -57,22 +63,27 @@ public class RobotContainer {
     //         questnav,
     //         new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    double targetRPM = 500;
-    double kP = 0;
-    double kS = 0;
-    double kV = 0;
+    targetRPM = 500;
+    kP = 0;
+    kS = 0;
+    kV = 0;
+    double changeMagnitude = 0.01;
 
     controller
         .rightTrigger()
-        .whileTrue(new InstantCommand(() -> shooter.testPIDFWithValues(targetRPM, kP, kS, kV)));
+        .whileTrue(new RunCommand(() -> shooter.testPIDFWithValues(targetRPM, kP, kS, kV)));
     controller
         .rightTrigger()
-        .whileFalse(
+        .onFalse(
             new InstantCommand(
                 () -> {
                   shooter.setFlywheelVoltage(0);
                   shooter.testing = false;
                 }));
+
+    // Change based on field testing
+    controller.rightBumper().onTrue(new InstantCommand(() -> kP += changeMagnitude));
+    controller.leftBumper().onTrue(new InstantCommand(() -> kP -= changeMagnitude));
 
     /* USE FOR KV TESTING */
     controller

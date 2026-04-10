@@ -155,6 +155,8 @@ public class Shooter extends SubsystemBase {
 
     setFlywheelVoltage(feedback + feedforward);
     testing = true;
+
+    System.out.println("kP: " + kP + " kS: " + kS + " kV: " + kV);
   }
 
   public void setShooterMeasurables(ShooterMeasurables shooterMeasurables) {
