@@ -95,7 +95,7 @@ public class Shooter extends SubsystemBase {
   public void applyStates() {
     switch (systemState) {
       case IDLE:
-        elevationIO.setVoltage(-0.3);
+        elevationIO.setVoltage(0.0);
         flywheelIO.setVoltage(Voltage.ofBaseUnits(0, Volts));
         break;
       case GOTO_WANTED_MEASURABLES:
@@ -136,11 +136,11 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  private void setElevationAngle(Rotation2d angle) {
+  public void setElevationAngle(Rotation2d angle) {
     elevationIO.setElevationAngle(angle);
   }
 
-  private void setFlywheelSpeed(AngularVelocity velo) {
+  public void setFlywheelSpeed(AngularVelocity velo) {
     flywheelIO.setVelo(velo);
   }
 

@@ -30,6 +30,8 @@ public interface IntakeIO {
   public default void setExtensionMotorPositionRad(
       double rad, double veloRotPerSec, double accelRotPerSec) {}
 
+  public default void setExtensionMotorPositionRad(double rad) {}
+
   public default void setExtensionVoltage(double voltage) {}
 
   public default void setSpinnerVoltage(double voltage) {}

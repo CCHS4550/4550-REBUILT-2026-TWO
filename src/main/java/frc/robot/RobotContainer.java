@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -16,6 +18,8 @@ import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
+import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
+import frc.robot.Util.TestShooterWrapper;
 
 public class RobotContainer {
   // private final Vision vision;
@@ -68,6 +72,30 @@ public class RobotContainer {
                 () -> {
                   shooter.setFlywheelVoltage(0);
                   shooter.testing = false;
+                }));
+
+    /* USE FOR KV TESTING */
+    controller
+        .b()
+        .whileTrue(new InstantCommand(() -> shooter.setFlywheelVoltage(2.0)))
+        .whileFalse(new InstantCommand(() -> shooter.setFlywheelVoltage(0.0)));
+
+    /*USE FOR FINDING INTERPOLATING STUFF */
+    TestShooterWrapper shooterWrapper =
+        new TestShooterWrapper(RadiansPerSecond.of(200), Rotation2d.fromDegrees(25.0));
+
+    controller
+        .leftBumper()
+        .whileTrue(
+            new InstantCommand(
+                () -> {
+                  shooter.setFlywheelSpeed(shooterWrapper.flywheelVelo);
+                  shooter.setElevationAngle(shooterWrapper.hoodAngle);
+                }))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  shooter.setWantedState(ShooterWantedState.IDLE);
                 }));
 
     // controller
