@@ -37,7 +37,7 @@ public class BruinRobotConfig {
   public final CanDeviceID BACK_RIGHT_STEER_ENCODER = new CanDeviceID(12);
 
   public final CanDeviceID INDEXER_MOTOR_1 = new CanDeviceID(21, CANIVORE_CANBUS);
-  public final CanDeviceID INDEXER_MOTOR_2 = new CanDeviceID(17, CANIVORE_CANBUS);
+  public final CanDeviceID INDEXER_MOTOR_2 = new CanDeviceID(25, CANIVORE_CANBUS);
 
   public final CanDeviceID ELEVATION_MOTOR = new CanDeviceID(20, CANIVORE_CANBUS);
 
@@ -301,11 +301,11 @@ public class BruinRobotConfig {
             .withElevationKd(0.1)
             .withElevationKs(0.0)
             .withElevationKv(0.5)
-            .withShooterKp(3.14)
+            .withShooterKp(0.5)
             .withShooterKi(0)
-            .withShooterKd(0.1)
+            .withShooterKd(0.0)
             .withShooterKs(0.0)
-            .withShooterKv(0.6);
+            .withShooterKv(0.06775);
 
     intakeConfig =
         new IntakeConfig()

@@ -119,6 +119,9 @@ public class LaunchCalculator {
     passingMaxDistance = 17.16;
     phaseDelay = 0.03;
 
+    // distance in meters
+
+    // distance from hub, degree of hood
     hoodAngleMap.put(0.96, Rotation2d.fromDegrees(10.0));
     hoodAngleMap.put(1.16, Rotation2d.fromDegrees(12.0));
     hoodAngleMap.put(1.58, Rotation2d.fromDegrees(14.0));
@@ -132,6 +135,7 @@ public class LaunchCalculator {
     hoodAngleMap.put(4.35, Rotation2d.fromDegrees(34.0));
     hoodAngleMap.put(4.84, Rotation2d.fromDegrees(38.0));
 
+    // distance from hub, flywheel speed(units?)
     flywheelSpeedMap.put(0.96, 150.0);
     flywheelSpeedMap.put(1.16, 155.0);
     flywheelSpeedMap.put(1.58, 160.0);
@@ -145,22 +149,26 @@ public class LaunchCalculator {
     flywheelSpeedMap.put(4.35, 185.0);
     flywheelSpeedMap.put(4.84, 190.0);
 
+    // distance from hub, air time of ball
     timeOfFlightMap.put(5.68, 1.16);
     timeOfFlightMap.put(4.55, 1.12);
     timeOfFlightMap.put(3.15, 1.11);
     timeOfFlightMap.put(1.88, 1.09);
     timeOfFlightMap.put(1.38, 0.90);
 
+    // passing distance, hood angle
     passingHoodAngleMap.put(5.46, Rotation2d.fromDegrees(38.0));
     passingHoodAngleMap.put(6.62, Rotation2d.fromDegrees(38.0));
     passingHoodAngleMap.put(7.80, Rotation2d.fromDegrees(38.0));
     passingHoodAngleMap.put(17.16, Rotation2d.fromDegrees(38.0));
 
+    // passing distance, flywheel speed
     passingFlywheelSpeedMap.put(5.46, 160.0);
     passingFlywheelSpeedMap.put(6.62, 180.0);
     passingFlywheelSpeedMap.put(7.80, 200.0);
     passingFlywheelSpeedMap.put(17.16, 360.0);
 
+    // passing distance, air time of ball
     passingTimeOfFlightMap.put(5.46, 1.27);
     passingTimeOfFlightMap.put(6.62, 1.39);
     passingTimeOfFlightMap.put(7.8, 1.49);

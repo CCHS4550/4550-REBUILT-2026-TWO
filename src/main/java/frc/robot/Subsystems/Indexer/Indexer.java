@@ -52,7 +52,7 @@ public class Indexer extends SubsystemBase {
         indexerIO.setVoltage(0);
         break;
       case RUNNING:
-        indexerIO.setVoltage(5); // find correct voltage later
+        indexerIO.setVoltage(8); // find correct voltage later
         break;
       default:
         indexerIO.setVoltage(0);
