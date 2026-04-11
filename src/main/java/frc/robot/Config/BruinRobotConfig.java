@@ -296,11 +296,11 @@ public class BruinRobotConfig {
     shooterConfig =
         new ShooterConfig()
             // 51.39646
-            .withElevationKp(21)
+            .withElevationKp(0.6)
             .withElevationKi(0)
-            .withElevationKd(0.1)
+            .withElevationKd(0.05)
             .withElevationKs(0.0)
-            .withElevationKv(0.5)
+            .withElevationKv(0.1)
             .withShooterKp(0.0)
             .withShooterKi(0)
             .withShooterKd(0.0)
