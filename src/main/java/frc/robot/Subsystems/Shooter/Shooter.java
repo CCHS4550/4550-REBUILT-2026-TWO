@@ -32,12 +32,15 @@ public class Shooter extends SubsystemBase {
   private ShooterMeasurables wantedShooterMeasurables =
       new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
 
+  private TestShooterWrapper wantedWrapperMeasurables = new TestShooterWrapper(RadiansPerSecond.of(0), Rotation2d.fromDegrees(0));
+
   public enum ShooterSystemState {
     IDLE,
     GOTO_WANTED_MEASURABLES,
     MANUAL_SHOOT,
     ZERO,
-    TEST
+    TEST,
+    TEST_INTERP_MEASURABLES
   }
 
   public enum ShooterWantedState {
@@ -45,7 +48,8 @@ public class Shooter extends SubsystemBase {
     ACTIVE_SHOOT,
     MANUAL_SHOOT,
     ZERO,
-    TEST
+    TEST,
+    TEST_INTERP_MEASURABLES
   }
 
   private ShooterSystemState systemState = ShooterSystemState.IDLE;
@@ -87,6 +91,8 @@ public class Shooter extends SubsystemBase {
         return ShooterSystemState.ZERO;
       case TEST:
         return ShooterSystemState.TEST;
+      case TEST_INTERP_MEASURABLES:
+        return ShooterSystemState.TEST_INTERP_MEASURABLES;
       default:
         return ShooterSystemState.IDLE;
     }
@@ -190,4 +196,6 @@ public class Shooter extends SubsystemBase {
   public void adjustElevationKSlotValue(double value, String slot) {
     elevationIO.adjustElevationKSlotValue(value, slot);
   }
+
+  public void setTestInterpMeasurables()
 }

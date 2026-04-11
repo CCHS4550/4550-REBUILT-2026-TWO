@@ -68,23 +68,10 @@ public class RobotContainer {
     //         questnav,
     //         new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    targetRPM = 300;
-    kP = 0;
-    kS = 0.37;
-    kV = 0.0152;
-    double changeMagnitude = 0.0001;
+    
 
-    controller
-        .rightTrigger()
-        .whileTrue(new RunCommand(() -> shooter.testPIDFWithValues(targetRPM, kP, kS, kV)));
-    controller
-        .rightTrigger()
-        .onFalse(
-            new InstantCommand(
-                () -> {
-                  shooter.setFlywheelVoltage(0);
-                  shooter.testing = false;
-                }));
+    
+    
 
     controller
         .a()
@@ -112,22 +99,27 @@ public class RobotContainer {
     double flywheelSpeed = 200;
     flywheelVoltage = 8;
 
-    // Ruhan code below(do not use lmao)
-    /* USE FOR KV TESTING */
-    controller
-        .b()
-        .whileTrue(
-            new RunCommand(
-                () -> {
-                  shooter.setFlywheelSpeed(
-                      AngularVelocity.ofBaseUnits(flywheelSpeed, RadiansPerSecond));
-                  System.out.println(AngularVelocity.ofBaseUnits(flywheelSpeed, RadiansPerSecond));
-                }))
-        .whileFalse(new RunCommand(() -> shooter.setFlywheelVoltage(0.0)));
+    
 
     /*USE FOR FINDING INTERPOLATING STUFF */
     TestShooterWrapper shooterWrapper =
         new TestShooterWrapper(RadiansPerSecond.of(200), Rotation2d.fromDegrees(25.0));
+
+    controller
+        .rightTrigger()
+        .whileTrue(
+          new InstantCommand(()->{
+            shooter.setTestInterpMeasurables(shooterWrapper);
+            shooter.setWantedState(ShooterWantedState.TEST_INTERP_MEASURABLES);
+            indexer.setWantedState(IndexerWantedState.RUNNING);
+          })
+         )
+         .whileFalse(
+            new InstantCommand(()->{
+              shooter.setWantedState(ShooterWantedState.IDLE);
+              indexer.setWantedState(IndexerWantedState.IDLE);
+            })
+         );
 
     // controller
     //     .leftBumper()
