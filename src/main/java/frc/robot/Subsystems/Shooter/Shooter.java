@@ -144,6 +144,7 @@ public class Shooter extends SubsystemBase {
       case TEST_INTERP_MEASURABLES:
         setFlywheelSpeed(wantedWrapperMeasurables.flywheelVelo);
         setElevationAngle(wantedWrapperMeasurables.hoodAngle);
+        break;
       default:
         break;
     }
