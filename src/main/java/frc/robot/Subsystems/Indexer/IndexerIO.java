@@ -25,4 +25,8 @@ public interface IndexerIO {
   default void updateInputs(IndexerIOInputs inputs) {}
 
   default void setVoltage(double voltage) {}
+
+  default void setMotor1Voltage(double voltage) {}
+
+  default void setMotor2Voltage(double voltage) {}
 }

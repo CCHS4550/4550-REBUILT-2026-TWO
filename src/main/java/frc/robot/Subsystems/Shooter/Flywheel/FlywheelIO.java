@@ -31,5 +31,7 @@ public interface FlywheelIO {
 
   default void setVelo(AngularVelocity velo) {}
 
+  default void setSpeed(double rpm) {}
+
   default void adjustFlywheelKSlotValue(double value, String slot) {}
 }

@@ -142,7 +142,8 @@ public class Shooter extends SubsystemBase {
         setFlywheelVoltage(2);
         break;
       case TEST_INTERP_MEASURABLES:
-        setFlywheelSpeed(wantedWrapperMeasurables.flywheelVelo);
+        // setFlywheelSpeed(wantedWrapperMeasurables.flywheelVelo);
+        setShooterSpeed(wantedWrapperMeasurables.flywheelVelo.baseUnitMagnitude());
         setElevationAngle(wantedWrapperMeasurables.hoodAngle);
         break;
       default:
@@ -171,6 +172,10 @@ public class Shooter extends SubsystemBase {
     testing = true;
 
     System.out.println("kP: " + kP + " kS: " + kS + " kV: " + kV);
+  }
+
+  public void setShooterSpeed(double rpm) {
+    flywheelIO.setSpeed(rpm);
   }
 
   public void setShooterMeasurables(ShooterMeasurables shooterMeasurables) {

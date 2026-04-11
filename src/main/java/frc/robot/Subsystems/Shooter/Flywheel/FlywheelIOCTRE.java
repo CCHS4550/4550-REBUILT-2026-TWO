@@ -1,6 +1,7 @@
 package frc.robot.Subsystems.Shooter.Flywheel;
 
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -157,6 +158,16 @@ public class FlywheelIOCTRE implements FlywheelIO {
                 velo.in(RotationsPerSecond) / Constants.ShooterConstants.SHOOTER_TWO_GEAR_RATIO)
             .withSlot(0)
             .withEnableFOC(true));
+  }
+
+  @Override
+  public void setSpeed(double rpm) {
+    double feedforward = (shooterConfig.Slot0.kV * rpm) + shooterConfig.Slot0.kS;
+    // double error = rpm - flywheelInputs.flywheel1VelocityRadPerSec;
+    // double feedback = error * shooterConfig.Slot0.kP;
+    double feedback = 0;
+
+    setVoltage(Voltage.ofBaseUnits(feedback + feedforward, Volts));
   }
 
   @Override

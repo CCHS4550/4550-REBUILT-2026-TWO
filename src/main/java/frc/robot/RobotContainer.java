@@ -72,6 +72,10 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)))
         .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
 
+    // controller.b().onTrue(new InstantCommand(() ->
+    // intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE))).onFalse(new
+    // InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+
     // Change based on field testing
     // controller
     //     .rightBumper()
@@ -95,18 +99,18 @@ public class RobotContainer {
 
     /*USE FOR FINDING INTERPOLATING STUFF */
     TestShooterWrapper shooterWrapper =
-        new TestShooterWrapper(RadiansPerSecond.of(200), Rotation2d.fromDegrees(25.0));
+        new TestShooterWrapper(RadiansPerSecond.of(400), Rotation2d.fromRadians(5));
 
     controller
         .rightTrigger()
-        .whileTrue(
+        .onTrue(
             new InstantCommand(
                 () -> {
                   shooter.setTestInterpMeasurables(shooterWrapper);
                   shooter.setWantedState(ShooterWantedState.TEST_INTERP_MEASURABLES);
                   indexer.setWantedState(IndexerWantedState.RUNNING);
                 }))
-        .whileFalse(
+        .onFalse(
             new InstantCommand(
                 () -> {
                   shooter.setWantedState(ShooterWantedState.IDLE);

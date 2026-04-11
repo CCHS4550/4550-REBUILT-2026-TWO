@@ -52,7 +52,9 @@ public class Indexer extends SubsystemBase {
         indexerIO.setVoltage(0);
         break;
       case RUNNING:
-        indexerIO.setVoltage(8); // find correct voltage later
+        // find good numbers
+        indexerIO.setMotor1Voltage(5);
+        indexerIO.setMotor2Voltage(4.5);
         break;
       default:
         indexerIO.setVoltage(0);

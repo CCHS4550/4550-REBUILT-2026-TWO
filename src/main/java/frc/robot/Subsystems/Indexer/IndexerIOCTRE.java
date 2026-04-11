@@ -44,12 +44,14 @@ public class IndexerIOCTRE implements IndexerIO {
 
     indexerConfig = new TalonFXConfiguration();
 
-    indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    boolean currentLimit = false;
+
+    indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = currentLimit;
+    indexerConfig.CurrentLimits.StatorCurrentLimitEnable = currentLimit;
     indexerConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
     indexerConfig.CurrentLimits.StatorCurrentLimit = 90.0;
 
-    indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     Phoenix6Util.applyAndCheckConfiguration(indexerMotor, indexerConfig, 5);
@@ -64,18 +66,18 @@ public class IndexerIOCTRE implements IndexerIO {
 
     indexerTwoMotor =
         new TalonFX(
-            bruinRobotConfig.INDEXER_MOTOR_1.getDeviceNumber(),
+            bruinRobotConfig.INDEXER_MOTOR_2.getDeviceNumber(),
             bruinRobotConfig.INDEXER_MOTOR_2.getBus());
 
     indexerTwoConfig = new TalonFXConfiguration();
 
-    indexerTwoConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    indexerTwoConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    indexerTwoConfig.CurrentLimits.SupplyCurrentLimitEnable = currentLimit;
+    indexerTwoConfig.CurrentLimits.StatorCurrentLimitEnable = currentLimit;
     indexerTwoConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
     indexerTwoConfig.CurrentLimits.StatorCurrentLimit = 90.0;
 
-    indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    indexerTwoConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    indexerTwoConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     Phoenix6Util.applyAndCheckConfiguration(indexerTwoMotor, indexerTwoConfig, 5);
 
@@ -127,6 +129,16 @@ public class IndexerIOCTRE implements IndexerIO {
   @Override
   public void setVoltage(double voltage) {
     indexerMotor.setVoltage(voltage);
+    indexerTwoMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void setMotor1Voltage(double voltage) {
+    indexerMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void setMotor2Voltage(double voltage) {
     indexerTwoMotor.setVoltage(voltage);
   }
 }
