@@ -14,6 +14,7 @@ import frc.robot.Subsystems.Shooter.Elevation.ElevationIOInputsAutoLogged;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIO;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOInputsAutoLogged;
 import frc.robot.Util.ShooterMeasurables;
+import frc.robot.Util.TestShooterWrapper;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -32,7 +33,8 @@ public class Shooter extends SubsystemBase {
   private ShooterMeasurables wantedShooterMeasurables =
       new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
 
-  private TestShooterWrapper wantedWrapperMeasurables = new TestShooterWrapper(RadiansPerSecond.of(0), Rotation2d.fromDegrees(0));
+  private TestShooterWrapper wantedWrapperMeasurables =
+      new TestShooterWrapper(RadiansPerSecond.of(0), Rotation2d.fromDegrees(0));
 
   public enum ShooterSystemState {
     IDLE,
@@ -139,6 +141,11 @@ public class Shooter extends SubsystemBase {
         // setFlywheelSpeed(RadiansPerSecond.of(200));
         setFlywheelVoltage(2);
         break;
+      case TEST_INTERP_MEASURABLES:
+        setFlywheelSpeed(wantedWrapperMeasurables.flywheelVelo);
+        setElevationAngle(wantedWrapperMeasurables.hoodAngle);
+      default:
+        break;
     }
   }
 
@@ -197,5 +204,7 @@ public class Shooter extends SubsystemBase {
     elevationIO.adjustElevationKSlotValue(value, slot);
   }
 
-  public void setTestInterpMeasurables()
+  public void setTestInterpMeasurables(TestShooterWrapper measureables) {
+    wantedWrapperMeasurables = measureables;
+  }
 }

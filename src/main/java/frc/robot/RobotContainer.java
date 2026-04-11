@@ -8,9 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
@@ -23,6 +21,7 @@ import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
+import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
 import frc.robot.Util.TestShooterWrapper;
 
 public class RobotContainer {
@@ -68,38 +67,31 @@ public class RobotContainer {
     //         questnav,
     //         new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    
-
-    
-    
-
     controller
         .a()
         .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)))
         .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
 
     // Change based on field testing
-    controller
-        .rightBumper()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  kV += changeMagnitude;
-                  System.out.println("flywheel voltage: " + kV);
-                }));
-    controller
-        .leftBumper()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  kV -= changeMagnitude;
-                  System.out.println("flywheel voltage: " + kV);
-                }));
+    // controller
+    //     .rightBumper()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               kV += changeMagnitude;
+    //               System.out.println("flywheel voltage: " + kV);
+    //             }));
+    // controller
+    //     .leftBumper()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               kV -= changeMagnitude;
+    //               System.out.println("flywheel voltage: " + kV);
+    //             }));
 
     double flywheelSpeed = 200;
     flywheelVoltage = 8;
-
-    
 
     /*USE FOR FINDING INTERPOLATING STUFF */
     TestShooterWrapper shooterWrapper =
@@ -108,18 +100,18 @@ public class RobotContainer {
     controller
         .rightTrigger()
         .whileTrue(
-          new InstantCommand(()->{
-            shooter.setTestInterpMeasurables(shooterWrapper);
-            shooter.setWantedState(ShooterWantedState.TEST_INTERP_MEASURABLES);
-            indexer.setWantedState(IndexerWantedState.RUNNING);
-          })
-         )
-         .whileFalse(
-            new InstantCommand(()->{
-              shooter.setWantedState(ShooterWantedState.IDLE);
-              indexer.setWantedState(IndexerWantedState.IDLE);
-            })
-         );
+            new InstantCommand(
+                () -> {
+                  shooter.setTestInterpMeasurables(shooterWrapper);
+                  shooter.setWantedState(ShooterWantedState.TEST_INTERP_MEASURABLES);
+                  indexer.setWantedState(IndexerWantedState.RUNNING);
+                }))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  shooter.setWantedState(ShooterWantedState.IDLE);
+                  indexer.setWantedState(IndexerWantedState.IDLE);
+                }));
 
     // controller
     //     .leftBumper()

@@ -52,7 +52,7 @@ public class ElevationIOCTRE implements ElevationIO {
     elevationConfig.Slot0.kS = bruinRobotConfig.getShooterConfig().elevationKs;
     elevationConfig.Slot0.kV = bruinRobotConfig.getShooterConfig().elevationKv;
     elevationConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    elevationConfig.Slot0.kG = -0.3;
+    elevationConfig.Slot0.kG = 0.1; // change
     elevationConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     elevationConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
@@ -120,6 +120,7 @@ public class ElevationIOCTRE implements ElevationIO {
           Rotation2d.fromRadians(
               Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
     }
+    // can't you use a clamp?
 
     elevationMotor.setControl(
         motionMagicVoltage.withPosition(
