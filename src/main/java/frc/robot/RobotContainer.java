@@ -9,6 +9,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
@@ -17,16 +20,21 @@ import frc.robot.Subsystems.Indexer.Indexer;
 import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
 import frc.robot.Subsystems.Indexer.IndexerIOCTRE;
 import frc.robot.Subsystems.Intake.Intake;
+import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
 import frc.robot.Subsystems.Intake.IntakeIOCTRE;
+import frc.robot.Subsystems.QuestNav.QuestNav;
+import frc.robot.Subsystems.QuestNav.QuestNavIOQuest;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
 import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
+import frc.robot.Subsystems.Vision.Vision;
+import frc.robot.Subsystems.Vision.VisionIOPhotonvision;
 import frc.robot.Util.TestShooterWrapper;
 
 public class RobotContainer {
-  // private final Vision vision;
-  // private final QuestNav questnav;
+  private final Vision vision;
+  private final QuestNav questnav;
 
   private final Shooter shooter;
   private final Intake intake;
@@ -34,11 +42,12 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem;
   private final CommandXboxController controller = new CommandXboxController(0);
 
-  private double targetRPM;
-  private double kP;
-  private double kS;
-  private double kV;
-  private double flywheelVoltage;
+  // private double targetRPM;
+  // private double kP;
+  // private double kS;
+  // private double kV;
+  // private double flywheelVoltage;
+  private double wantedHoodAngle;
 
   public RobotContainer() {
     BruinRobotConfig config = new BruinRobotConfig();
@@ -59,22 +68,34 @@ public class RobotContainer {
             moduleConstants[0].SpeedAt12Volts
                 / Math.hypot(moduleConstants[0].LocationX, moduleConstants[0].LocationY));
 
-    // questnav =
-    //     new QuestNav(swerveSubsystem, new
-    // QuestNavIOQuest(config.getVisionConfigurations().get(1)));
-    // vision =
-    //     new Vision(
-    //         questnav,
-    //         new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
+    questnav =
+        new QuestNav(swerveSubsystem, new QuestNavIOQuest(config.getVisionConfigurations().get(1)));
+    vision =
+        new Vision(
+            questnav,
+            new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
     controller
         .a()
         .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)))
         .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
 
-    // controller.b().onTrue(new InstantCommand(() ->
-    // intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE))).onFalse(new
-    // InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+    controller
+        .b()
+        .whileTrue(
+            new InstantCommand(
+                () -> {
+                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
+                  System.out.println("Extending");
+                }));
+    controller
+        .b()
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+                  System.out.println("Intaking");
+                }));
 
     // Change based on field testing
     // controller
@@ -95,22 +116,33 @@ public class RobotContainer {
     //             }));
 
     double flywheelSpeed = 200;
-    flywheelVoltage = 8;
+    // flywheelVoltage = 8;
 
     /*USE FOR FINDING INTERPOLATING STUFF */
+    // elevation goes from 0 to 6 radians of motor rotation
+    // goes from 20 to 60 degrees of mechanism rotation
+    wantedHoodAngle = 20;
+
+    double radiansFromDegrees = ((wantedHoodAngle - 20) / 40.0) * 6;
     TestShooterWrapper shooterWrapper =
-        new TestShooterWrapper(RadiansPerSecond.of(400), Rotation2d.fromRadians(5));
+        new TestShooterWrapper(
+            RadiansPerSecond.of(250), Rotation2d.fromRadians(radiansFromDegrees));
 
     controller
         .rightTrigger()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  shooter.setTestInterpMeasurables(shooterWrapper);
-                  shooter.setWantedState(ShooterWantedState.TEST_INTERP_MEASURABLES);
-                  indexer.setWantedState(IndexerWantedState.RUNNING);
-                }))
-        .onFalse(
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      shooter.setWantedState(ShooterWantedState.TEST);
+                    }),
+                new SequentialCommandGroup(
+                    new WaitCommand(3),
+                    new InstantCommand(
+                        () -> {
+                          indexer.setWantedState(IndexerWantedState.RUNNING);
+                        }))))
+        .whileFalse(
             new InstantCommand(
                 () -> {
                   shooter.setWantedState(ShooterWantedState.IDLE);

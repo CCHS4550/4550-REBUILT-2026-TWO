@@ -80,11 +80,15 @@ public class Intake extends SubsystemBase {
         intakeIO.setSpinnerVoltage(5.0);
         intakeIO.setExtensionMotorPositionRad(
             Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
+        System.out.println("Motor Position: " + inputs.extensionPosRadians);
+        System.out.println("Wanted state: Extended intake");
         break;
       case EXTENDED_PASSIVE:
-        intakeIO.setExtensionVoltage(0.0);
+        intakeIO.setSpinnerVoltage(0.0);
         intakeIO.setExtensionMotorPositionRad(
             Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
+        System.out.println("Motor Position: " + inputs.extensionPosRadians);
+        System.out.println("Wanted state: Extended passive");
         break;
       case STOWED:
         intakeIO.setExtensionVoltage(0.0);

@@ -138,8 +138,8 @@ public class Shooter extends SubsystemBase {
         setFlywheelSpeed(RadiansPerSecond.of(0));
         break;
       case TEST:
-        // setFlywheelSpeed(RadiansPerSecond.of(200));
-        setFlywheelVoltage(2);
+        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(320, RadiansPerSecond));
+        setElevationAngle(Rotation2d.fromDegrees(60));
         break;
       case TEST_INTERP_MEASURABLES:
         // setFlywheelSpeed(wantedWrapperMeasurables.flywheelVelo);

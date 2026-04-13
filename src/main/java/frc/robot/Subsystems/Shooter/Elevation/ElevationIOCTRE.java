@@ -53,16 +53,18 @@ public class ElevationIOCTRE implements ElevationIO {
     elevationConfig.Slot0.kS = bruinRobotConfig.getShooterConfig().elevationKs;
     elevationConfig.Slot0.kV = bruinRobotConfig.getShooterConfig().elevationKv;
     elevationConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-    elevationConfig.Slot0.kG = 0.1; // change
+    elevationConfig.Slot0.kG = -0.3; // change
     elevationConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    elevationConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    elevationConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     elevationConfig.MotionMagic.MotionMagicCruiseVelocity = 64.4;
     elevationConfig.MotionMagic.MotionMagicAcceleration = 75.3; // some constant idk
 
     Phoenix6Util.applyAndCheckConfiguration(elevationMotor, elevationConfig, 5);
 
-    elevationMotor.setPosition(0.0);
+    elevationMotor.setPosition(
+        Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS
+            / Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT);
     elevationAngleRotations = elevationMotor.getPosition();
     elevationAppliedVolts = elevationMotor.getMotorVoltage();
     elevationSupplyCurrentAmps = elevationMotor.getSupplyCurrent();
@@ -107,24 +109,25 @@ public class ElevationIOCTRE implements ElevationIO {
 
   @Override
   public void setElevationAngle(Rotation2d angle) {
-    // angle =
-    //     Rotation2d.fromRadians(
-    //         MathUtil.clamp(
-    //             angle.getRadians(),
-    //             Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
-    //             Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS));
+    angle =
+        Rotation2d.fromRadians(
+            MathUtil.clamp(
+                angle.getRadians(),
+                Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
+                Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS));
+
+    double wantedAngle =
+        angle.getRadians() / Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT;
+
+    elevationMotor.setControl(motionMagicVoltage.withPosition(wantedAngle));
+
+    // angle = Rotation2d.fromRadians(MathUtil.clamp(angle.getRadians(), 0.02, 4.3)); // fill
 
     // double wantedAngle = angle.getRadians();
-
-    // elevationMotor.setControl(motionMagicVoltage.withPosition(wantedAngle).withFeedForward(0.2));
-
-    angle = Rotation2d.fromRadians(MathUtil.clamp(angle.getRadians(), 0.02, 4.3)); // fill
-
-    double wantedAngle = angle.getRadians();
-    double error = wantedAngle - elevationMotor.getPosition().getValueAsDouble();
-    double kP = 1.5;
-    double kS = 0.41;
-    setVoltage(error * kP + kS);
+    // double error = wantedAngle - elevationMotor.getPosition().getValueAsDouble();
+    // double kP = 1.5;
+    // double kS = 0.41;
+    // setVoltage(error * kP + kS);
 
     // System.out.println(wantedAngle);
     // System.out.println(error);

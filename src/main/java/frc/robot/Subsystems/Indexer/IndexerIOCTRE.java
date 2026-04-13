@@ -44,7 +44,7 @@ public class IndexerIOCTRE implements IndexerIO {
 
     indexerConfig = new TalonFXConfiguration();
 
-    boolean currentLimit = false;
+    boolean currentLimit = true;
 
     indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = currentLimit;
     indexerConfig.CurrentLimits.StatorCurrentLimitEnable = currentLimit;
@@ -129,7 +129,7 @@ public class IndexerIOCTRE implements IndexerIO {
   @Override
   public void setVoltage(double voltage) {
     indexerMotor.setVoltage(voltage);
-    indexerTwoMotor.setVoltage(voltage);
+    indexerTwoMotor.setVoltage(voltage * 0.5);
   }
 
   @Override

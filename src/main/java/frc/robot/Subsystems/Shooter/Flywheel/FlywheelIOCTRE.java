@@ -67,7 +67,7 @@ public class FlywheelIOCTRE implements FlywheelIO {
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    shooterConfig.MotionMagic.MotionMagicAcceleration = 15;
+    shooterConfig.MotionMagic.MotionMagicAcceleration = 4000;
 
     // change this later!
 
@@ -163,11 +163,13 @@ public class FlywheelIOCTRE implements FlywheelIO {
   @Override
   public void setSpeed(double rpm) {
     double feedforward = (shooterConfig.Slot0.kV * rpm) + shooterConfig.Slot0.kS;
-    // double error = rpm - flywheelInputs.flywheel1VelocityRadPerSec;
-    // double feedback = error * shooterConfig.Slot0.kP;
-    double feedback = 0;
+    double error = rpm - flywheel1VelocityRotationsPerSec.getValueAsDouble() * 2 * Math.PI;
+    double feedback = error * shooterConfig.Slot0.kP;
 
     setVoltage(Voltage.ofBaseUnits(feedback + feedforward, Volts));
+    System.out.println("Error" + error);
+    System.out.println("Target: " + rpm);
+    System.out.println("Velo: " + (flywheelMotor1.getVelocity().getValueAsDouble() * 2 * Math.PI));
   }
 
   @Override

@@ -44,7 +44,7 @@ public class BruinRobotConfig {
   public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(16, CANIVORE_CANBUS);
   public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(22, CANIVORE_CANBUS);
 
-  public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(14, CANIVORE_CANBUS);
+  public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(17, CANIVORE_CANBUS);
   public final CanDeviceID INTAKE_EXTENSION = new CanDeviceID(15);
 
   /**
@@ -296,16 +296,16 @@ public class BruinRobotConfig {
     shooterConfig =
         new ShooterConfig()
             // 51.39646
-            .withElevationKp(0)
+            .withElevationKp(0.6)
             .withElevationKi(0)
-            .withElevationKd(0)
+            .withElevationKd(0.05)
             .withElevationKs(0.0)
-            .withElevationKv(0)
-            .withShooterKp(0.0)
+            .withElevationKv(0.1)
+            .withShooterKp(0.314)
             .withShooterKi(0)
             .withShooterKd(0.0)
-            .withShooterKs(0.37)
-            .withShooterKv(0.0152);
+            .withShooterKs(0.037)
+            .withShooterKv(0.1236);
 
     intakeConfig =
         new IntakeConfig()

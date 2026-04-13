@@ -111,6 +111,7 @@ public class SwerveIOCTRE extends SwerveDrivetrain implements SwerveIO {
   @Override
   public void addQuestPose(Pose2d pose, double timestamp, Matrix<N3, N1> visionMeasurementStdDevs) {
     this.addVisionMeasurement(pose, timestamp, visionMeasurementStdDevs);
+    System.out.println("adding vision measurement");
   }
 
   public void updateModuleInputs(ModuleIOInputs... inputs) {

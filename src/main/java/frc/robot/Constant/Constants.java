@@ -57,7 +57,7 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final double ELEVATION_GEAR_RATIO = 12.0 / 50; // fill
+    public static final double ELEVATION_GEAR_RATIO = 1.0 / 65.23; // fill
     public static final double ELEVATION_POSITION_COEFFICIENT = 2 * Math.PI * ELEVATION_GEAR_RATIO;
 
     public static final double SHOOTER_ONE_GEAR_RATIO = 24.0 / 18.0;
