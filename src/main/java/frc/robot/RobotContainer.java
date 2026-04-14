@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -9,15 +7,11 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
 import frc.robot.Subsystems.Indexer.Indexer;
-import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
 import frc.robot.Subsystems.Indexer.IndexerIOCTRE;
 import frc.robot.Subsystems.Intake.Intake;
 import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
@@ -27,10 +21,8 @@ import frc.robot.Subsystems.QuestNav.QuestNavIOQuest;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
-import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
 import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.Subsystems.Vision.VisionIOPhotonvision;
-import frc.robot.Util.TestShooterWrapper;
 
 public class RobotContainer {
   private final Vision vision;
@@ -75,27 +67,27 @@ public class RobotContainer {
             questnav,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    controller
-        .a()
-        .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)))
-        .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
+    // controller
+    //     .a()
+    //     .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)))
+    //     .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
 
-    controller
-        .b()
-        .whileTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-                  System.out.println("Extending");
-                }));
-    controller
-        .b()
-        .whileFalse(
-            new InstantCommand(
-                () -> {
-                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
-                  System.out.println("Intaking");
-                }));
+    // controller
+    //     .b()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
+    //               System.out.println("Extending");
+    //             }));
+    // controller
+    //     .b()
+    //     .whileFalse(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+    //               System.out.println("Intaking");
+    //             }));
 
     // Change based on field testing
     // controller
@@ -124,30 +116,30 @@ public class RobotContainer {
     wantedHoodAngle = 20;
 
     double radiansFromDegrees = ((wantedHoodAngle - 20) / 40.0) * 6;
-    TestShooterWrapper shooterWrapper =
-        new TestShooterWrapper(
-            RadiansPerSecond.of(250), Rotation2d.fromRadians(radiansFromDegrees));
-
+    // controller
+    //     .rightTrigger()
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             new InstantCommand(
+    //                 () -> {
+    //                   shooter.setWantedState(ShooterWantedState.TEST);
+    //                 }),
+    //             new SequentialCommandGroup(
+    //                 new WaitCommand(3),
+    //                 new InstantCommand(
+    //                     () -> {
+    //                       indexer.setWantedState(IndexerWantedState.RUNNING);
+    //                     }))))
+    //     .whileFalse(
+    //         new InstantCommand(
+    //             () -> {
+    //               shooter.setWantedState(ShooterWantedState.IDLE);
+    //               indexer.setWantedState(IndexerWantedState.IDLE);
+    //             }));
     controller
         .rightTrigger()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(
-                    () -> {
-                      shooter.setWantedState(ShooterWantedState.TEST);
-                    }),
-                new SequentialCommandGroup(
-                    new WaitCommand(3),
-                    new InstantCommand(
-                        () -> {
-                          indexer.setWantedState(IndexerWantedState.RUNNING);
-                        }))))
-        .whileFalse(
-            new InstantCommand(
-                () -> {
-                  shooter.setWantedState(ShooterWantedState.IDLE);
-                  indexer.setWantedState(IndexerWantedState.IDLE);
-                }));
+        .whileTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))
+        .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
 
     // controller
     //     .leftBumper()
