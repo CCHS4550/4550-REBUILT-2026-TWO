@@ -83,10 +83,10 @@ public class LaunchCalculator {
   public static final ShootPreset trenchPreset;
   public static final ShootPreset outpostPreset;
   public static final ShootPreset hoodMinPreset =
-      new ShootPreset(Rotation2d.fromDegrees(0), RadiansPerSecond.of(0));
+      new ShootPreset(Rotation2d.fromRadians(Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS), RadiansPerSecond.of(0));
 
   public static final ShootPreset hoodMaxPreset =
-      new ShootPreset(Rotation2d.fromDegrees(90), RadiansPerSecond.of(0));
+      new ShootPreset(Rotation2d.fromRadians(Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS), RadiansPerSecond.of(0));
 
   public static final double passingIdleSpeed = 100.0;
 
@@ -113,7 +113,7 @@ public class LaunchCalculator {
           FieldConstants.LinesHorizontal.leftBumpEnd);
 
   static {
-    minDistance = 0.9;
+    minDistance = 2.1;
     maxDistance = 4.9;
     passingMinDistance = 5.4;
     passingMaxDistance = 17.16;
@@ -122,10 +122,10 @@ public class LaunchCalculator {
     // distance in meters
 
     // distance from hub, degree of hood
-    hoodAngleMap.put(0.96, Rotation2d.fromDegrees(10.0));
-    hoodAngleMap.put(1.16, Rotation2d.fromDegrees(12.0));
-    hoodAngleMap.put(1.58, Rotation2d.fromDegrees(14.0));
-    hoodAngleMap.put(2.07, Rotation2d.fromDegrees(18.5));
+    // hoodAngleMap.put(0.96, Rotation2d.fromDegrees(10.0));
+    // hoodAngleMap.put(1.16, Rotation2d.fromDegrees(12.0));
+    // hoodAngleMap.put(1.58, Rotation2d.fromDegrees(14.0));
+    // hoodAngleMap.put(2.07, Rotation2d.fromDegrees(18.5));
     hoodAngleMap.put(2.37, Rotation2d.fromDegrees(22.0));
     hoodAngleMap.put(2.47, Rotation2d.fromDegrees(23.0));
     hoodAngleMap.put(2.70, Rotation2d.fromDegrees(24.0));
@@ -136,10 +136,10 @@ public class LaunchCalculator {
     hoodAngleMap.put(4.84, Rotation2d.fromDegrees(38.0));
 
     // distance from hub, flywheel speed(units?)
-    flywheelSpeedMap.put(0.96, 150.0);
-    flywheelSpeedMap.put(1.16, 155.0);
-    flywheelSpeedMap.put(1.58, 160.0);
-    flywheelSpeedMap.put(2.07, 165.0);
+    // flywheelSpeedMap.put(0.96, 150.0);
+    // flywheelSpeedMap.put(1.16, 155.0);
+    // flywheelSpeedMap.put(1.58, 160.0);
+    // flywheelSpeedMap.put(2.07, 165.0);
     flywheelSpeedMap.put(2.37, 170.0);
     flywheelSpeedMap.put(2.47, 170.0);
     flywheelSpeedMap.put(2.70, 170.0);
