@@ -42,6 +42,7 @@ public class Shooter extends SubsystemBase {
     MANUAL_SHOOT,
     ZERO,
     TEST,
+    TEST_2,
     TEST_INTERP_MEASURABLES
   }
 
@@ -51,6 +52,7 @@ public class Shooter extends SubsystemBase {
     MANUAL_SHOOT,
     ZERO,
     TEST,
+    TEST_2,
     TEST_INTERP_MEASURABLES
   }
 
@@ -93,6 +95,8 @@ public class Shooter extends SubsystemBase {
         return ShooterSystemState.ZERO;
       case TEST:
         return ShooterSystemState.TEST;
+      case TEST_2:
+        return ShooterSystemState.TEST_2;
       case TEST_INTERP_MEASURABLES:
         return ShooterSystemState.TEST_INTERP_MEASURABLES;
       default:
@@ -138,7 +142,11 @@ public class Shooter extends SubsystemBase {
         setFlywheelSpeed(RadiansPerSecond.of(0));
         break;
       case TEST:
-        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(320, RadiansPerSecond));
+        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(375.5, RadiansPerSecond));
+        setElevationAngle(Rotation2d.fromDegrees(61));
+        break;
+      case TEST_2:
+        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(377.9, RadiansPerSecond));
         setElevationAngle(Rotation2d.fromDegrees(61));
         break;
       case TEST_INTERP_MEASURABLES:
