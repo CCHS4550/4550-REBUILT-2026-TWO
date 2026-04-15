@@ -74,7 +74,7 @@ public final class Constants {
     public static final double TURRET_HEIGHT_METERS = 0.305;
 
     public static final Transform3d SHOOTER_TRANSFORM =
-        new Transform3d(-0.0259334, -0.212725, 0.4445254, new Rotation3d(0, 0, -Math.PI));
+        new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
 
     public static final double MAX_BALL_HEIGHT_METERS = 5.4864;
   }
