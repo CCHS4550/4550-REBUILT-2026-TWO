@@ -79,6 +79,31 @@ public class RobotContainer {
     //     .whileTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))
     //     .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
 
+    // controller
+    //     .leftBumper()
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             new InstantCommand(
+    //                 () -> {
+    //                   shooter.setWantedState(ShooterWantedState.TEST);
+    //                 }),
+    //             new SequentialCommandGroup(
+    //                 new WaitCommand(3),
+    //                 new InstantCommand(
+    //                     () -> {
+    //                       indexer.setWantedState(IndexerWantedState.RUNNING);
+    //                     }),
+    //                 new InstantCommand(
+    //                     () -> {
+    //                       shooter.setWantedState(ShooterWantedState.TEST_2);
+    //                     }))))
+    //     .whileFalse(
+    //         new InstantCommand(
+    //             () -> {
+    //               shooter.setWantedState(ShooterWantedState.IDLE);
+    //               indexer.setWantedState(IndexerWantedState.IDLE);
+    //             }));
+
     
     // code to establish intaking
     controller
@@ -113,6 +138,7 @@ public class RobotContainer {
       .and (controller.b().negate())
       .whileTrue(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.SHOOT)))
       .onFalse(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
     
   }
 
