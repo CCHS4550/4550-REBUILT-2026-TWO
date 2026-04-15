@@ -664,6 +664,10 @@ public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestCons
     }
   }
 
+  public void setSwerveRequest (SwerveRequest request){
+    io.setSwerveState(request);
+  }
+
   public double getRobotDistanceFromChoreoEndpoint() {
     Logger.recordOutput("Choreo/FinalPose", desiredChoreoTrajectory.getFinalPose(false).get());
     var distance =
