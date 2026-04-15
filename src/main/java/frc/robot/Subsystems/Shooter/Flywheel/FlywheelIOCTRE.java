@@ -67,7 +67,7 @@ public class FlywheelIOCTRE implements FlywheelIO {
     shooterConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     shooterConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    shooterConfig.MotionMagic.MotionMagicAcceleration = 4000;
+    shooterConfig.MotionMagic.MotionMagicAcceleration = 10000;
 
     // change this later!
 

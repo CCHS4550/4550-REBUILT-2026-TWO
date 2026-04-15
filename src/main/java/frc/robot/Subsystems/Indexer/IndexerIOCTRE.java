@@ -73,7 +73,7 @@ public class IndexerIOCTRE implements IndexerIO {
 
     indexerTwoConfig.CurrentLimits.SupplyCurrentLimitEnable = currentLimit;
     indexerTwoConfig.CurrentLimits.StatorCurrentLimitEnable = currentLimit;
-    indexerTwoConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    indexerTwoConfig.CurrentLimits.SupplyCurrentLimit = 100.0;
     indexerTwoConfig.CurrentLimits.StatorCurrentLimit = 90.0;
 
     indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;

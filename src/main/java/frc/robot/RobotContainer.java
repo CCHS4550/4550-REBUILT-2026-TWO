@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -35,7 +33,6 @@ import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
 import frc.robot.Subsystems.Superstructure.WantedSuperstructureState;
 import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.Subsystems.Vision.VisionIOPhotonvision;
-import frc.robot.Util.TestShooterWrapper;
 
 public class RobotContainer {
   private final Vision vision;
