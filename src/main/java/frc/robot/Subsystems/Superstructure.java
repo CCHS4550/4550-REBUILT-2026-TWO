@@ -128,7 +128,7 @@ public class Superstructure extends SubsystemBase {
         break;
       case SHOOT:
         swerveSubsystem.setTargetRotation(shooterCalcs.getDriveAngle());
-        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+        intake.setWantedIntakeState(WantedIntakeState.PUMPING);
         indexer.setWantedState(IndexerWantedState.RUNNING);
         shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
         break;

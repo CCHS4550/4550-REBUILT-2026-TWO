@@ -28,6 +28,7 @@ import frc.robot.Subsystems.Shooter.Shooter;
 import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
 import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.Subsystems.Vision.VisionIOPhotonvision;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
   private final Vision vision;
@@ -44,7 +45,7 @@ public class RobotContainer {
   // private double kS;
   // private double kV;
   // private double flywheelVoltage;
-  private double wantedHoodAngle;
+  // private double wantedHoodAngle;
 
   public RobotContainer() {
     BruinRobotConfig config = new BruinRobotConfig();
@@ -72,192 +73,59 @@ public class RobotContainer {
             questnav,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
+   
     // controller
-    //     .a()
-    //     .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)))
-    //     .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
+    //     .rightTrigger()
+    //     .whileTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))
+    //     .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
 
-    // controller
-    //     .b()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-    //               System.out.println("Extending");
-    //             }));
-    // controller
-    //     .b()
-    //     .whileFalse(
-    //         new InstantCommand(
-    //             () -> {
-    //               intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
-    //               System.out.println("Intaking");
-    //             }));
-
-    // Change based on field testing
-    // controller
-    //     .rightBumper()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               kV += changeMagnitude;
-    //               System.out.println("flywheel voltage: " + kV);
-    //             }));
-    // controller
-    //     .leftBumper()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               kV -= changeMagnitude;
-    //               System.out.println("flywheel voltage: " + kV);
-    //             }));
-
-    double flywheelSpeed = 200;
-    // flywheelVoltage = 8;
-
-    /*USE FOR FINDING INTERPOLATING STUFF */
-    // elevation goes from 0 to 6 radians of motor rotation
-    // goes from 20 to 60 degrees of mechanism rotation
-    wantedHoodAngle = 20;
-
-    double radiansFromDegrees = ((wantedHoodAngle - 20) / 40.0) * 6;
-    controller
-        .rightBumper()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(
-                    () -> {
-                      shooter.setWantedState(ShooterWantedState.TEST);
-                    }),
-                new SequentialCommandGroup(
-                    new WaitCommand(3),
-                    new InstantCommand(
-                        () -> {
-                          indexer.setWantedState(IndexerWantedState.RUNNING);
-                        }),
-                    new InstantCommand(
-                        () -> {
-                          shooter.setWantedState(ShooterWantedState.TEST_2);
-                        }))))
-        .whileFalse(
-            new InstantCommand(
-                () -> {
-                  shooter.setWantedState(ShooterWantedState.IDLE);
-                  indexer.setWantedState(IndexerWantedState.IDLE);
-                }));
-    controller
-        .rightTrigger()
-        .whileTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))
-        .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
-
+    
+    // code to establish intaking
     controller
         .b()
+        .and(controller.rightBumper().negate())
         .whileTrue(
             new InstantCommand(
                 () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)))
         .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
-    // controller
-    //     .leftBumper()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               shooter.setFlywheelSpeed(shooterWrapper.flywheelVelo);
-    //               shooter.setElevationAngle(shooterWrapper.hoodAngle);
-    //             }))
-    //     .whileFalse(
-    //         new InstantCommand(
-    //             () -> {
-    //               shooter.setWantedState(ShooterWantedState.IDLE);
-    //             }));
 
-    // controller
-    //     .rightTrigger()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> {
-    //               shooter.setWantedState(ShooterWantedState.TEST);
-    //               ;
-    //               System.out.println("Shooting!");
-    //             }));
-    // controller
-    //     .rightTrigger()
-    //     .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
-
-    // controller
-    //     .a()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)));
-    // controller
-    //     .b()
-    //     .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
-    // controller
-    //     .x()
-    //     .onTrue(new InstantCommand(() ->
-    // intake.setWantedIntakeState(WantedIntakeState.PUMPING)));
-    // controller
-    //     .x()
-    //     .onFalse(new InstantCommand(() ->
-    // intake.setWantedIntakeState(WantedIntakeState.STOWED)));
-
-    /* on second thought i don't like the way its written but ill keep it here for now ig
-    /// for yall that are reading this
-    /// "P" = kP
-    /// "I" = kI
-    /// and so on
-    double changeMagnitude = 0.01;
-    String slot = "P";
-    int adjustedModule = 0; // 0 is flywheels, 1 is elevator, could add more later
-    // These should print out the new slot value, if that doesn't happen, thats not good
-    // btw ur welcom for this readable code, it should work
+    // code for pre-aim, intaking (good for rev up)
     controller
-        .rightBumper()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  switch (adjustedModule) {
-                    case (0):
-                      shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
-                      break;
-                    case (1):
-                      shooter.adjustElevationKSlotValue(changeMagnitude, slot);
-                      break;
-                    default:
-                      System.out.println("Invalid module!!!!");
-                      break;
-                  }
-                }));
+      .rightBumper()
+      .and(controller.b())
+      .and(controller.rightTrigger().negate())
+      .whileTrue(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.PRE_AIM_INTAKING)))
+      .onFalse(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
+    // code for pre-aim, no intaking (more rev up opportunities)
     controller
-        .leftBumper()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  switch (adjustedModule) {
-                    case (0):
-                      shooter.adjustFlywheelKSlotValue(-1 * changeMagnitude, slot);
-                      break;
-                    case (1):
-                      shooter.adjustElevationKSlotValue(-1 * changeMagnitude, slot);
-                      break;
-                    default:
-                      System.out.println("Invalid module!!!!");
-                      break;
-                  }
-                }));
-                */
+      .rightBumper()
+      .and(controller.b().negate())    
+      .and(controller.rightTrigger().negate())
+      .whileTrue(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.PRE_AIM)))
+      .onFalse(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
+
+    // code for shooting, everything should auto align and stuff
+    controller
+      .rightBumper()
+      .and(controller.rightTrigger())
+      .and (controller.b().negate())
+      .whileTrue(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.SHOOT)))
+      .onFalse(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+    
   }
 
-  // public SwerveSubsystem getSwerveSubsystem() {
-  //   return swerveSubsystem;
-  // }
+  public SwerveSubsystem getSwerveSubsystem() {
+    return swerveSubsystem;
+  }
 
   // public void setTestPose() {
   //   swerveSubsystem.resetTranslationAndRotation(new Pose2d(3, 3, new Rotation2d()));
   // }
 
   public boolean questPoseEstablished() {
-    // return questnav.questPoseEstablished();
-    return true;
+     return questnav.questPoseEstablished();
   }
 
   public boolean isAtAutoStartingPose(Pose2d AutoStartingPose) {
