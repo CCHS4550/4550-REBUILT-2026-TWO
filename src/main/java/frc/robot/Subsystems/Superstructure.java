@@ -110,6 +110,16 @@ public class Superstructure extends SubsystemBase {
           shooter.setWantedState(ShooterWantedState.IDLE);
         }
         break;
+      case INTAKING_PRE_AIM:
+        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
+        break;
+      case PASSIVE_PRE_AIM:
+        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
+        break;
       case AIMING:
         swerveSubsystem.setTargetRotation(shooterCalcs.getDriveAngle());
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
@@ -118,7 +128,7 @@ public class Superstructure extends SubsystemBase {
         break;
       case SHOOT:
         swerveSubsystem.setTargetRotation(shooterCalcs.getDriveAngle());
-        intake.setWantedIntakeState(WantedIntakeState.PUMPING);
+        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
         indexer.setWantedState(IndexerWantedState.RUNNING);
         shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
         break;
@@ -146,6 +156,10 @@ public class Superstructure extends SubsystemBase {
           return SystemState.SHOOT;
         }
         return SystemState.AIMING;
+      case PRE_AIM:
+        return SystemState.PASSIVE_PRE_AIM;
+      case PRE_AIM_INTAKING:
+        return SystemState.INTAKING_PRE_AIM;
       default:
         return SystemState.IDLE;
     }
@@ -157,7 +171,9 @@ public class Superstructure extends SubsystemBase {
     ZERO,
     EXTEND_INTAKE,
     INTAKING,
-    SHOOT
+    SHOOT,
+    PRE_AIM,
+    PRE_AIM_INTAKING
   }
 
   private enum SystemState {
@@ -166,6 +182,8 @@ public class Superstructure extends SubsystemBase {
     ZERO,
     EXTEND_INTAKE,
     INTAKING,
+    INTAKING_PRE_AIM,
+    PASSIVE_PRE_AIM,
     AIMING,
     SHOOT
   }

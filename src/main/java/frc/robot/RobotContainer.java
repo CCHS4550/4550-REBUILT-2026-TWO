@@ -3,8 +3,6 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,10 +12,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
-import frc.robot.Subsystems.Superstructure;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
-import frc.robot.Subsystems.Drive.SwerveSubsystem.WantedState;
 import frc.robot.Subsystems.Indexer.Indexer;
 import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
 import frc.robot.Subsystems.Indexer.IndexerIOCTRE;
@@ -30,7 +26,6 @@ import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
 import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
-import frc.robot.Subsystems.Superstructure.WantedSuperstructureState;
 import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.Subsystems.Vision.VisionIOPhotonvision;
 
@@ -43,8 +38,6 @@ public class RobotContainer {
   private final Indexer indexer;
   private final SwerveSubsystem swerveSubsystem;
   private final CommandXboxController controller = new CommandXboxController(0);
-
-  private final Superstructure superstructure;
 
   // private double targetRPM;
   // private double kP;
@@ -79,44 +72,179 @@ public class RobotContainer {
             questnav,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    superstructure = new Superstructure(swerveSubsystem, intake, shooter, indexer);
+    // controller
+    //     .a()
+    //     .onTrue(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.RUNNING)))
+    //     .onFalse(new InstantCommand(() -> indexer.setWantedState(IndexerWantedState.IDLE)));
 
+    // controller
+    //     .b()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
+    //               System.out.println("Extending");
+    //             }));
+    // controller
+    //     .b()
+    //     .whileFalse(
+    //         new InstantCommand(
+    //             () -> {
+    //               intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+    //               System.out.println("Intaking");
+    //             }));
 
-    controller
-        .b()
-        .whileTrue(
-            new InstantCommand(
-                () -> {
-                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
-                }));
-    controller
-        .b()
-        .whileFalse(
-            new InstantCommand(
-                () -> {
-                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
-                  System.out.println("Intaking");
-                }));
-    
+    // Change based on field testing
+    // controller
+    //     .rightBumper()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               kV += changeMagnitude;
+    //               System.out.println("flywheel voltage: " + kV);
+    //             }));
+    // controller
+    //     .leftBumper()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               kV -= changeMagnitude;
+    //               System.out.println("flywheel voltage: " + kV);
+    //             }));
+
+    double flywheelSpeed = 200;
+    // flywheelVoltage = 8;
+
+    /*USE FOR FINDING INTERPOLATING STUFF */
+    // elevation goes from 0 to 6 radians of motor rotation
+    // goes from 20 to 60 degrees of mechanism rotation
+    wantedHoodAngle = 20;
+
+    double radiansFromDegrees = ((wantedHoodAngle - 20) / 40.0) * 6;
     controller
         .rightBumper()
         .whileTrue(
-          new InstantCommand(
-            ()-> 
-              superstructure.setWantedSuperstructureState(WantedSuperstructureState.SHOOT)))
-        .onFalse(
-          new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+            new ParallelCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      shooter.setWantedState(ShooterWantedState.TEST);
+                    }),
+                new SequentialCommandGroup(
+                    new WaitCommand(3),
+                    new InstantCommand(
+                        () -> {
+                          indexer.setWantedState(IndexerWantedState.RUNNING);
+                        }),
+                    new InstantCommand(
+                        () -> {
+                          shooter.setWantedState(ShooterWantedState.TEST_2);
+                        }))))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  shooter.setWantedState(ShooterWantedState.IDLE);
+                  indexer.setWantedState(IndexerWantedState.IDLE);
+                }));
+    controller
+        .rightTrigger()
+        .whileTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))
+        .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
 
     controller
-        .leftTrigger()
+        .b()
         .whileTrue(
-          new InstantCommand(()-> swerveSubsystem.setSwerveRequest(new SwerveRequest.SwerveDriveBrake()))
-        )
-        .onFalse(
-          new InstantCommand(()-> swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE))
-        );
+            new InstantCommand(
+                () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)))
+        .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
+    // controller
+    //     .leftBumper()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               shooter.setFlywheelSpeed(shooterWrapper.flywheelVelo);
+    //               shooter.setElevationAngle(shooterWrapper.hoodAngle);
+    //             }))
+    //     .whileFalse(
+    //         new InstantCommand(
+    //             () -> {
+    //               shooter.setWantedState(ShooterWantedState.IDLE);
+    //             }));
 
-    
+    // controller
+    //     .rightTrigger()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               shooter.setWantedState(ShooterWantedState.TEST);
+    //               ;
+    //               System.out.println("Shooting!");
+    //             }));
+    // controller
+    //     .rightTrigger()
+    //     .onFalse(new InstantCommand(() -> shooter.setWantedState(ShooterWantedState.IDLE)));
+
+    // controller
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)));
+    // controller
+    //     .b()
+    //     .onTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+    // controller
+    //     .x()
+    //     .onTrue(new InstantCommand(() ->
+    // intake.setWantedIntakeState(WantedIntakeState.PUMPING)));
+    // controller
+    //     .x()
+    //     .onFalse(new InstantCommand(() ->
+    // intake.setWantedIntakeState(WantedIntakeState.STOWED)));
+
+    /* on second thought i don't like the way its written but ill keep it here for now ig
+    /// for yall that are reading this
+    /// "P" = kP
+    /// "I" = kI
+    /// and so on
+    double changeMagnitude = 0.01;
+    String slot = "P";
+    int adjustedModule = 0; // 0 is flywheels, 1 is elevator, could add more later
+    // These should print out the new slot value, if that doesn't happen, thats not good
+    // btw ur welcom for this readable code, it should work
+    controller
+        .rightBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  switch (adjustedModule) {
+                    case (0):
+                      shooter.adjustFlywheelKSlotValue(changeMagnitude, slot);
+                      break;
+                    case (1):
+                      shooter.adjustElevationKSlotValue(changeMagnitude, slot);
+                      break;
+                    default:
+                      System.out.println("Invalid module!!!!");
+                      break;
+                  }
+                }));
+    controller
+        .leftBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  switch (adjustedModule) {
+                    case (0):
+                      shooter.adjustFlywheelKSlotValue(-1 * changeMagnitude, slot);
+                      break;
+                    case (1):
+                      shooter.adjustElevationKSlotValue(-1 * changeMagnitude, slot);
+                      break;
+                    default:
+                      System.out.println("Invalid module!!!!");
+                      break;
+                  }
+                }));
+                */
   }
 
   // public SwerveSubsystem getSwerveSubsystem() {
