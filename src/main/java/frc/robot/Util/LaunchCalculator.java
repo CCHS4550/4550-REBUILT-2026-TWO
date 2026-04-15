@@ -113,7 +113,7 @@ public class LaunchCalculator {
           FieldConstants.LinesHorizontal.leftBumpEnd);
 
   static {
-    minDistance = 0.9;
+    minDistance = 2.2;
     maxDistance = 4.9;
     passingMinDistance = 5.4;
     passingMaxDistance = 17.16;
@@ -122,39 +122,35 @@ public class LaunchCalculator {
     // distance in meters
 
     // distance from hub, degree of hood
-    hoodAngleMap.put(0.96, Rotation2d.fromDegrees(10.0));
-    hoodAngleMap.put(1.16, Rotation2d.fromDegrees(12.0));
-    hoodAngleMap.put(1.58, Rotation2d.fromDegrees(14.0));
-    hoodAngleMap.put(2.07, Rotation2d.fromDegrees(18.5));
-    hoodAngleMap.put(2.37, Rotation2d.fromDegrees(22.0));
-    hoodAngleMap.put(2.47, Rotation2d.fromDegrees(23.0));
-    hoodAngleMap.put(2.70, Rotation2d.fromDegrees(24.0));
-    hoodAngleMap.put(2.94, Rotation2d.fromDegrees(25.0));
-    hoodAngleMap.put(3.48, Rotation2d.fromDegrees(27.0));
-    hoodAngleMap.put(3.92, Rotation2d.fromDegrees(32.0));
-    hoodAngleMap.put(4.35, Rotation2d.fromDegrees(34.0));
-    hoodAngleMap.put(4.84, Rotation2d.fromDegrees(38.0));
+    // hoodAngleMap.put(0.96, Rotation2d.fromDegrees(10.0));
+    // hoodAngleMap.put(1.16, Rotation2d.fromDegrees(12.0));
+    // hoodAngleMap.put(1.58, Rotation2d.fromDegrees(14.0));
+    // hoodAngleMap.put(2.07, Rotation2d.fromDegrees(18.5));
+    hoodAngleMap.put(2.2, Rotation2d.fromDegrees(60.0));
+    // hoodAngleMap.put(2.47, Rotation2d.fromDegrees(23.0));
+    // hoodAngleMap.put(2.70, Rotation2d.fromDegrees(24.0));
+    // hoodAngleMap.put(2.94, Rotation2d.fromDegrees(25.0));
+    // hoodAngleMap.put(3.48, Rotation2d.fromDegrees(27.0));
+    // hoodAngleMap.put(3.92, Rotation2d.fromDegrees(32.0));
+    // hoodAngleMap.put(4.35, Rotation2d.fromDegrees(34.0));
+    // hoodAngleMap.put(4.84, Rotation2d.fromDegrees(38.0));
 
     // distance from hub, flywheel speed(units?)
-    flywheelSpeedMap.put(0.96, 150.0);
-    flywheelSpeedMap.put(1.16, 155.0);
-    flywheelSpeedMap.put(1.58, 160.0);
-    flywheelSpeedMap.put(2.07, 165.0);
-    flywheelSpeedMap.put(2.37, 170.0);
-    flywheelSpeedMap.put(2.47, 170.0);
-    flywheelSpeedMap.put(2.70, 170.0);
-    flywheelSpeedMap.put(2.94, 175.0);
-    flywheelSpeedMap.put(3.48, 175.0);
-    flywheelSpeedMap.put(3.92, 180.0);
-    flywheelSpeedMap.put(4.35, 185.0);
-    flywheelSpeedMap.put(4.84, 190.0);
+    // flywheelSpeedMap.put(0.96, 150.0);
+    // flywheelSpeedMap.put(1.16, 155.0);
+    // flywheelSpeedMap.put(1.58, 160.0);
+    // flywheelSpeedMap.put(2.07, 165.0);
+    flywheelSpeedMap.put(2.25, 377.5);
+    // flywheelSpeedMap.put(2.47, 170.0);
+    // flywheelSpeedMap.put(2.70, 170.0);
+    // flywheelSpeedMap.put(2.94, 175.0);
+    // flywheelSpeedMap.put(3.48, 175.0);
+    // flywheelSpeedMap.put(3.92, 180.0);
+    // flywheelSpeedMap.put(4.35, 185.0);
+    // flywheelSpeedMap.put(4.84, 190.0);
 
     // distance from hub, air time of ball
-    timeOfFlightMap.put(5.68, 1.16);
-    timeOfFlightMap.put(4.55, 1.12);
-    timeOfFlightMap.put(3.15, 1.11);
-    timeOfFlightMap.put(1.88, 1.09);
-    timeOfFlightMap.put(1.38, 0.90);
+    timeOfFlightMap.put(2.2, 1.1);
 
     // passing distance, hood angle
     passingHoodAngleMap.put(5.46, Rotation2d.fromDegrees(38.0));
