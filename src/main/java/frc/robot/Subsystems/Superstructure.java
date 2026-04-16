@@ -187,4 +187,9 @@ public class Superstructure extends SubsystemBase {
     AIMING,
     SHOOT
   }
+
+  private Pose2d calculateLaunchPose(){
+    Translation2d x = Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry();
+    Translation2d y = FieldConstants.getScoringPose();
+  }
 }
