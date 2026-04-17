@@ -29,8 +29,8 @@ public class Intake extends SubsystemBase {
     IDLE
   }
 
-  private SystemState systemState = SystemState.EXTENDED_PASSIVE;
-  private WantedIntakeState wantedState = WantedIntakeState.EXTENDED_PASSIVE;
+  private SystemState systemState = SystemState.STOWED;
+  private WantedIntakeState wantedState = WantedIntakeState.STOWED;
   private final IntakeIO intakeIO;
 
   private IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
@@ -180,7 +180,7 @@ public class Intake extends SubsystemBase {
     }
   }
 
-  public void tareTS(){
+  public void tareTS() {
     intakeIO.tareExtensionPosition();
   }
 

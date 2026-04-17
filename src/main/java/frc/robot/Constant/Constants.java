@@ -72,7 +72,7 @@ public final class Constants {
     public static final double STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(61);
 
     public static final Transform3d SHOOTER_TRANSFORM =
-        new Transform3d(0.2921, 0, 0, new Rotation3d(0, 0,0));
+        new Transform3d(0.2921, 0, 0, new Rotation3d(0, 0, 0));
 
     public static final double MAX_BALL_HEIGHT_METERS = 5.4864;
   }
@@ -81,8 +81,8 @@ public final class Constants {
     public static final double EXTENSION_GEAR_RATIO = 1.0 / 26.0;
     public static final double EXTENSION_POSITION_COEFFICIENT = 2 * Math.PI * EXTENSION_GEAR_RATIO;
 
-    public static final double INTAKE_BOTTOM_RADS = 0.0;
-    public static final double INTAKE_STOWED_RADS = 2.27;
+    public static final double INTAKE_BOTTOM_RADS = 0.01;
+    public static final double INTAKE_STOWED_RADS = 1.827;
     public static final double INTAKE_TOP_PUMP_RADS = 1.0;
     public static final double INTAKE_BOTTOM_PUMP_RADS = 0.5;
 
@@ -99,7 +99,7 @@ public final class Constants {
     public static final double linearStdDevBaseline = 0.02;
     public static final double angularStdDevBaseline = 0.06;
     public static final double maxAmbiguity = 0.01;
-    public static final double maxZError = 3.75;
+    public static final double maxZError = 6.75;
   }
 
   public static final class ShooterCalculationConstants {

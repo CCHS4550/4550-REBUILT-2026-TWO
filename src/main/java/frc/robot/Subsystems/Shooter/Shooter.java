@@ -16,7 +16,6 @@ import frc.robot.Subsystems.Shooter.Elevation.ElevationIOInputsAutoLogged;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIO;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOInputsAutoLogged;
 import frc.robot.Util.ShooterMeasurables;
-import frc.robot.Util.TestShooterWrapper;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -29,8 +28,6 @@ public class Shooter extends SubsystemBase {
   public double passingVelo = 377.5;
 
   private double smoothedSpeedRadPerSec = 0.0;
-  
-
 
   private FlywheelIO flywheelIO;
   private ElevationIO elevationIO;
@@ -88,7 +85,6 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Subsystems/elevation", elevationInputs);
 
     atGoal = atSetpoint();
-
   }
 
   public ShooterSystemState handleStateTransitions() {
@@ -106,7 +102,7 @@ public class Shooter extends SubsystemBase {
       case TEST_2:
         return ShooterSystemState.TEST_2;
       case PASSING:
-      return ShooterSystemState.PASSING;
+        return ShooterSystemState.PASSING;
       case TEST_INTERP_MEASURABLES:
         return ShooterSystemState.TEST_INTERP_MEASURABLES;
       default:
@@ -178,7 +174,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setWantedState(ShooterWantedState wantedState) {
-    if(wantedState == this.wantedState){
+    if (wantedState == this.wantedState) {
       return;
     }
 
@@ -191,32 +187,29 @@ public class Shooter extends SubsystemBase {
 
   public boolean atSetpoint() {
     double speed = shooterInitVelo;
-    if(systemState == ShooterSystemState.PASSING) {
+    if (systemState == ShooterSystemState.PASSING) {
       speed = passingVelo;
     }
 
-    if(systemState != ShooterSystemState.TEST && systemState != ShooterSystemState.TEST_2){
+    if (systemState != ShooterSystemState.TEST && systemState != ShooterSystemState.TEST_2) {
+      timer.stop();
       timer.reset();
       return false;
     }
 
-    boolean close = MathUtil.isNear(
-            flywheelInputs.flywheel1VelocityRadPerSec,
-            speed,
-            speed
-                * 0.06) // Allowance is 6% of wanted velocity
-        && MathUtil.isNear(
-            elevationInputs.elevationAngle.getRadians(),
-            1.064,
-            0.3);
-    if(close && !timer.isRunning()){
+    boolean close =
+        MathUtil.isNear(
+                flywheelInputs.flywheel1VelocityRadPerSec,
+                speed,
+                speed * 0.06) // Allowance is 6% of wanted velocity
+            && MathUtil.isNear(elevationInputs.elevationAngle.getRadians(), 1.064, 0.3);
+    if (close && !timer.isRunning()) {
       timer.start();
     }
 
-    if(close && timer.hasElapsed(0.5)){
+    if (close && timer.hasElapsed(0.5)) {
       return true;
-    }
-    else{
+    } else {
       return false;
     }
   }

@@ -24,7 +24,7 @@ public class Robotstate {
 
   public record SwerveDriveObservation(Pose2d robotPose, ChassisSpeeds robotSpeeds) {}
 
-  public void updateQuestBooleans(boolean connected, boolean tracking){
+  public void updateQuestBooleans(boolean connected, boolean tracking) {
     questnavConnected = connected;
     questnavTracking = tracking;
   }
@@ -72,7 +72,7 @@ public class Robotstate {
     return getAllowedTagPosesLength() != 32;
   }
 
-  public boolean getQuestValid(){
+  public boolean getQuestValid() {
     return questnavConnected && questnavTracking;
   }
 }

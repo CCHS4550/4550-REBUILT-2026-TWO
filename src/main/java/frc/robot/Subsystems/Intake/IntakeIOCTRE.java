@@ -3,6 +3,7 @@ package frc.robot.Subsystems.Intake;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -26,6 +27,7 @@ public class IntakeIOCTRE implements IntakeIO {
   private TalonFXConfiguration extensionConfig;
 
   private MotionMagicVoltage extensionController = new MotionMagicVoltage(0).withSlot(0);
+  private MotionMagicVelocityVoltage spinnerController = new MotionMagicVelocityVoltage(0);
 
   private final StatusSignal<Voltage> spinnerAppliedVolts;
   private final StatusSignal<Current> spinnerSupplyCurrentAmps;
@@ -54,8 +56,15 @@ public class IntakeIOCTRE implements IntakeIO {
     spinnerConfig = new TalonFXConfiguration();
     spinnerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     spinnerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    spinnerConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    spinnerConfig.CurrentLimits.SupplyCurrentLimit = 60.0;
     spinnerConfig.CurrentLimits.StatorCurrentLimit = 90.0;
+
+    spinnerConfig.Slot0.kP = 0.1;
+    spinnerConfig.Slot0.kI = 0;
+    spinnerConfig.Slot0.kD = 0;
+    spinnerConfig.Slot0.kV = 0.1;
+
+    spinnerConfig.MotionMagic.MotionMagicAcceleration = 100;
 
     spinnerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     spinnerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -74,8 +83,8 @@ public class IntakeIOCTRE implements IntakeIO {
     // extensionConfig.Slot0.kV = robotConfig.getIntakeConfig().extensionkV;
     // extensionConfig.Slot0.kG = robotConfig.getIntakeConfig().extensionkG;
 
-    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = 10;
-    extensionConfig.MotionMagic.MotionMagicAcceleration = 5;
+    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = 25;
+    extensionConfig.MotionMagic.MotionMagicAcceleration = 15;
 
     extensionConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     extensionConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -91,7 +100,7 @@ public class IntakeIOCTRE implements IntakeIO {
     spinnerMotorTemp = spinnerIntakeMotor.getDeviceTemp();
 
     extensionIntakeMotor.setPosition(
-        Constants.IntakeConstants.INTAKE_BOTTOM_RADS
+        Constants.IntakeConstants.INTAKE_STOWED_RADS
             / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT);
     extensionAppliedVolts = extensionIntakeMotor.getMotorVoltage();
     extensionPosRot = extensionIntakeMotor.getPosition();
@@ -156,9 +165,6 @@ public class IntakeIOCTRE implements IntakeIO {
                     * Math.cos(
                         extensionPosRot.getValueAsDouble()
                             * Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT)));
-    // extensionIntakeMotor.setControl(
-    //     extensionController.withPosition(
-    //         rad / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT));
   }
 
   @Override
@@ -169,6 +175,11 @@ public class IntakeIOCTRE implements IntakeIO {
   @Override
   public void setSpinnerVoltage(double voltage) {
     spinnerIntakeMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void setSpinnerVelo(AngularVelocity velo) {
+    spinnerIntakeMotor.setControl(spinnerController.withVelocity(velo));
   }
 
   @Override

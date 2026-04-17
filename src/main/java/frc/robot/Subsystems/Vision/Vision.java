@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.FieldConstants;
@@ -214,7 +213,6 @@ public class Vision extends SubsystemBase {
     }
     return true;
   }
-
 
   // only consumer is the questnav currently, but keep this information incase we need to plug
   // vision into a pose estimator later
