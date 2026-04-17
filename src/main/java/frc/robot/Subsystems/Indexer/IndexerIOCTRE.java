@@ -19,8 +19,7 @@ public class IndexerIOCTRE implements IndexerIO {
   private TalonFX indexerMotor;
   private TalonFX indexerTwoMotor;
 
-  private MotionMagicVelocityVoltage indexerControl =
-      new MotionMagicVelocityVoltage(0).withSlot(0);
+  private MotionMagicVelocityVoltage indexerControl = new MotionMagicVelocityVoltage(0).withSlot(0);
   private MotionMagicVelocityVoltage indexerControl2 =
       new MotionMagicVelocityVoltage(0).withSlot(0);
 
@@ -59,7 +58,9 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerConfig.Slot0.kP = 0.1;
     indexerConfig.Slot0.kI = 0.0;
     indexerConfig.Slot0.kD = 0.0;
-    indexerConfig.Slot0.kV = 0.15;
+    indexerConfig.Slot0.kV = 0.12;
+
+    indexerConfig.MotionMagic.MotionMagicAcceleration = 1000;
 
     indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -89,7 +90,9 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerTwoConfig.Slot0.kP = 0.1;
     indexerTwoConfig.Slot0.kI = 0.0;
     indexerTwoConfig.Slot0.kD = 0.0;
-    indexerTwoConfig.Slot0.kV = 0.15;
+    indexerTwoConfig.Slot0.kV = 0.12;
+
+    indexerTwoConfig.MotionMagic.MotionMagicAcceleration = 1000;
 
     indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     indexerTwoConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -158,12 +161,12 @@ public class IndexerIOCTRE implements IndexerIO {
   }
 
   @Override
-  public void setMotor1Velo(AngularVelocity velo){
+  public void setMotor1Velo(AngularVelocity velo) {
     indexerMotor.setControl(indexerControl.withVelocity(velo));
   }
 
   @Override
-  public void setMotor2Velo(AngularVelocity velo){
+  public void setMotor2Velo(AngularVelocity velo) {
     indexerTwoMotor.setControl(indexerControl2.withVelocity(velo));
   }
 }

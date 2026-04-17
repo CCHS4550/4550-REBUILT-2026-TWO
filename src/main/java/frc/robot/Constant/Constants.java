@@ -72,7 +72,7 @@ public final class Constants {
     public static final double STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(61);
 
     public static final Transform3d SHOOTER_TRANSFORM =
-        new Transform3d(0.2921, 0, 0, new Rotation3d(0, 0, 0));
+        new Transform3d(0.0, 0, 0, new Rotation3d(0, 0, 0));
 
     public static final double MAX_BALL_HEIGHT_METERS = 5.4864;
   }

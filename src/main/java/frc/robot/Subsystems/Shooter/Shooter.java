@@ -191,7 +191,9 @@ public class Shooter extends SubsystemBase {
       speed = passingVelo;
     }
 
-    if (systemState != ShooterSystemState.TEST && systemState != ShooterSystemState.TEST_2) {
+    if (systemState != ShooterSystemState.TEST
+        && systemState != ShooterSystemState.TEST_2
+        && systemState != ShooterSystemState.PASSING) {
       timer.stop();
       timer.reset();
       return false;
@@ -205,6 +207,10 @@ public class Shooter extends SubsystemBase {
             && MathUtil.isNear(elevationInputs.elevationAngle.getRadians(), 1.064, 0.3);
     if (close && !timer.isRunning()) {
       timer.start();
+    }
+
+    if (timer.isRunning() && atGoal == true) {
+      return true;
     }
 
     if (close && timer.hasElapsed(0.5)) {
