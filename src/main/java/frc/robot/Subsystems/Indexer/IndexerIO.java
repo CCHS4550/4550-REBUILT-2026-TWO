@@ -2,6 +2,8 @@ package frc.robot.Subsystems.Indexer;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.units.measure.AngularVelocity;
+
 public interface IndexerIO {
   @AutoLog
   public class IndexerIOInputs {
@@ -29,4 +31,10 @@ public interface IndexerIO {
   default void setMotor1Voltage(double voltage) {}
 
   default void setMotor2Voltage(double voltage) {}
+
+  default void setMotor1Velo(AngularVelocity velo) {}
+
+  default void setMotor2Velo(AngularVelocity velo) {
+    
+  }
 }

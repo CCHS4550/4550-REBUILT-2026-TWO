@@ -3,6 +3,7 @@ package frc.robot.Subsystems.Indexer;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -16,8 +17,12 @@ import frc.robot.Util.Phoenix6Util;
 
 public class IndexerIOCTRE implements IndexerIO {
   private TalonFX indexerMotor;
-
   private TalonFX indexerTwoMotor;
+
+  private MotionMagicVelocityVoltage indexerControl =
+      new MotionMagicVelocityVoltage(0).withSlot(0);
+  private MotionMagicVelocityVoltage indexerControl2 =
+      new MotionMagicVelocityVoltage(0).withSlot(0);
 
   private TalonFXConfiguration indexerConfig;
   private TalonFXConfiguration indexerTwoConfig;
@@ -51,6 +56,11 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
     indexerConfig.CurrentLimits.StatorCurrentLimit = 90.0;
 
+    indexerConfig.Slot0.kP = 0.1;
+    indexerConfig.Slot0.kI = 0.0;
+    indexerConfig.Slot0.kD = 0.0;
+    indexerConfig.Slot0.kV = 0.15;
+
     indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
@@ -75,6 +85,11 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerTwoConfig.CurrentLimits.StatorCurrentLimitEnable = currentLimit;
     indexerTwoConfig.CurrentLimits.SupplyCurrentLimit = 100.0;
     indexerTwoConfig.CurrentLimits.StatorCurrentLimit = 90.0;
+
+    indexerTwoConfig.Slot0.kP = 0.1;
+    indexerTwoConfig.Slot0.kI = 0.0;
+    indexerTwoConfig.Slot0.kD = 0.0;
+    indexerTwoConfig.Slot0.kV = 0.15;
 
     indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     indexerTwoConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -140,5 +155,15 @@ public class IndexerIOCTRE implements IndexerIO {
   @Override
   public void setMotor2Voltage(double voltage) {
     indexerTwoMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void setMotor1Velo(AngularVelocity velo){
+    indexerMotor.setControl(indexerControl.withVelocity(velo));
+  }
+
+  @Override
+  public void setMotor2Velo(AngularVelocity velo){
+    indexerTwoMotor.setControl(indexerControl2.withVelocity(velo));
   }
 }

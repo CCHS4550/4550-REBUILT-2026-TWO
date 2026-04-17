@@ -1,6 +1,10 @@
 package frc.robot.Subsystems.Indexer;
 
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Indexer extends SubsystemBase {
@@ -53,8 +57,11 @@ public class Indexer extends SubsystemBase {
         break;
       case RUNNING:
         // find good numbers
-        indexerIO.setMotor1Voltage(2.75);
-        indexerIO.setMotor2Voltage(2);
+        // indexerIO.setMotor1Voltage(2.75);
+        // indexerIO.setMotor2Voltage(2);
+
+        indexerIO.setMotor1Velo(AngularVelocity.ofBaseUnits(250, RadiansPerSecond));
+        indexerIO.setMotor2Velo(AngularVelocity.ofBaseUnits(200, RadiansPerSecond));
         break;
       default:
         indexerIO.setVoltage(0);

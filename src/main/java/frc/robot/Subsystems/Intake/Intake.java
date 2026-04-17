@@ -1,8 +1,12 @@
 package frc.robot.Subsystems.Intake;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.Constants;
+
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -77,7 +81,7 @@ public class Intake extends SubsystemBase {
   private void applyStates() {
     switch (systemState) {
       case EXTENDED_INTAKING:
-        intakeIO.setSpinnerVoltage(5.0);
+        intakeIO.setSpinnerVelo(AngularVelocity.ofBaseUnits(150, RadiansPerSecond));
         intakeIO.setExtensionMotorPositionRad(
             Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
         break;
