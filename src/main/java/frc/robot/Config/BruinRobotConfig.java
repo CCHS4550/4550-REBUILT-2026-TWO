@@ -280,17 +280,17 @@ public class BruinRobotConfig {
     // TODO: find and fill
     photonVisionConfig =
         new VisionConfig("Photonvision Camera 1")
-            .withHeightOffset(Units.inchesToMeters(13.29))
-            .withLengthOffset(Units.inchesToMeters(-10.739))
-            .withWidthOffset(Units.inchesToMeters(19.859))
-            .withMountingYaw(Units.degreesToRadians(90))
-            .withMountingPitch(Units.degreesToRadians(110));
+            .withHeightOffset(Units.inchesToMeters(8.727))
+            .withLengthOffset(Units.inchesToMeters(12.461))
+            .withWidthOffset(Units.inchesToMeters(7.014))
+            .withMountingYaw(Units.degreesToRadians(0))
+            .withMountingPitch(Units.degreesToRadians(55));
     questNavConfig =
         new VisionConfig("Questnav")
-            .withHeightOffset(Units.inchesToMeters(0))
-            .withLengthOffset(Units.inchesToMeters(0))
-            .withWidthOffset(Units.inchesToMeters(0))
-            .withMountingYaw(Units.degreesToRadians(0));
+            .withHeightOffset(Units.inchesToMeters(22.58))
+            .withLengthOffset(Units.inchesToMeters(3.04))
+            .withWidthOffset(Units.inchesToMeters(-13.75))
+            .withMountingYaw(Units.degreesToRadians(90));
 
     // Turret Constants
     shooterConfig =

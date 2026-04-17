@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.FieldConstants;
@@ -21,7 +22,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
   // consumer for our vision data, how all data leaves the subsystem
-  private final VisionConsumer consumer;
+  private final VisionConsumer[] consumers = new VisionConsumer[2];
 
   // array of VisionIO interfaces for the amount of cameras that we have, can be defined as real or
   // sim later
@@ -40,9 +41,10 @@ public class Vision extends SubsystemBase {
    *     functional interface
    * @param io instances of VisionIO or classes implementing VisionIO
    */
-  public Vision(VisionConsumer consumer, VisionIO... io) {
+  public Vision(VisionConsumer consumer, VisionConsumer otherConsumer, VisionIO... io) {
     // Initialize io and the consumer
-    this.consumer = consumer;
+    this.consumers[0] = consumer;
+    this.consumers[1] = otherConsumer;
     this.io = io;
 
     // Initialize inputs
@@ -154,7 +156,12 @@ public class Vision extends SubsystemBase {
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
 
         // Send vision observation
-        consumer.accept(
+        consumers[0].acceptVision(
+            observation.pose().toPose2d(),
+            observation.timestamp(),
+            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
+        consumers[1].acceptVision(
             observation.pose().toPose2d(),
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
@@ -208,11 +215,12 @@ public class Vision extends SubsystemBase {
     return true;
   }
 
+
   // only consumer is the questnav currently, but keep this information incase we need to plug
   // vision into a pose estimator later
   @FunctionalInterface
   public interface VisionConsumer {
-    void accept(
+    void acceptVision(
         Pose2d visionRobotPoseMeters,
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs);

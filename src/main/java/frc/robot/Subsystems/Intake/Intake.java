@@ -180,6 +180,10 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  public void tareTS(){
+    intakeIO.tareExtensionPosition();
+  }
+
   @Override
   public void periodic() {
     intakeIO.updateInputs(inputs);

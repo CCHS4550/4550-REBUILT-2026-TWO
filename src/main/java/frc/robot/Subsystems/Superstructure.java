@@ -1,8 +1,15 @@
 package frc.robot.Subsystems;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robotstate;
+import frc.robot.Constant.Constants;
+import frc.robot.Constant.FieldConstants;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
 import frc.robot.Subsystems.Drive.SwerveSubsystem.WantedState;
 import frc.robot.Subsystems.Indexer.Indexer;
@@ -12,11 +19,20 @@ import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
 import frc.robot.Subsystems.Shooter.Shooter;
 import frc.robot.Subsystems.Shooter.Shooter.ShooterSystemState;
 import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
+import frc.robot.Util.AllianceFlipUtil;
 import frc.robot.Util.LaunchCalculator;
 import frc.robot.Util.ShooterMeasurables;
+
+import java.lang.reflect.Field;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Superstructure extends SubsystemBase {
+  private static final InterpolatingDoubleTreeMap passingFlywheelSpeedMap =
+      new InterpolatingDoubleTreeMap();
+
+  private double shootingDisMeters = 2.75;
+
   private final SwerveSubsystem swerveSubsystem;
   private final Intake intake;
   private final Shooter shooter;
@@ -34,6 +50,9 @@ public class Superstructure extends SubsystemBase {
     this.intake = intake;
     this.indexer = indexer;
     this.shooter = shooter;
+
+    passingFlywheelSpeedMap.put(3.0, 377.5);
+    passingFlywheelSpeedMap.put(5.62, 450.0);
   }
 
   @Override
@@ -43,6 +62,7 @@ public class Superstructure extends SubsystemBase {
 
     shooterCalcs = launchCalculator.getParameters();
     shooter.setShooterMeasurables(shooterCalcs);
+    shooter.passingVelo = getLauncherVeloPassing();
 
     systemState = handleStateTransitions();
     applyStates();
@@ -81,6 +101,7 @@ public class Superstructure extends SubsystemBase {
         if (DriverStation.isDisabled()) {
           swerveSubsystem.setWantedState(WantedState.IDLE);
         }
+        swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE);
         intake.setWantedIntakeState(WantedIntakeState.IDLE);
         indexer.setWantedState(IndexerWantedState.IDLE);
         shooter.setWantedState(ShooterWantedState.IDLE);
@@ -113,32 +134,46 @@ public class Superstructure extends SubsystemBase {
       case INTAKING_PRE_AIM:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
         indexer.setWantedState(IndexerWantedState.IDLE);
-        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
+        shooter.setWantedState(ShooterWantedState.TEST);
         break;
       case PASSIVE_PRE_AIM:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
         indexer.setWantedState(IndexerWantedState.IDLE);
-        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
+        shooter.setWantedState(ShooterWantedState.TEST);
         break;
       case AIMING:
-        swerveSubsystem.setTargetRotation(shooterCalcs.getDriveAngle());
+        if(isPassing()){
+          swerveSubsystem.setTargetRotation(getDriveAngleWithLauncherOffset(Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry(), FieldConstants.getPassingPose().getTranslation()));
+          intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+          indexer.setWantedState(IndexerWantedState.IDLE);
+          shooter.setWantedState(ShooterWantedState.PASSING);
+        }
+
+        swerveSubsystem.setDesiredPoseForDriveToPoint(calculateLaunchPose(), 13);
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
         indexer.setWantedState(IndexerWantedState.IDLE);
-        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
+        shooter.setWantedState(ShooterWantedState.TEST);
         break;
       case SHOOT:
-        swerveSubsystem.setTargetRotation(shooterCalcs.getDriveAngle());
+        if(isPassing()){
+          swerveSubsystem.setTargetRotation(getDriveAngleWithLauncherOffset(Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry(), FieldConstants.getPassingPose().getTranslation()));
+          intake.setWantedIntakeState(WantedIntakeState.PUMPING);
+          indexer.setWantedState(IndexerWantedState.RUNNING);
+          shooter.setWantedState(ShooterWantedState.PASSING);
+        }
+
+        swerveSubsystem.setDesiredPoseForDriveToPoint(calculateLaunchPose(), 13);
         intake.setWantedIntakeState(WantedIntakeState.PUMPING);
         indexer.setWantedState(IndexerWantedState.RUNNING);
-        shooter.setWantedState(ShooterWantedState.ACTIVE_SHOOT);
+        shooter.setWantedState(ShooterWantedState.TEST_2);
         break;
     }
   }
 
   private SystemState handleStateTransitions() {
-    if (wantedState1 == WantedSuperstructureState.SHOOT && !shooterCalcs.getIsValid()) {
-      return SystemState.IDLE;
-    }
+    // if (wantedState1 == WantedSuperstructureState.SHOOT && !shooterCalcs.getIsValid()) {
+    //   return SystemState.IDLE;
+    // }
 
     switch (wantedState1) {
       case IDLE:
@@ -152,7 +187,10 @@ public class Superstructure extends SubsystemBase {
       case INTAKING:
         return SystemState.INTAKING;
       case SHOOT:
-        if (shooter.atSetpoint() && swerveSubsystem.isAtDesiredRotation(0.2)) {
+        if (shooter.atSetpoint() && swerveSubsystem.isAtDesiredRotation(0.2) && swerveSubsystem.isAtDriveToPointSetpoint()) {
+          return SystemState.SHOOT;
+        }
+        if (shooter.atSetpoint() && swerveSubsystem.isAtDesiredRotation(0.2) && isPassing()) {
           return SystemState.SHOOT;
         }
         return SystemState.AIMING;
@@ -189,7 +227,55 @@ public class Superstructure extends SubsystemBase {
   }
 
   private Pose2d calculateLaunchPose(){
-    Translation2d x = Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry();
-    Translation2d y = FieldConstants.getScoringPose();
+
+    Translation2d launch = new Translation2d();
+    Translation2d x = Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getTranslation();
+    Translation2d y = FieldConstants.getScoringPose().getTranslation();
+
+    Translation2d direction = x.minus(y);
+    double distance = direction.getNorm();
+
+    if (distance == 0){
+      launch = x;
+    }
+
+    Translation2d unit = new Translation2d(direction.getX() / distance, direction.getY() / distance);
+    launch = y.plus(unit.times(shootingDisMeters));
+
+    Rotation2d angle = getDriveAngleWithLauncherOffset(Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry(), FieldConstants.getScoringPose().getTranslation());
+
+    Pose2d launchPose = new Pose2d(launch, angle);
+    return launchPose;
+  }
+
+   private Rotation2d getDriveAngleWithLauncherOffset(
+      Pose2d robotPose, Translation2d target) {
+    Rotation2d fieldToHubAngle = target.minus(robotPose.getTranslation()).getAngle();
+    Rotation2d hubAngle =
+        new Rotation2d(
+            Math.asin(
+                MathUtil.clamp(
+                    Constants.ShooterConstants.SHOOTER_TRANSFORM.getTranslation().getY()
+                        / target.getDistance(robotPose.getTranslation()),
+                    -1.0,
+                    1.0)));
+    Rotation2d driveAngle =
+        fieldToHubAngle
+            .plus(hubAngle)
+            .plus(Constants.ShooterConstants.SHOOTER_TRANSFORM.getRotation().toRotation2d());
+    return driveAngle;
+  }
+
+  private boolean isPassing(){
+     boolean passing =
+        AllianceFlipUtil.applyX(
+                Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getX())
+            > FieldConstants.LinesVertical.hubCenter;
+    return passing;
+  }
+
+  private double getLauncherVeloPassing(){
+    double distance = Robotstate.getInstance().getRobotPoseFromSwerveDriveOdometry().getTranslation().getDistance(FieldConstants.getPassingPose().getTranslation());
+    return passingFlywheelSpeedMap.get(distance);
   }
 }

@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
+import frc.robot.Subsystems.Superstructure;
+import frc.robot.Subsystems.Superstructure.WantedSuperstructureState;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
 import frc.robot.Subsystems.Indexer.Indexer;
@@ -38,6 +40,8 @@ public class RobotContainer {
   private final Intake intake;
   private final Indexer indexer;
   private final SwerveSubsystem swerveSubsystem;
+
+  private final Superstructure superstructure;
   private final CommandXboxController controller = new CommandXboxController(0);
 
   // private double targetRPM;
@@ -70,39 +74,10 @@ public class RobotContainer {
         new QuestNav(swerveSubsystem, new QuestNavIOQuest(config.getVisionConfigurations().get(1)));
     vision =
         new Vision(
-            questnav,
+            questnav, swerveSubsystem,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-   
-    // controller
-    //     .rightTrigger()
-    //     .whileTrue(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))
-    //     .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
-
-    // controller
-    //     .leftBumper()
-    //     .whileTrue(
-    //         new ParallelCommandGroup(
-    //             new InstantCommand(
-    //                 () -> {
-    //                   shooter.setWantedState(ShooterWantedState.TEST);
-    //                 }),
-    //             new SequentialCommandGroup(
-    //                 new WaitCommand(3),
-    //                 new InstantCommand(
-    //                     () -> {
-    //                       indexer.setWantedState(IndexerWantedState.RUNNING);
-    //                     }),
-    //                 new InstantCommand(
-    //                     () -> {
-    //                       shooter.setWantedState(ShooterWantedState.TEST_2);
-    //                     }))))
-    //     .whileFalse(
-    //         new InstantCommand(
-    //             () -> {
-    //               shooter.setWantedState(ShooterWantedState.IDLE);
-    //               indexer.setWantedState(IndexerWantedState.IDLE);
-    //             }));
+    superstructure = new Superstructure(swerveSubsystem, intake, shooter, indexer);
 
     
     // code to establish intaking
@@ -113,6 +88,9 @@ public class RobotContainer {
             new InstantCommand(
                 () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)))
         .whileFalse(new InstantCommand(() -> intake.setWantedIntakeState(WantedIntakeState.IDLE)));
+
+    // tare the intake if something goes wrong
+    controller.a().onTrue(new InstantCommand(() -> intake.tareTS()));
 
     // code for pre-aim, intaking (good for rev up)
     controller
@@ -138,6 +116,7 @@ public class RobotContainer {
       .and (controller.b().negate())
       .whileTrue(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.SHOOT)))
       .onFalse(new InstantCommand(()-> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
 
     
   }

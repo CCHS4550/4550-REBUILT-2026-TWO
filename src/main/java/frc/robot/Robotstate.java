@@ -14,12 +14,20 @@ public class Robotstate {
     return instance;
   }
 
+  private boolean questnavConnected;
+  private boolean questnavTracking;
+
   private ChassisSpeeds robotSpeeds = new ChassisSpeeds();
   private Pose2d robotToFieldFromSwerveDriveOdometry = new Pose2d();
   private Pose2d robotToFieldFromQuestNav = new Pose2d();
   private int[] allowedTagPoses = IntStream.range(1, 33).toArray();
 
   public record SwerveDriveObservation(Pose2d robotPose, ChassisSpeeds robotSpeeds) {}
+
+  public void updateQuestBooleans(boolean connected, boolean tracking){
+    questnavConnected = connected;
+    questnavTracking = tracking;
+  }
 
   public void addPoseObservation(SwerveDriveObservation observation) {
     this.robotToFieldFromSwerveDriveOdometry = observation.robotPose;
@@ -62,5 +70,9 @@ public class Robotstate {
 
   public boolean getIfAllowedTagsSpecified() {
     return getAllowedTagPosesLength() != 32;
+  }
+
+  public boolean getQuestValid(){
+    return questnavConnected && questnavTracking;
   }
 }

@@ -3,9 +3,11 @@ package frc.robot.Subsystems.Shooter;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constant.Constants;
@@ -19,6 +21,17 @@ import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
+  private Timer timer = new Timer();
+  private final LinearFilter veloFilter =
+      LinearFilter.movingAverage((int) (0.1 / Constants.loopPeriodSecs));
+
+  private double shooterInitVelo = 375.5;
+  public double passingVelo = 377.5;
+
+  private double smoothedSpeedRadPerSec = 0.0;
+  
+
+
   private FlywheelIO flywheelIO;
   private ElevationIO elevationIO;
 
@@ -28,13 +41,9 @@ public class Shooter extends SubsystemBase {
   private CommandXboxController controller;
 
   private boolean atGoal;
-  public boolean testing;
 
   private ShooterMeasurables wantedShooterMeasurables =
       new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
-
-  private TestShooterWrapper wantedWrapperMeasurables =
-      new TestShooterWrapper(RadiansPerSecond.of(0), Rotation2d.fromDegrees(0));
 
   public enum ShooterSystemState {
     IDLE,
@@ -43,6 +52,7 @@ public class Shooter extends SubsystemBase {
     ZERO,
     TEST,
     TEST_2,
+    PASSING,
     TEST_INTERP_MEASURABLES
   }
 
@@ -53,6 +63,7 @@ public class Shooter extends SubsystemBase {
     ZERO,
     TEST,
     TEST_2,
+    PASSING,
     TEST_INTERP_MEASURABLES
   }
 
@@ -64,11 +75,12 @@ public class Shooter extends SubsystemBase {
     this.flywheelIO = flywheelIO;
     this.controller = controller;
     atGoal = false;
-    testing = false;
   }
 
   @Override
   public void periodic() {
+    smoothedSpeedRadPerSec = veloFilter.calculate(flywheelInputs.flywheel1VelocityRadPerSec);
+
     flywheelIO.updateInputs(flywheelInputs);
     Logger.processInputs("Subsystems/flywheels", flywheelInputs);
 
@@ -77,10 +89,6 @@ public class Shooter extends SubsystemBase {
 
     atGoal = atSetpoint();
 
-    if (!testing) {
-      systemState = handleStateTransitions();
-      applyStates();
-    }
   }
 
   public ShooterSystemState handleStateTransitions() {
@@ -97,6 +105,8 @@ public class Shooter extends SubsystemBase {
         return ShooterSystemState.TEST;
       case TEST_2:
         return ShooterSystemState.TEST_2;
+      case PASSING:
+      return ShooterSystemState.PASSING;
       case TEST_INTERP_MEASURABLES:
         return ShooterSystemState.TEST_INTERP_MEASURABLES;
       default:
@@ -114,27 +124,6 @@ public class Shooter extends SubsystemBase {
         setElevationAngle(Rotation2d.fromRadians(wantedShooterMeasurables.getHoodAngle()));
         setFlywheelSpeed(RadiansPerSecond.of(wantedShooterMeasurables.getFlywheelSpeed()));
         break;
-        // case MANUAL_SHOOT:
-        //   double elevationInput = controller.getRightY();
-        //   elevationInput = MathUtil.applyDeadband(elevationInput, 0.1);
-
-        //   double currentAngle = elevationInputs.elevationAngle.getRadians();
-        //   double adjustmentRate = 1.5; // hopefully is in rad/sec
-
-        //   double newAngle = currentAngle + elevationInput * adjustmentRate * 0.02;
-
-        //   newAngle =
-        //       MathUtil.clamp(
-        //           newAngle,
-        //           Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
-        //           Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
-
-        //   setElevationAngle(Rotation2d.fromRadians(newAngle));
-        //   if (wantedFlywheelState) {
-        //     setFlywheelSpeed(RadiansPerSecond.of(200));
-        //   }
-
-        //   break;
       case ZERO:
         setElevationAngle(
             Rotation2d.fromRadians(
@@ -142,17 +131,16 @@ public class Shooter extends SubsystemBase {
         setFlywheelSpeed(RadiansPerSecond.of(0));
         break;
       case TEST:
-        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(375.5, RadiansPerSecond));
+        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(shooterInitVelo, RadiansPerSecond));
         setElevationAngle(Rotation2d.fromDegrees(61));
         break;
       case TEST_2:
         flywheelIO.setVelo(AngularVelocity.ofBaseUnits(377.9, RadiansPerSecond));
         setElevationAngle(Rotation2d.fromDegrees(61));
         break;
-      case TEST_INTERP_MEASURABLES:
-        // setFlywheelSpeed(wantedWrapperMeasurables.flywheelVelo);
-        setShooterSpeed(wantedWrapperMeasurables.flywheelVelo.baseUnitMagnitude());
-        setElevationAngle(wantedWrapperMeasurables.hoodAngle);
+      case PASSING:
+        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(passingVelo, RadiansPerSecond));
+        setElevationAngle(Rotation2d.fromDegrees(61));
         break;
       default:
         break;
@@ -177,7 +165,6 @@ public class Shooter extends SubsystemBase {
     double feedback = error * kP;
 
     setFlywheelVoltage(feedback + feedforward);
-    testing = true;
 
     System.out.println("kP: " + kP + " kS: " + kS + " kV: " + kV);
   }
@@ -191,6 +178,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setWantedState(ShooterWantedState wantedState) {
+    if(wantedState == this.wantedState){
+      return;
+    }
+
     this.wantedState = wantedState;
   }
 
@@ -199,15 +190,35 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean atSetpoint() {
-    return MathUtil.isNear(
+    double speed = shooterInitVelo;
+    if(systemState == ShooterSystemState.PASSING) {
+      speed = passingVelo;
+    }
+
+    if(systemState != ShooterSystemState.TEST && systemState != ShooterSystemState.TEST_2){
+      timer.reset();
+      return false;
+    }
+
+    boolean close = MathUtil.isNear(
             flywheelInputs.flywheel1VelocityRadPerSec,
-            wantedShooterMeasurables.getFlywheelSpeed(),
-            wantedShooterMeasurables.getFlywheelSpeed()
-                * 0.05) // Allowance is 5% of wanted velocity
+            speed,
+            speed
+                * 0.06) // Allowance is 6% of wanted velocity
         && MathUtil.isNear(
             elevationInputs.elevationAngle.getRadians(),
-            wantedShooterMeasurables.getHoodAngle(),
+            1.064,
             0.3);
+    if(close && !timer.isRunning()){
+      timer.start();
+    }
+
+    if(close && timer.hasElapsed(0.5)){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 
   public void adjustFlywheelKSlotValue(double value, String slot) {
@@ -216,9 +227,5 @@ public class Shooter extends SubsystemBase {
 
   public void adjustElevationKSlotValue(double value, String slot) {
     elevationIO.adjustElevationKSlotValue(value, slot);
-  }
-
-  public void setTestInterpMeasurables(TestShooterWrapper measureables) {
-    wantedWrapperMeasurables = measureables;
   }
 }

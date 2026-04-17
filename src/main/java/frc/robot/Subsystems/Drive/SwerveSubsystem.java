@@ -30,13 +30,14 @@ import frc.robot.Constant.Constants;
 import frc.robot.Constant.FieldConstants;
 import frc.robot.Robotstate;
 import frc.robot.Subsystems.QuestNav.QuestNav;
+import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.Util.SubsystemDataProcessor;
 import frc.robot.Util.SysIdMechanism;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestConsumer {
+public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestConsumer, Vision.VisionConsumer {
   private final PIDController choreoXController = new PIDController(1.14, 0, 0);
   private final PIDController choreoYController = new PIDController(1.14, 0, 0);
   private final PIDController choreoThetaController = new PIDController(0.5, 0, 0);
@@ -541,38 +542,32 @@ public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestCons
   }
 
   private ChassisSpeeds calculateSpeedsBasedOnJoystickInputs() {
-    if (DriverStation.getAlliance().isEmpty()) {
-      return new ChassisSpeeds(0, 0, 0);
+        if (DriverStation.getAlliance().isEmpty()) {
+            return new ChassisSpeeds(0, 0, 0);
+        }
+
+        double xMagnitude = MathUtil.applyDeadband(controller.getLeftY(), CONTROLLER_DEADBAND);
+        double yMagnitude = MathUtil.applyDeadband(controller.getLeftX(), CONTROLLER_DEADBAND);
+        double angularMagnitude = MathUtil.applyDeadband(controller.getRightX(), CONTROLLER_DEADBAND);
+        //
+        //        xMagnitude = Math.copySign(xMagnitude * xMagnitude, xMagnitude);
+        //        yMagnitude = Math.copySign(yMagnitude * yMagnitude, yMagnitude);
+        angularMagnitude = Math.copySign(angularMagnitude * angularMagnitude, angularMagnitude);
+
+        double xVelocity = (FieldConstants.isBlueAlliance() ? -xMagnitude * maxVelocity : xMagnitude * maxVelocity)
+                * teleopVelocityCoefficient;
+        double yVelocity = (FieldConstants.isBlueAlliance() ? -yMagnitude * maxVelocity : yMagnitude * maxVelocity)
+                * teleopVelocityCoefficient;
+        double angularVelocity = angularMagnitude * maxAngularVelocity * rotationVelocityCoefficient;
+
+        Rotation2d skewCompensationFactor =
+                Rotation2d.fromRadians(swerveInputs.Speeds.omegaRadiansPerSecond * SKEW_COMPENSATION_SCALAR);
+
+        return ChassisSpeeds.fromRobotRelativeSpeeds(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                        new ChassisSpeeds(xVelocity, yVelocity, -angularVelocity), swerveInputs.Pose.getRotation()),
+                swerveInputs.Pose.getRotation().plus(skewCompensationFactor));
     }
-
-    double xMagnitude = MathUtil.applyDeadband(controller.getLeftY(), CONTROLLER_DEADBAND);
-    double yMagnitude = MathUtil.applyDeadband(controller.getLeftX(), CONTROLLER_DEADBAND);
-    double angularMagnitude = MathUtil.applyDeadband(controller.getRightX(), CONTROLLER_DEADBAND);
-
-    xMagnitude = Math.copySign(xMagnitude * xMagnitude, xMagnitude);
-    yMagnitude = Math.copySign(yMagnitude * yMagnitude, yMagnitude);
-    angularMagnitude = Math.copySign(angularMagnitude * angularMagnitude, angularMagnitude);
-
-    double xVelocity =
-        (FieldConstants.isBlueAlliance() ? -xMagnitude * maxVelocity : xMagnitude * maxVelocity)
-            * teleopVelocityCoefficient;
-
-    double yVelocity =
-        (FieldConstants.isBlueAlliance() ? -yMagnitude * maxVelocity : yMagnitude * maxVelocity)
-            * teleopVelocityCoefficient;
-
-    double angularVelocity = angularMagnitude * maxAngularVelocity * rotationVelocityCoefficient;
-
-    Rotation2d skewCompensationFactor =
-        Rotation2d.fromRadians(
-            swerveInputs.Speeds.omegaRadiansPerSecond * SKEW_COMPENSATION_SCALAR);
-
-    return ChassisSpeeds.fromRobotRelativeSpeeds(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(xVelocity, yVelocity, -angularVelocity),
-            swerveInputs.Pose.getRotation()),
-        swerveInputs.Pose.getRotation().plus(skewCompensationFactor));
-  }
 
   public void resetTranslationAndRotation(Pose2d pose2d) {
     resetTranslation(pose2d);
@@ -678,18 +673,21 @@ public class SwerveSubsystem extends SubsystemBase implements QuestNav.QuestCons
     return distance;
   }
 
-  /** Adds a new timestamped vision measurement. */
+  /** Adds a new timestamped quest measurement. */
   @Override
   public void accept(
       Pose2d questRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> questMeasurementStdDevs) {
     io.addQuestPose(questRobotPoseMeters, timestampSeconds, questMeasurementStdDevs);
-    System.out.println("swerve accept calle");
+    // System.out.println("swerve accept calle");
   }
 
-  // @Override
-  // public void accept(Pose2d pose, double time, Matrix<N3, N1> StdDevs) {
-  //   this.resetTranslationAndRotation(pose);
-  // }
+  /** Adds a new timestamped vision measurement. */
+  @Override
+  public void acceptVision(Pose2d pose, double time, Matrix<N3, N1> StdDevs) {
+    if(!Robotstate.getInstance().getQuestValid()){
+      io.addQuestPose(pose, time, StdDevs);
+    }
+  }
 }
