@@ -15,6 +15,7 @@ public class Intake extends SubsystemBase {
 
   public enum WantedIntakeState {
     EXTENDED_INTAKING,
+    EXTENDED_OUTTAKING,
     EXTENDED_PASSIVE,
     STOWED,
     PUMPING,
@@ -24,6 +25,7 @@ public class Intake extends SubsystemBase {
 
   public enum SystemState {
     EXTENDED_INTAKING,
+    EXTENDED_OUTTAKING,
     EXTENDED_PASSIVE,
     STOWED,
     STOW_SLOW,
@@ -80,7 +82,16 @@ public class Intake extends SubsystemBase {
   private void applyStates() {
     switch (systemState) {
       case EXTENDED_INTAKING:
-        intakeIO.setSpinnerVelo(AngularVelocity.ofBaseUnits(150, RadiansPerSecond));
+        if (inputs.extensionPosRadians < 0.08) {
+          intakeIO.setSpinnerVelo(AngularVelocity.ofBaseUnits(400, RadiansPerSecond));
+        } else {
+          intakeIO.setSpinnerVoltage(0);
+        }
+        intakeIO.setExtensionMotorPositionRad(
+            Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
+        break;
+      case EXTENDED_OUTTAKING:
+        intakeIO.setSpinnerVelo(AngularVelocity.ofBaseUnits(-100, RadiansPerSecond));
         intakeIO.setExtensionMotorPositionRad(
             Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
         break;
@@ -118,6 +129,8 @@ public class Intake extends SubsystemBase {
     switch (wantedState) {
       case EXTENDED_INTAKING:
         return SystemState.EXTENDED_INTAKING;
+      case EXTENDED_OUTTAKING:
+        return SystemState.EXTENDED_OUTTAKING;
       case EXTENDED_PASSIVE:
         return SystemState.EXTENDED_PASSIVE;
       case STOWED:

@@ -493,8 +493,8 @@ public class SwerveSubsystem extends SubsystemBase
       teleopVelocityCoefficient = 1.0;
       rotationVelocityCoefficient = 1.0;
     } else {
-      teleopVelocityCoefficient = 0.6;
-      rotationVelocityCoefficient = 0.6;
+      teleopVelocityCoefficient = 0.9;
+      rotationVelocityCoefficient = 0.9;
     }
   }
 
@@ -549,17 +549,17 @@ public class SwerveSubsystem extends SubsystemBase
 
     double xMagnitude = MathUtil.applyDeadband(controller.getLeftY(), CONTROLLER_DEADBAND);
     double yMagnitude = MathUtil.applyDeadband(controller.getLeftX(), CONTROLLER_DEADBAND);
-    double angularMagnitude = MathUtil.applyDeadband(controller.getRightX(), CONTROLLER_DEADBAND);
+    double angularMagnitude = MathUtil.applyDeadband(-controller.getRightX(), CONTROLLER_DEADBAND);
     //
     //        xMagnitude = Math.copySign(xMagnitude * xMagnitude, xMagnitude);
     //        yMagnitude = Math.copySign(yMagnitude * yMagnitude, yMagnitude);
     angularMagnitude = Math.copySign(angularMagnitude * angularMagnitude, angularMagnitude);
 
     double xVelocity =
-        (FieldConstants.isBlueAlliance() ? -xMagnitude * maxVelocity : xMagnitude * maxVelocity)
+        (FieldConstants.isBlueAlliance() ? xMagnitude * maxVelocity : xMagnitude * maxVelocity)
             * teleopVelocityCoefficient;
     double yVelocity =
-        (FieldConstants.isBlueAlliance() ? -yMagnitude * maxVelocity : yMagnitude * maxVelocity)
+        (FieldConstants.isBlueAlliance() ? yMagnitude * maxVelocity : yMagnitude * maxVelocity)
             * teleopVelocityCoefficient;
     double angularVelocity = angularMagnitude * maxAngularVelocity * rotationVelocityCoefficient;
 
@@ -685,7 +685,7 @@ public class SwerveSubsystem extends SubsystemBase
       double timestampSeconds,
       Matrix<N3, N1> questMeasurementStdDevs) {
     // io.addQuestPose(questRobotPoseMeters, timestampSeconds, questMeasurementStdDevs);
-    resetTranslationAndRotation(questRobotPoseMeters);
+    // resetTranslationAndRotation(questRobotPoseMeters);
     // System.out.println("swerve accept calle");
   }
 
@@ -694,7 +694,7 @@ public class SwerveSubsystem extends SubsystemBase
   public void acceptVision(Pose2d pose, double time, Matrix<N3, N1> StdDevs) {
     if (!Robotstate.getInstance().getQuestValid()) {
       // io.addQuestPose(pose, time, StdDevs);
-      resetTranslationAndRotation(pose);
+      // resetTranslationAndRotation(pose);
     }
   }
 }

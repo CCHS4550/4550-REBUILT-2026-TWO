@@ -25,6 +25,9 @@ import frc.robot.Util.ShooterMeasurables;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Superstructure extends SubsystemBase {
+
+  public boolean stopApplyingStates = false;
+
   private static final InterpolatingDoubleTreeMap passingFlywheelSpeedMap =
       new InterpolatingDoubleTreeMap();
 
@@ -42,7 +45,7 @@ public class Superstructure extends SubsystemBase {
       new ShooterMeasurables(false, new Rotation2d(), 0, 0, 0, 0, 0, 0, 0, false);
 
   public Superstructure(
-      SwerveSubsystem swerveSubsystem, Intake intake, Shooter shooter, Indexer indexer) {
+      SwerveSubsystem swerveSubsystem, Shooter shooter, Indexer indexer, Intake intake) {
     this.swerveSubsystem = swerveSubsystem;
     this.intake = intake;
     this.indexer = indexer;
@@ -55,6 +58,7 @@ public class Superstructure extends SubsystemBase {
   @Override
   public void periodic() {
     // Log launching parameters TODO: fix logging bugs later
+    distance();
     var launchCalculator = LaunchCalculator.getInstance();
 
     shooterCalcs = launchCalculator.getParameters();
@@ -62,7 +66,10 @@ public class Superstructure extends SubsystemBase {
     shooter.passingVelo = getLauncherVeloPassing();
 
     systemState = handleStateTransitions();
-    applyStates();
+
+    if (!stopApplyingStates) {
+      applyStates();
+    }
 
     // Clear launching parameters
     launchCalculator.clearLaunchingParameters();
@@ -133,6 +140,13 @@ public class Superstructure extends SubsystemBase {
           shooter.setWantedState(ShooterWantedState.IDLE);
         }
         break;
+      case OUTTAKING:
+        intake.setWantedIntakeState(WantedIntakeState.EXTENDED_OUTTAKING);
+        indexer.setWantedState(IndexerWantedState.IDLE);
+        if (shooter.getSystemState() != ShooterSystemState.ZERO) {
+          shooter.setWantedState(ShooterWantedState.IDLE);
+        }
+        break;
       case INTAKING_PRE_AIM:
         intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING);
         indexer.setWantedState(IndexerWantedState.IDLE);
@@ -196,6 +210,8 @@ public class Superstructure extends SubsystemBase {
         return SystemState.EXTEND_INTAKE;
       case INTAKING:
         return SystemState.INTAKING;
+      case OUTTAKING:
+        return SystemState.OUTTAKING;
       case SHOOT:
         if (shooter.atSetpoint()
             && swerveSubsystem.isAtDesiredRotation(0.2)
@@ -221,6 +237,7 @@ public class Superstructure extends SubsystemBase {
     ZERO,
     EXTEND_INTAKE,
     INTAKING,
+    OUTTAKING,
     SHOOT,
     PRE_AIM,
     PRE_AIM_INTAKING
@@ -232,6 +249,7 @@ public class Superstructure extends SubsystemBase {
     ZERO,
     EXTEND_INTAKE,
     INTAKING,
+    OUTTAKING,
     INTAKING_PRE_AIM,
     PASSIVE_PRE_AIM,
     AIMING,
@@ -301,5 +319,15 @@ public class Superstructure extends SubsystemBase {
       velo = 600;
     }
     return velo;
+  }
+
+  @AutoLogOutput(key = "superstructure/distance")
+  private double distance() {
+    double distance =
+        Robotstate.getInstance()
+            .getRobotPoseFromSwerveDriveOdometry()
+            .getTranslation()
+            .getDistance(FieldConstants.getScoringPose().getTranslation());
+    return distance;
   }
 }

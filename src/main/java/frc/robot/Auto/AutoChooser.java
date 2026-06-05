@@ -40,7 +40,8 @@ public class AutoChooser extends SendableChooser<Auto> {
           new AutoProgram(Auto.IDLE, "IDLE", AutoFactory::createIdleCommand),
           new AutoProgram(Auto.TEST, "TEST", AutoFactory::createTestAuto),
           new AutoProgram(
-              Auto.LEFT_MIDDLE_SCORE, "LEFT_MIDDLE_SCORE", AutoFactory::createLeftMiddleScoreAuto));
+              Auto.LEFT_MIDDLE_SCORE, "LEFT_MIDDLE_SCORE", AutoFactory::createLeftMiddleScoreAuto),
+          new AutoProgram(Auto.EASY_SCORE, "MIDLLE_PRESCORE", AutoFactory::createEasyMiddleAuto));
 
   /**
    * Create a new <code>AutoChooser</code>

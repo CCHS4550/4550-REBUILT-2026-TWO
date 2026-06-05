@@ -109,7 +109,7 @@ public class Robot extends LoggedRobot {
     if (Robot.isSimulation()) {
       DriverStation.silenceJoystickConnectionWarning(true);
     }
-    // SmartDashboard.putString("Selected Auto", autoChooser.getSelected().name());
+    SmartDashboard.putString("Selected Auto", autoChooser.getSelected().name());
   }
 
   /** This function is called once when the robot is disabled. */

@@ -24,7 +24,7 @@ public class Shooter extends SubsystemBase {
   private final LinearFilter veloFilter =
       LinearFilter.movingAverage((int) (0.1 / Constants.loopPeriodSecs));
 
-  private double shooterInitVelo = 375.5;
+  private double shooterInitVelo = 379.5;
   public double passingVelo = 377.5;
 
   private double smoothedSpeedRadPerSec = 0.0;
@@ -85,6 +85,9 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Subsystems/elevation", elevationInputs);
 
     atGoal = atSetpoint();
+
+    systemState = handleStateTransitions();
+    applyStates();
   }
 
   public ShooterSystemState handleStateTransitions() {
@@ -111,6 +114,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void applyStates() {
+
     switch (systemState) {
       case IDLE:
         elevationIO.setVoltage(0.0);
@@ -131,7 +135,7 @@ public class Shooter extends SubsystemBase {
         setElevationAngle(Rotation2d.fromDegrees(61));
         break;
       case TEST_2:
-        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(377.9, RadiansPerSecond));
+        flywheelIO.setVelo(AngularVelocity.ofBaseUnits(383.9, RadiansPerSecond));
         setElevationAngle(Rotation2d.fromDegrees(61));
         break;
       case PASSING:

@@ -59,8 +59,8 @@ public class Indexer extends SubsystemBase {
         // indexerIO.setMotor1Voltage(2.75);
         // indexerIO.setMotor2Voltage(2);
 
-        indexerIO.setMotor1Velo(AngularVelocity.ofBaseUnits(250, RadiansPerSecond));
-        indexerIO.setMotor2Velo(AngularVelocity.ofBaseUnits(200, RadiansPerSecond));
+        indexerIO.setMotor1Velo(AngularVelocity.ofBaseUnits(550, RadiansPerSecond));
+        indexerIO.setMotor2Velo(AngularVelocity.ofBaseUnits(500, RadiansPerSecond));
         break;
       default:
         indexerIO.setVoltage(0);

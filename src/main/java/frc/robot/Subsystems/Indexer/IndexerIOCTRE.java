@@ -60,7 +60,7 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerConfig.Slot0.kD = 0.0;
     indexerConfig.Slot0.kV = 0.12;
 
-    indexerConfig.MotionMagic.MotionMagicAcceleration = 1000;
+    indexerConfig.MotionMagic.MotionMagicAcceleration = 10000;
 
     indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     indexerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -92,7 +92,7 @@ public class IndexerIOCTRE implements IndexerIO {
     indexerTwoConfig.Slot0.kD = 0.0;
     indexerTwoConfig.Slot0.kV = 0.12;
 
-    indexerTwoConfig.MotionMagic.MotionMagicAcceleration = 1000;
+    indexerTwoConfig.MotionMagic.MotionMagicAcceleration = 10000;
 
     indexerTwoConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     indexerTwoConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

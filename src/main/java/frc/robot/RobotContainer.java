@@ -7,19 +7,25 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
 import frc.robot.Subsystems.Indexer.Indexer;
+import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
 import frc.robot.Subsystems.Indexer.IndexerIOCTRE;
 import frc.robot.Subsystems.Intake.Intake;
+import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
 import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.QuestNav.QuestNav;
 import frc.robot.Subsystems.QuestNav.QuestNavIOQuest;
 import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
 import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
 import frc.robot.Subsystems.Shooter.Shooter;
+import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
 import frc.robot.Subsystems.Superstructure;
 import frc.robot.Subsystems.Superstructure.WantedSuperstructureState;
 import frc.robot.Subsystems.Vision.Vision;
@@ -71,11 +77,11 @@ public class RobotContainer {
             swerveSubsystem,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    superstructure = new Superstructure(swerveSubsystem, intake, shooter, indexer);
+    superstructure = new Superstructure(swerveSubsystem, shooter, indexer, intake);
 
     // code to establish intaking
     controller
-        .b()
+        .leftTrigger()
         .and(controller.rightBumper().negate())
         .whileTrue(
             new InstantCommand(
@@ -86,81 +92,126 @@ public class RobotContainer {
             new InstantCommand(
                 () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
 
-    // tare the intake if something goes wrong
-    controller.a().onTrue(new InstantCommand(() -> intake.tareTS()));
-
-    // code for pre-aim, intaking (good for rev up)
+    // code to establish outtaking
     controller
-        .rightBumper()
-        .and(controller.b())
-        .and(controller.rightTrigger().negate())
+        .b()
+        .and(controller.rightBumper().negate())
         .whileTrue(
             new InstantCommand(
                 () ->
                     superstructure.setWantedSuperstructureState(
-                        WantedSuperstructureState.PRE_AIM_INTAKING)))
+                        WantedSuperstructureState.OUTTAKING)))
         .onFalse(
             new InstantCommand(
                 () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
 
-    // code for pre-aim, no intaking (more rev up opportunities)
+    // tare the intake if something goes wrong
+    controller.a().onTrue(new InstantCommand(() -> intake.tareTS()));
+
+    // code to establish stow
     controller
-        .rightBumper()
-        .and(controller.b().negate())
-        .and(controller.rightTrigger().negate())
+        .x()
+        .and(controller.rightBumper().negate())
         .whileTrue(
             new InstantCommand(
-                () ->
-                    superstructure.setWantedSuperstructureState(WantedSuperstructureState.PRE_AIM)))
+                () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.STOW)))
         .onFalse(
             new InstantCommand(
                 () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
 
-    // code for shooting, everything should auto align and stuff
     controller
-        .rightBumper()
-        .and(controller.rightTrigger())
-        .and(controller.b().negate())
+        .y()
+        .and(controller.rightBumper().negate())
         .whileTrue(
             new InstantCommand(
-                () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.SHOOT)))
+                () -> {
+                  superstructure.stopApplyingStates = true;
+                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+                }))
         .onFalse(
             new InstantCommand(
-                () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+                () -> {
+                  superstructure.stopApplyingStates = false;
+                  intake.setWantedIntakeState(WantedIntakeState.IDLE);
+                }));
+
+    // // code for pre-aim, intaking (good for rev up)
+    // controller
+    //     .rightBumper()
+    //     .and(controller.b())
+    //     .and(controller.rightTrigger().negate())
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 superstructure.setWantedSuperstructureState(
+    //                     WantedSuperstructureState.PRE_AIM_INTAKING)))
+    //     .onFalse(
+    //         new InstantCommand(
+    //             () ->
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
+    // // code for pre-aim, no intaking (more rev up opportunities)
+    // controller
+    //     .rightBumper()
+    //     .and(controller.b().negate())
+    //     .and(controller.rightTrigger().negate())
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () ->
+    //
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.PRE_AIM)))
+    //     .onFalse(
+    //         new InstantCommand(
+    //             () ->
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
+    // // code for shooting, everything should auto align and stuff
+    // controller
+    //     .rightBumper()
+    //     .and(controller.rightTrigger())
+    //     .and(controller.b().negate())
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () ->
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.SHOOT)))
+    //     .onFalse(
+    //         new InstantCommand(
+    //             () ->
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
 
     // test code for manual shooting
     // This must be disabled before use of full bot
     // disable superstructure before use
-    // controller
-    //     .rightBumper()
-    //     .whileTrue(
-    //         new ParallelCommandGroup(
-    //             new InstantCommand(
-    //                 () -> {
-    //                   shooter.setWantedState(ShooterWantedState.TEST);
-    //                 }),
-    //             new SequentialCommandGroup(
-    //                 new WaitCommand(3),
-    //                 new InstantCommand(
-    //                     () -> {
-    //                       indexer.setWantedState(IndexerWantedState.RUNNING);
-    //                     }),
-    //                 new InstantCommand(
-    //                     () -> {
-    //                       shooter.setWantedState(ShooterWantedState.TEST_2);
-    //                     }),
-    //                 new WaitCommand(0),
-    //                 new InstantCommand(()->
-    // intake.setWantedIntakeState(WantedIntakeState.PUMPING))
-    //                     )))
-    //     .whileFalse(
-    //         new InstantCommand(
-    //             () -> {
-    //               shooter.setWantedState(ShooterWantedState.IDLE);
-    //               indexer.setWantedState(IndexerWantedState.IDLE);
-    //               intake.setWantedIntakeState(WantedIntakeState.IDLE);
-    //             }));
-
+    controller
+        .rightTrigger()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      superstructure.stopApplyingStates = true;
+                      shooter.setWantedState(ShooterWantedState.TEST);
+                    }),
+                new SequentialCommandGroup(
+                    new WaitCommand(2),
+                    new InstantCommand(
+                        () -> {
+                          indexer.setWantedState(IndexerWantedState.RUNNING);
+                        }),
+                    new InstantCommand(
+                        () -> {
+                          shooter.setWantedState(ShooterWantedState.TEST_2);
+                        }),
+                    new WaitCommand(0),
+                    new InstantCommand(
+                        () -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))))
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  superstructure.stopApplyingStates = false;
+                  shooter.setWantedState(ShooterWantedState.IDLE);
+                  indexer.setWantedState(IndexerWantedState.IDLE);
+                  intake.setWantedIntakeState(WantedIntakeState.IDLE);
+                }));
   }
 
   public SwerveSubsystem getSwerveSubsystem() {

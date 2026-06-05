@@ -81,7 +81,7 @@ public final class Constants {
     public static final double EXTENSION_GEAR_RATIO = 1.0 / 26.0;
     public static final double EXTENSION_POSITION_COEFFICIENT = 2 * Math.PI * EXTENSION_GEAR_RATIO;
 
-    public static final double INTAKE_BOTTOM_RADS = 0.01;
+    public static final double INTAKE_BOTTOM_RADS = 0.05;
     public static final double INTAKE_STOWED_RADS = 1.827;
     public static final double INTAKE_TOP_PUMP_RADS = 1.0;
     public static final double INTAKE_BOTTOM_PUMP_RADS = 0.5;
@@ -98,7 +98,7 @@ public final class Constants {
   public static final class VisionConstants {
     public static final double linearStdDevBaseline = 0.02;
     public static final double angularStdDevBaseline = 0.06;
-    public static final double maxAmbiguity = 0.01;
+    public static final double maxAmbiguity = 0.1;
     public static final double maxZError = 6.75;
   }
 

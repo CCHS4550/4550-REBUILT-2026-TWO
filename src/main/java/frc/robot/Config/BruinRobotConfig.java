@@ -88,7 +88,7 @@ public class BruinRobotConfig {
   /** The maximum speed of the robot in meters per second. */
 
   // TODO: find and fill
-  private final double MAX_SPEED_METERS_PER_SECOND = 5;
+  private final double MAX_SPEED_METERS_PER_SECOND = 8;
 
   // CANcoder offsets of the swerve modules
 
@@ -283,14 +283,14 @@ public class BruinRobotConfig {
             .withHeightOffset(Units.inchesToMeters(8.727))
             .withLengthOffset(Units.inchesToMeters(12.461))
             .withWidthOffset(Units.inchesToMeters(7.014))
-            .withMountingYaw(Units.degreesToRadians(180))
+            .withMountingYaw(Units.degreesToRadians(0))
             .withMountingPitch(Units.degreesToRadians(55));
     questNavConfig =
         new VisionConfig("Questnav")
             .withHeightOffset(Units.inchesToMeters(22.58))
             .withLengthOffset(Units.inchesToMeters(3.04))
             .withWidthOffset(Units.inchesToMeters(-13.75))
-            .withMountingYaw(Units.degreesToRadians(-90));
+            .withMountingYaw(Units.degreesToRadians(90));
 
     // Turret Constants
     shooterConfig =

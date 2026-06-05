@@ -96,6 +96,18 @@ class AutoFactory {
                         .setWantedSuperstructureState(WantedSuperstructureState.SHOOT))));
   }
 
+  Pair<Pose2d, Command> createEasyMiddleAuto() {
+    var initialPose = FieldConstants.getMiddleStartingPose();
+    return Pair.of(
+        initialPose,
+        Commands.sequence(
+            new InstantCommand(
+                () -> robotContainer.getSwerveSubsystem().resetTranslationAndRotation(initialPose)),
+            new ParallelCommandGroup(driveToPoint(FieldConstants.getEasyScorePose(), 6)),
+            setState(WantedSuperstructureState.EXTEND_INTAKE),
+            setState(WantedSuperstructureState.SHOOT)));
+  }
+
   Command setState(WantedSuperstructureState state) {
     return new InstantCommand(
         () -> robotContainer.getSuperstructure().setWantedSuperstructureState(state));
