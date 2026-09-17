@@ -3,9 +3,9 @@ package frc.robot.Subsystems.Intake;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
@@ -26,8 +26,8 @@ public class IntakeIOCTRE implements IntakeIO {
   private TalonFXConfiguration spinnerConfig;
   private TalonFXConfiguration extensionConfig;
 
-  private DynamicMotionMagicVoltage extensionController =
-      new DynamicMotionMagicVoltage(0, 100, 50).withSlot(0);
+  private MotionMagicVoltage extensionController = new MotionMagicVoltage(0).withSlot(0);
+  private MotionMagicVelocityVoltage spinnerController = new MotionMagicVelocityVoltage(0);
 
   private final StatusSignal<Voltage> spinnerAppliedVolts;
   private final StatusSignal<Current> spinnerSupplyCurrentAmps;
@@ -56,8 +56,15 @@ public class IntakeIOCTRE implements IntakeIO {
     spinnerConfig = new TalonFXConfiguration();
     spinnerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     spinnerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    spinnerConfig.CurrentLimits.SupplyCurrentLimit = 40.0;
+    spinnerConfig.CurrentLimits.SupplyCurrentLimit = 60.0;
     spinnerConfig.CurrentLimits.StatorCurrentLimit = 90.0;
+
+    spinnerConfig.Slot0.kP = 0.1;
+    spinnerConfig.Slot0.kI = 0;
+    spinnerConfig.Slot0.kD = 0;
+    spinnerConfig.Slot0.kV = 0.1;
+
+    spinnerConfig.MotionMagic.MotionMagicAcceleration = 100;
 
     spinnerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     spinnerConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -71,15 +78,16 @@ public class IntakeIOCTRE implements IntakeIO {
     extensionConfig.Slot0.kP = robotConfig.getIntakeConfig().extensionkP;
     extensionConfig.Slot0.kI = robotConfig.getIntakeConfig().extensionkI;
     extensionConfig.Slot0.kD = robotConfig.getIntakeConfig().extensionkD;
-    extensionConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    extensionConfig.Slot0.kS = robotConfig.getIntakeConfig().extensionkS;
-    extensionConfig.Slot0.kV = robotConfig.getIntakeConfig().extensionkS;
-    extensionConfig.Slot0.kG = robotConfig.getIntakeConfig().extensionkG;
-    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = 100;
-    extensionConfig.MotionMagic.MotionMagicAcceleration = 50;
+    // extensionConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+    // extensionConfig.Slot0.kS = robotConfig.getIntakeConfig().extensionkS;
+    // extensionConfig.Slot0.kV = robotConfig.getIntakeConfig().extensionkV;
+    // extensionConfig.Slot0.kG = robotConfig.getIntakeConfig().extensionkG;
+
+    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = 25;
+    extensionConfig.MotionMagic.MotionMagicAcceleration = 15;
 
     extensionConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    extensionConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    extensionConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     Phoenix6Util.applyAndCheckConfiguration(spinnerIntakeMotor, spinnerConfig, 5);
     Phoenix6Util.applyAndCheckConfiguration(extensionIntakeMotor, extensionConfig, 5);
@@ -124,7 +132,7 @@ public class IntakeIOCTRE implements IntakeIO {
         extensionVelocityRotationsPerSec.getValueAsDouble()
             * Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT; // Update with constant
     inputs.extensionIntakeAccelRadPerSecSquared =
-        extensionVelocityRotationsPerSec.getValueAsDouble()
+        extensionAccelerationRotationsPerSecSquared.getValueAsDouble()
             * Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT;
     inputs.extensionIntakeTemperature = extensionMotorTemp.getValueAsDouble();
 
@@ -142,8 +150,7 @@ public class IntakeIOCTRE implements IntakeIO {
     inputs.spinnerIntakeVelocityRadPerSec =
         Units.rotationsToRadians(
             spinnerVelocityRotationsPerSec.getValueAsDouble()); // Update with constant
-    inputs.spinnerIntakeAccelRadPerSecSquared =
-        Units.rotationsToRadians(spinnerAccelerationRotationsPerSecSquared.getValueAsDouble());
+    Units.rotationsToRadians(spinnerAccelerationRotationsPerSecSquared.getValueAsDouble());
     inputs.spinnerIntakeTemperature = spinnerMotorTemp.getValueAsDouble();
   }
 
@@ -152,9 +159,12 @@ public class IntakeIOCTRE implements IntakeIO {
       double rad, double veloRotPerSec, double accelRotPerSec) {
     extensionIntakeMotor.setControl(
         extensionController
-            .withPosition(Units.radiansToRotations(rad))
-            .withVelocity(veloRotPerSec)
-            .withAcceleration(accelRotPerSec));
+            .withPosition(rad / Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT)
+            .withFeedForward(
+                Constants.IntakeConstants.extensionkG
+                    * Math.cos(
+                        extensionPosRot.getValueAsDouble()
+                            * Constants.IntakeConstants.EXTENSION_POSITION_COEFFICIENT)));
   }
 
   @Override
@@ -165,5 +175,15 @@ public class IntakeIOCTRE implements IntakeIO {
   @Override
   public void setSpinnerVoltage(double voltage) {
     spinnerIntakeMotor.setVoltage(voltage);
+  }
+
+  @Override
+  public void setSpinnerVelo(AngularVelocity velo) {
+    spinnerIntakeMotor.setControl(spinnerController.withVelocity(velo));
+  }
+
+  @Override
+  public void tareExtensionPosition() {
+    extensionIntakeMotor.setPosition(0);
   }
 }

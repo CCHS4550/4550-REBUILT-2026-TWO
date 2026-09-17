@@ -1,5 +1,6 @@
 package frc.robot.Subsystems.Intake;
 
+import edu.wpi.first.units.measure.AngularVelocity;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
@@ -30,7 +31,13 @@ public interface IntakeIO {
   public default void setExtensionMotorPositionRad(
       double rad, double veloRotPerSec, double accelRotPerSec) {}
 
+  public default void setExtensionMotorPositionRad(double rad) {}
+
   public default void setExtensionVoltage(double voltage) {}
 
   public default void setSpinnerVoltage(double voltage) {}
+
+  public default void setSpinnerVelo(AngularVelocity velo) {}
+
+  public default void tareExtensionPosition() {}
 }

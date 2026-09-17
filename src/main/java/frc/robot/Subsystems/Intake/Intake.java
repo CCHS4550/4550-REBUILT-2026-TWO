@@ -1,6 +1,9 @@
 package frc.robot.Subsystems.Intake;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constant.Constants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -12,6 +15,7 @@ public class Intake extends SubsystemBase {
 
   public enum WantedIntakeState {
     EXTENDED_INTAKING,
+    EXTENDED_OUTTAKING,
     EXTENDED_PASSIVE,
     STOWED,
     PUMPING,
@@ -21,6 +25,7 @@ public class Intake extends SubsystemBase {
 
   public enum SystemState {
     EXTENDED_INTAKING,
+    EXTENDED_OUTTAKING,
     EXTENDED_PASSIVE,
     STOWED,
     STOW_SLOW,
@@ -39,15 +44,59 @@ public class Intake extends SubsystemBase {
     this.intakeIO = intakeIO;
   }
 
+  // So the big GPT said to do this, but I don't really know how it works and I hate converting
+  // units so ts deprecated ig
+  /*
+    private final SysIdRoutine sysIdRoutine =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> intakeIO.setExtensionVoltage(voltage.in(Volts)),
+                log -> {
+                  log.motor("extension")
+                      .voltage(inputs.extensionIntakeVoltage.in(Volts))
+                      .angularPosition(inputs.extensionPosRadians)
+                      .angularVelocity(inputs.extensionIntakeVelocityRadPerSec);
+                },
+                this));
+
+    public Command sysIdQuasistaticForward() {
+      return sysIdRoutine
+          .quasistatic(SysIdRoutine.Direction.kForward)
+          .beforeStarting(() -> runningSysId = true)
+          .finallyDo(() -> runningSysId = false);
+    }
+  */
+
+  // public Command setExtensionToAngle(double angleRad) {
+  //   return runOnce(() -> intakeIO.setExtensionMotorPositionRad(angleRad, 100, 50));
+  // }
+
+  /// private final CommandXboxController driverController = new CommandXboxController(0);
+  /// driverController.a().onTrue(intake.setExtensionToAngle(1.0));
+
+  public void tare() {
+    intakeIO.tareExtensionPosition();
+  }
+
   private void applyStates() {
     switch (systemState) {
       case EXTENDED_INTAKING:
-        intakeIO.setSpinnerVoltage(5.0);
+        if (inputs.extensionPosRadians < 0.08) {
+          intakeIO.setSpinnerVelo(AngularVelocity.ofBaseUnits(400, RadiansPerSecond));
+        } else {
+          intakeIO.setSpinnerVoltage(0);
+        }
+        intakeIO.setExtensionMotorPositionRad(
+            Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
+        break;
+      case EXTENDED_OUTTAKING:
+        intakeIO.setSpinnerVelo(AngularVelocity.ofBaseUnits(-100, RadiansPerSecond));
         intakeIO.setExtensionMotorPositionRad(
             Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
         break;
       case EXTENDED_PASSIVE:
-        intakeIO.setExtensionVoltage(0.0);
+        intakeIO.setSpinnerVoltage(0.0);
         intakeIO.setExtensionMotorPositionRad(
             Constants.IntakeConstants.INTAKE_BOTTOM_RADS, 100, 50);
         break;
@@ -80,6 +129,8 @@ public class Intake extends SubsystemBase {
     switch (wantedState) {
       case EXTENDED_INTAKING:
         return SystemState.EXTENDED_INTAKING;
+      case EXTENDED_OUTTAKING:
+        return SystemState.EXTENDED_OUTTAKING;
       case EXTENDED_PASSIVE:
         return SystemState.EXTENDED_PASSIVE;
       case STOWED:
@@ -94,6 +145,7 @@ public class Intake extends SubsystemBase {
         } else {
           return SystemState.LOWER_PUMP;
         }
+        // return SystemState.LOWER_PUMP;
       case IDLE:
         return SystemState.IDLE;
       default:
@@ -144,12 +196,19 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  public void tareTS() {
+    intakeIO.tareExtensionPosition();
+  }
+
   @Override
   public void periodic() {
     intakeIO.updateInputs(inputs);
     Logger.processInputs("Subsystems/Intake", inputs);
     Logger.recordOutput("Subsystems/Intake/SystemState", systemState);
     Logger.recordOutput("Subsystems/Intake/DesiredState", wantedState);
+    Logger.recordOutput("Intake/AngleRad", inputs.extensionPosRadians);
+    Logger.recordOutput("Intake/VelocityRadPerSec", inputs.extensionIntakeVelocityRadPerSec);
+    Logger.recordOutput("Intake/AppliedVolts", inputs.extensionIntakeVoltage);
     systemState = handleStateTransitions();
     applyStates();
   }

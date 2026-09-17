@@ -36,20 +36,15 @@ public class BruinRobotConfig {
   public final CanDeviceID BACK_RIGHT_STEER_MOTOR = new CanDeviceID(11);
   public final CanDeviceID BACK_RIGHT_STEER_ENCODER = new CanDeviceID(12);
 
-  public final CanDeviceID KICKER_MOTOR = new CanDeviceID(16, CANIVORE_CANBUS);
-  public final CanDeviceID INDEXER_MOTOR = new CanDeviceID(23, CANIVORE_CANBUS);
+  public final CanDeviceID INDEXER_MOTOR_1 = new CanDeviceID(21, CANIVORE_CANBUS);
+  public final CanDeviceID INDEXER_MOTOR_2 = new CanDeviceID(25, CANIVORE_CANBUS);
 
-  public final CanDeviceID ROTATION_MOTOR = new CanDeviceID(19, CANIVORE_CANBUS);
   public final CanDeviceID ELEVATION_MOTOR = new CanDeviceID(20, CANIVORE_CANBUS);
 
-  public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(-1, CANIVORE_CANBUS);
-  public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(-1, CANIVORE_CANBUS);
-  public final CanDeviceID FLYWHEEL_MOTOR_3 = new CanDeviceID(-1, CANIVORE_CANBUS);
+  public final CanDeviceID FLYWHEEL_MOTOR_1 = new CanDeviceID(16, CANIVORE_CANBUS);
+  public final CanDeviceID FLYWHEEL_MOTOR_2 = new CanDeviceID(22, CANIVORE_CANBUS);
 
-  public final CanDeviceID ELEVATION_CANCODER = new CanDeviceID(21, CANIVORE_CANBUS);
-  public final CanDeviceID ROTATION_CANCODER = new CanDeviceID(22, CANIVORE_CANBUS);
-
-  public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(14, CANIVORE_CANBUS);
+  public final CanDeviceID INTAKE_ROLLER = new CanDeviceID(17, CANIVORE_CANBUS);
   public final CanDeviceID INTAKE_EXTENSION = new CanDeviceID(15, CANIVORE_CANBUS);
 
   /**
@@ -93,7 +88,7 @@ public class BruinRobotConfig {
   /** The maximum speed of the robot in meters per second. */
 
   // TODO: find and fill
-  private final double MAX_SPEED_METERS_PER_SECOND = 5;
+  private final double MAX_SPEED_METERS_PER_SECOND = 8;
 
   // CANcoder offsets of the swerve modules
 
@@ -285,38 +280,38 @@ public class BruinRobotConfig {
     // TODO: find and fill
     photonVisionConfig =
         new VisionConfig("Photonvision Camera 1")
-            .withHeightOffset(Units.inchesToMeters(13.29))
-            .withLengthOffset(Units.inchesToMeters(-10.739))
-            .withWidthOffset(Units.inchesToMeters(19.859))
-            .withMountingYaw(Units.degreesToRadians(90))
-            .withMountingPitch(Units.degreesToRadians(110));
+            .withHeightOffset(Units.inchesToMeters(8.727))
+            .withLengthOffset(Units.inchesToMeters(12.461))
+            .withWidthOffset(Units.inchesToMeters(7.014))
+            .withMountingYaw(Units.degreesToRadians(0))
+            .withMountingPitch(Units.degreesToRadians(55));
     questNavConfig =
         new VisionConfig("Questnav")
-            .withHeightOffset(Units.inchesToMeters(0))
-            .withLengthOffset(Units.inchesToMeters(0))
-            .withWidthOffset(Units.inchesToMeters(0))
-            .withMountingYaw(Units.degreesToRadians(0));
+            .withHeightOffset(Units.inchesToMeters(22.58))
+            .withLengthOffset(Units.inchesToMeters(3.04))
+            .withWidthOffset(Units.inchesToMeters(-13.75))
+            .withMountingYaw(Units.degreesToRadians(90));
 
     // Turret Constants
     shooterConfig =
         new ShooterConfig()
             // 51.39646
-            .withElevationKp(21)
+            .withElevationKp(0.6)
             .withElevationKi(0)
-            .withElevationKd(0.1)
+            .withElevationKd(0.05)
             .withElevationKs(0.0)
-            .withElevationKv(0.5)
-            .withShooterKp(5.6)
+            .withElevationKv(0.1)
+            .withShooterKp(0.04)
             .withShooterKi(0)
-            .withShooterKd(0)
-            .withShooterKs(0.0)
-            .withShooterKv(0.0);
+            .withShooterKd(0.001)
+            .withShooterKs(0.037)
+            .withShooterKv(0.1316);
 
     intakeConfig =
         new IntakeConfig()
-            .withExtensionkP(0.7)
+            .withExtensionkP(8.0)
             .withExtensionkI(0.0)
-            .withExtensionkD(0.0)
+            .withExtensionkD(0.1)
             .withExtensionkS(0.0)
             .withExtensionkV(0.0)
             .withExtensionkG(0.0);

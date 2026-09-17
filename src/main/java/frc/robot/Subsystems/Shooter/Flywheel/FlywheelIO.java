@@ -18,13 +18,11 @@ public interface FlywheelIO {
     public double flywheel2SupplyCurrent = 0.0;
     public double flywheel2Temperature = 0.0;
 
-    public double flywheel3AppliedVoltage = 0.0;
-    public double flywheel3StatorCurrent = 0.0;
-    public double flywheel3SupplyCurrent = 0.0;
-    public double flywheel3Temperature = 0.0;
+    public double flywheel1VelocityRadPerSec = 0.0;
+    public double flywheel1AccelRadPerSecPerSec = 0.0;
 
-    public double flywheelVelocityRadPerSec = 0.0;
-    public double flywheelAccelRadPerSecPerSec = 0.0;
+    public double flywheel2VelocityRadPerSec = 0.0;
+    public double flywheel2AccelRadPerSecPerSec = 0.0;
   }
 
   default void updateInputs(FlywheelIOInputs io) {}
@@ -32,4 +30,8 @@ public interface FlywheelIO {
   default void setVoltage(Voltage voltage) {}
 
   default void setVelo(AngularVelocity velo) {}
+
+  default void setSpeed(double rpm) {}
+
+  default void adjustFlywheelKSlotValue(double value, String slot) {}
 }

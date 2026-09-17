@@ -6,12 +6,28 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Config.BruinRobotConfig;
 import frc.robot.Subsystems.Drive.SwerveIOCTRE;
 import frc.robot.Subsystems.Drive.SwerveSubsystem;
+import frc.robot.Subsystems.Indexer.Indexer;
+import frc.robot.Subsystems.Indexer.Indexer.IndexerWantedState;
+import frc.robot.Subsystems.Indexer.IndexerIOCTRE;
+import frc.robot.Subsystems.Intake.Intake;
+import frc.robot.Subsystems.Intake.Intake.WantedIntakeState;
+import frc.robot.Subsystems.Intake.IntakeIOCTRE;
 import frc.robot.Subsystems.QuestNav.QuestNav;
 import frc.robot.Subsystems.QuestNav.QuestNavIOQuest;
+import frc.robot.Subsystems.Shooter.Elevation.ElevationIOCTRE;
+import frc.robot.Subsystems.Shooter.Flywheel.FlywheelIOCTRE;
+import frc.robot.Subsystems.Shooter.Shooter;
+import frc.robot.Subsystems.Shooter.Shooter.ShooterWantedState;
+import frc.robot.Subsystems.Superstructure;
+import frc.robot.Subsystems.Superstructure.WantedSuperstructureState;
 import frc.robot.Subsystems.Vision.Vision;
 import frc.robot.Subsystems.Vision.VisionIOPhotonvision;
 
@@ -19,11 +35,28 @@ public class RobotContainer {
   private final Vision vision;
   private final QuestNav questnav;
 
+  private final Shooter shooter;
+  private final Intake intake;
+  private final Indexer indexer;
   private final SwerveSubsystem swerveSubsystem;
+
+  private final Superstructure superstructure;
   private final CommandXboxController controller = new CommandXboxController(0);
+
+  // private double targetRPM;
+  // private double kP;
+  // private double kS;
+  // private double kV;
+  // private double flywheelVoltage;
+  // private double wantedHoodAngle;
 
   public RobotContainer() {
     BruinRobotConfig config = new BruinRobotConfig();
+
+    intake = new Intake(new IntakeIOCTRE(config));
+    indexer = new Indexer(new IndexerIOCTRE(config));
+    shooter = new Shooter(new ElevationIOCTRE(config), new FlywheelIOCTRE(config), controller);
+
     SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>[]
         moduleConstants = config.getModuleConstants();
 
@@ -35,179 +68,163 @@ public class RobotContainer {
             moduleConstants[0].SpeedAt12Volts,
             moduleConstants[0].SpeedAt12Volts
                 / Math.hypot(moduleConstants[0].LocationX, moduleConstants[0].LocationY));
-    // swerveSubsystem =
-    //     new SwerveSubsystem(
-    //         new SwerveIOCTRE(config.getSwerveDrivetrainConstants(),
-    // config.getModuleConstants()),
-    //         config.geRobotConfig(),
-    //         controller,
-    //         0.5,
-    //         0.5 / Math.hypot(moduleConstants[0].LocationX, moduleConstants[0].LocationY));
+
     questnav =
         new QuestNav(swerveSubsystem, new QuestNavIOQuest(config.getVisionConfigurations().get(1)));
     vision =
         new Vision(
             questnav,
+            swerveSubsystem,
             new VisionIOPhotonvision("photonvision", config.getVisionConfigurations().get(0)));
 
-    // controller
-    //     .a()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> swerveSubsystem.setTargetRotation(Rotation2d.fromDegrees(90))));
-    // controller
-    //     .a()
-    //     .whileTrue(
-    //         new InstantCommand(() ->
-    // swerveSubsystem.setWantedState(WantedState.ROTATION_LOCK)));
-    // controller
-    //     .a()
-    //     .whileFalse(
-    //         new InstantCommand(() ->
-    // swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE)));
+    superstructure = new Superstructure(swerveSubsystem, shooter, indexer, intake);
 
+    // code to establish intaking
+    controller
+        .leftTrigger()
+        .and(controller.rightBumper().negate())
+        .whileTrue(
+            new InstantCommand(
+                () ->
+                    superstructure.setWantedSuperstructureState(
+                        WantedSuperstructureState.INTAKING)))
+        .onFalse(
+            new InstantCommand(
+                () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
+    // code to establish outtaking
+    controller
+        .b()
+        .and(controller.rightBumper().negate())
+        .whileTrue(
+            new InstantCommand(
+                () ->
+                    superstructure.setWantedSuperstructureState(
+                        WantedSuperstructureState.OUTTAKING)))
+        .onFalse(
+            new InstantCommand(
+                () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
+    // tare the intake if something goes wrong
+    controller.a().onTrue(new InstantCommand(() -> intake.tareTS()));
+
+    // code to establish stow
+    controller
+        .x()
+        .and(controller.rightBumper().negate())
+        .whileTrue(
+            new InstantCommand(
+                () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.STOW)))
+        .onFalse(
+            new InstantCommand(
+                () -> superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
+
+    controller
+        .y()
+        .and(controller.rightBumper().negate())
+        .whileTrue(
+            new InstantCommand(
+                () -> {
+                  superstructure.stopApplyingStates = true;
+                  intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE);
+                }))
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  superstructure.stopApplyingStates = false;
+                  intake.setWantedIntakeState(WantedIntakeState.IDLE);
+                }));
+
+    // // code for pre-aim, intaking (good for rev up)
     // controller
-    //     .b()
-    //     .onTrue(
+    //     .rightBumper()
+    //     .and(controller.b())
+    //     .and(controller.rightTrigger().negate())
+    //     .whileTrue(
     //         new InstantCommand(
     //             () ->
-    //                 swerveSubsystem.setDesiredPoseForDriveToPointWithConstraints(
-    //                     new Pose2d(0.5, 0.5, new Rotation2d(Units.degreesToRadians(67))),
-    //                     1,
-    //                     3.14)));
-    // controller
-    //     .b()
-    //     .whileTrue(
-    //         new InstantCommand(() ->
-    // swerveSubsystem.setWantedState(WantedState.DRIVE_TO_POINT)));
-
-    // controller
-    //     .b()
-    //     .whileFalse(
-    //         new InstantCommand(() ->
-    // swerveSubsystem.setWantedState(WantedState.TELEOP_DRIVE)));
-    // controller
-    //     .x()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //             () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_PASSIVE)));
-    // controller
-    //     .rightTrigger()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> intake.setWantedIntakeState(WantedIntakeState.EXTENDED_INTAKING)));
-    // controller
-    //     .rightTrigger()
-    //     .onFalse(new InstantCommand(() ->
-    // intake.setWantedIntakeState(WantedIntakeState.IDLE)));
-
-    // controller
-    //     .y()
-    //     .onTrue(new InstantCommand(() ->
-    // intake.setWantedIntakeState(WantedIntakeState.STOWED)));
-
-    // controller
-    //     .rightTrigger()
-    //     .onTrue(
+    //                 superstructure.setWantedSuperstructureState(
+    //                     WantedSuperstructureState.PRE_AIM_INTAKING)))
+    //     .onFalse(
     //         new InstantCommand(
     //             () ->
-    //                 turret.setWantedTurretMeasurables(
-    //                     new TurretMeasurables(
-    //                         new Rotation2d(Units.degreesToRadians(20)),
-    //                         new Rotation2d(Units.degreesToRadians(20), 2)))));
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
 
+    // // code for pre-aim, no intaking (more rev up opportunities)
     // controller
-    //     .rightTrigger()
-    //     .onTrue(
+    //     .rightBumper()
+    //     .and(controller.b().negate())
+    //     .and(controller.rightTrigger().negate())
+    //     .whileTrue(
     //         new InstantCommand(
     //             () ->
-    //                 turret.setWantedTurretMeasurables(
-    //                     new TurretMeasurables(
-    //                         new Rotation2d(0), new Rotation2d(45 * ((2 * Math.PI) / 360))))));
-
-    // controller
-    //     .rightTrigger()
-    //     .whileTrue(new InstantCommand(() ->
-    // turret.setWantedState(TurretWantedState.TESTING)));
-
-    // controller
-    //     .rightTrigger()
-    //     .onFalse(new InstantCommand(() -> turret.setWantedState(TurretWantedState.IDLE)));
-
-    // controller
-    //     .rightTrigger()
-    //     .whileFalse(new InstantCommand(() -> turret.setWantedState(TurretWantedState.IDLE)));
-
-    // controller.start().onTrue(new InstantCommand(() -> turret.setEncoderPositionAtBottom()));
-
-    // controller
-    //     .x()
-    //     .whileFalse(
+    //
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.PRE_AIM)))
+    //     .onFalse(
     //         new InstantCommand(
-    //             () -> {
-    //               kicker.setWantedState(Kicker.KickerWantedState.IDLE);
-    //               agitator.setWantedAgitatorState(Agitator.WantedAgitatorState.IDLE);
-    //               turret.setFlywheelSpeed(RadiansPerSecond.of(0.0));
-    //               //   turret.setWantedState(Turret.TurretWantedState.IDLE);
-    //             }));
+    //             () ->
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
 
-    // actual button bindings!
+    // // code for shooting, everything should auto align and stuff
     // controller
-    //     .a()
-    //     .onTrue(
+    //     .rightBumper()
+    //     .and(controller.rightTrigger())
+    //     .and(controller.b().negate())
+    //     .whileTrue(
     //         new InstantCommand(
-    //             () -> swerveSubsystem.resetRotation(swerveSubsystem.getSwerveRotation())));
+    //             () ->
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.SHOOT)))
+    //     .onFalse(
+    //         new InstantCommand(
+    //             () ->
+    // superstructure.setWantedSuperstructureState(WantedSuperstructureState.IDLE)));
 
-    // actual button bindings!
-    // controller
-    //     .a()
-    //     .onTrue(new InstantCommand(() -> questnav.setPose(new Pose2d(3, 3, new
-    // Rotation2d()))));
-
-    // controller
-    // .rightTrigger()
-    // .whileTrue(new InstantCommand(() -> superstructure.setIntakeActive(true)))
-    // .onFalse(new InstantCommand(() -> superstructure.setIntakeActive(false)));
-
-    //     controller
-    //         .rightBumper()
-    //         .whileTrue(
-    //             new InstantCommand(
-    //                 () ->
-    //                     superstructure.setWantedSuperstructureState(
-    //                         WantedSuperstructureState.ACTIVE_SHOOT, true)))
-    //         .whileFalse(
-    //             new InstantCommand(
-    //                 () ->
-    //                     superstructure.setWantedSuperstructureState(
-    //                         WantedSuperstructureState.IDLE, false)));
-    //     controller
-    //         .leftBumper()
-    //         .whileTrue(
-    //             new InstantCommand(
-    //                 () ->
-    //                     superstructure.setWantedSuperstructureState(
-    //                         WantedSuperstructureState.STOW, false)))
-    //         .whileFalse(
-    //             new InstantCommand(
-    //                 () ->
-    //                     superstructure.setWantedSuperstructureState(
-    //                         WantedSuperstructureState.IDLE, false)));
-
-    //     controller
-    //         .rightBumper()
-    //         .whileTrue(new InstantCommand(() ->
-    // turret.setWantedState(TurretWantedState.SHOOT_SCORE)))
-    //         .whileFalse(new InstantCommand(() -> turret.setWantedState(TurretWantedState.IDLE)));
+    // test code for manual shooting
+    // This must be disabled before use of full bot
+    // disable superstructure before use
+    controller
+        .rightTrigger()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      superstructure.stopApplyingStates = true;
+                      shooter.setWantedState(ShooterWantedState.TEST);
+                    }),
+                new SequentialCommandGroup(
+                    new WaitCommand(2),
+                    new InstantCommand(
+                        () -> {
+                          indexer.setWantedState(IndexerWantedState.RUNNING);
+                        }),
+                    new InstantCommand(
+                        () -> {
+                          shooter.setWantedState(ShooterWantedState.TEST_2);
+                        }),
+                    new WaitCommand(0),
+                    new InstantCommand(
+                        () -> intake.setWantedIntakeState(WantedIntakeState.PUMPING)))))
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  superstructure.stopApplyingStates = false;
+                  shooter.setWantedState(ShooterWantedState.IDLE);
+                  indexer.setWantedState(IndexerWantedState.IDLE);
+                  intake.setWantedIntakeState(WantedIntakeState.IDLE);
+                }));
   }
 
   public SwerveSubsystem getSwerveSubsystem() {
     return swerveSubsystem;
   }
 
-  public void setTestPose() {
-    swerveSubsystem.resetTranslationAndRotation(new Pose2d(3, 3, new Rotation2d()));
+  public Superstructure getSuperstructure() {
+    return superstructure;
   }
+
+  // public void setTestPose() {
+  //   swerveSubsystem.resetTranslationAndRotation(new Pose2d(3, 3, new Rotation2d()));
+  // }
 
   public boolean questPoseEstablished() {
     return questnav.questPoseEstablished();

@@ -24,9 +24,13 @@ public class FieldConstants {
   public static Pose2d passingPoseBlue = new Pose2d(2.5, 4, new Rotation2d());
   public static Pose2d passingPoseRed = new Pose2d(14.5, 4, new Rotation2d());
 
-  public static Pose2d middleStartingPoseBlue = new Pose2d();
+  public static Pose2d middleStartingPoseBlue = new Pose2d(3.5, 4.0, Rotation2d.fromDegrees(0));
 
-  public static Pose2d middleStartingPoseRed = new Pose2d();
+  public static Pose2d middleStartingPoseRed = new Pose2d(13.1, 4.0, Rotation2d.fromDegrees(180));
+
+  public static Pose2d blueEasyScore = new Pose2d(1.9, 4.0, Rotation2d.fromDegrees(0));
+
+  public static Pose2d redEasyScore = new Pose2d(14.7, 4.0, Rotation2d.fromDegrees(180));
 
   public static final double HUB_HEIGHT = 1.905;
 
@@ -49,6 +53,10 @@ public class FieldConstants {
 
   public static Pose2d getMiddleStartingPose() {
     return isBlueAlliance() ? middleStartingPoseBlue : middleStartingPoseRed;
+  }
+
+  public static Pose2d getEasyScorePose() {
+    return isBlueAlliance() ? blueEasyScore : redEasyScore;
   }
 
   public static class LinesVertical {

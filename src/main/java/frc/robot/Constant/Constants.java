@@ -57,51 +57,36 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final double ELEVATION_GEAR_RATIO = 1.0 / 149.08; // fill
-    public static final double ELEVATION_ENCODER_GEAR_RATIO = 1.0 / 8.80;
+    public static final double ELEVATION_GEAR_RATIO = 1.0 / 65.23; // fill
     public static final double ELEVATION_POSITION_COEFFICIENT = 2 * Math.PI * ELEVATION_GEAR_RATIO;
 
-    public static final double ELEVATION_ENCODER_POSITION_COEFFICIENT =
-        2 * Math.PI * ELEVATION_ENCODER_GEAR_RATIO;
+    public static final double SHOOTER_ONE_GEAR_RATIO = 24.0 / 18.0;
+    public static final double SHOOTER_ONE_POSITION_COEFFICIENT =
+        2 * Math.PI * SHOOTER_ONE_GEAR_RATIO;
 
-    public static final double ROTATION_GEAR_RATIO = 1.0 / 37;
-    public static final double ROTATION_GEAR_RATIO_TO_ENCODER = 1.0 / 7.41;
-    public static final double ROTATION_POSITION_COEFFICIENT = 2 * Math.PI * ROTATION_GEAR_RATIO;
-    public static final double ROTATION_POSITION_COEFFICIENT_TO_ENCODER =
-        2 * Math.PI * ROTATION_GEAR_RATIO_TO_ENCODER;
+    public static final double SHOOTER_TWO_GEAR_RATIO = 24.0 / 18.0;
+    public static final double SHOOTER_TWO_POSITION_COEFFICIENT =
+        2 * Math.PI * SHOOTER_TWO_GEAR_RATIO;
 
-    // public static final double ELEVATION_DEFAULT_ENCODER_READING_AT_SHALLOWEST_ANGLE = -0.48;
-    public static final double ELEVATION_DEFAULT_ENCODER_READING_AT_SHALLOWEST_ANGLE = 0.35;
-    public static final double SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(45);
-    public static final double STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(78);
-
-    public static final double SHOOTER_CLOSE_RADIANS_PER_SEC = 300.0;
-
-    public static final double SHOOTER_FAR_RADIANS_PER_SEC = 400;
-
-    public static final double SHOOTER_ULTRA_FAR_RADIANS_PER_SEC = 500;
-
-    public static final double TURRET_HEIGHT_METERS = 0.305;
+    public static final double SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(29);
+    public static final double STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS = Math.toRadians(61);
 
     public static final Transform3d SHOOTER_TRANSFORM =
-        new Transform3d(0, 0, 0, new Rotation3d(0, 0, 0));
+        new Transform3d(0.0, 0, 0, new Rotation3d(0, 0, 0));
 
     public static final double MAX_BALL_HEIGHT_METERS = 5.4864;
-
-    public static final double FORWARD_ROTATION_LIMIT_RADIANS = 0.0;
-
-    public static final double BACKWARDS_ROTATION_LIMIT_RADIANS = 0.0;
-    public static final double SHOOTER_PASSING_SLOW_RADIANS_PER_SEC = 421;
   }
 
   public static final class IntakeConstants {
-    public static final double EXTENSION_GEAR_RATIO = 1.0 / 25.0; // fill
+    public static final double EXTENSION_GEAR_RATIO = 1.0 / 26.0;
     public static final double EXTENSION_POSITION_COEFFICIENT = 2 * Math.PI * EXTENSION_GEAR_RATIO;
 
-    public static final double INTAKE_BOTTOM_RADS = 0.0;
-    public static final double INTAKE_STOWED_RADS = 99999999; // fill
-    public static final double INTAKE_TOP_PUMP_RADS = 99999999; // fill
-    public static final double INTAKE_BOTTOM_PUMP_RADS = 999999; // fill
+    public static final double INTAKE_BOTTOM_RADS = 0.05;
+    public static final double INTAKE_STOWED_RADS = 1.827;
+    public static final double INTAKE_TOP_PUMP_RADS = 1.0;
+    public static final double INTAKE_BOTTOM_PUMP_RADS = 0.5;
+
+    public static final double extensionkG = 0.275;
   }
 
   public static final class LowerChassisConstants {
@@ -113,7 +98,7 @@ public final class Constants {
   public static final class VisionConstants {
     public static final double linearStdDevBaseline = 0.02;
     public static final double angularStdDevBaseline = 0.06;
-    public static final double maxAmbiguity = 0.01;
+    public static final double maxAmbiguity = 0.1;
     public static final double maxZError = 6.75;
   }
 

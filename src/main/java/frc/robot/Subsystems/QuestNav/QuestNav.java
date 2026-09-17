@@ -57,6 +57,8 @@ public class QuestNav extends SubsystemBase implements Vision.VisionConsumer {
     io.updateInputs(inputs);
     Logger.processInputs("Questnav", inputs);
 
+    Robotstate.getInstance().updateQuestBooleans(inputs.QuestNavConnected, inputs.QuestNavTracking);
+
     List<Pose3d> allPoseFrames = new LinkedList<>();
     List<Pose3d> rejectedPoseFrames = new LinkedList<>();
     List<Pose3d> acceptedPoseFrames = new LinkedList<>();
@@ -134,7 +136,7 @@ public class QuestNav extends SubsystemBase implements Vision.VisionConsumer {
   }
 
   @Override
-  public void accept(
+  public void acceptVision(
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {

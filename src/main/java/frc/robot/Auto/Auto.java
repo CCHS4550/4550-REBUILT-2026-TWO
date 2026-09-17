@@ -4,4 +4,6 @@ package frc.robot.Auto;
 public enum Auto {
   IDLE,
   TEST,
+  LEFT_MIDDLE_SCORE,
+  EASY_SCORE
 }

@@ -2,14 +2,13 @@ package frc.robot.Subsystems.Shooter.Elevation;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -23,9 +22,7 @@ import frc.robot.Util.Phoenix6Util;
 
 public class ElevationIOCTRE implements ElevationIO {
   private TalonFX elevationMotor;
-  private CANcoder elevationEncoder;
   private TalonFXConfiguration elevationConfig;
-  private CANcoderConfiguration encoderConfig;
   private MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0).withSlot(0);
   private final StatusSignal<Angle> elevationAngleRotations;
   private final StatusSignal<Voltage> elevationAppliedVolts;
@@ -40,25 +37,10 @@ public class ElevationIOCTRE implements ElevationIO {
         new TalonFX(
             bruinRobotConfig.ELEVATION_MOTOR.getDeviceNumber(),
             bruinRobotConfig.ELEVATION_MOTOR.getBus()); // creates motor
-    elevationEncoder =
-        new CANcoder(
-            bruinRobotConfig.ELEVATION_CANCODER.getDeviceNumber(),
-            bruinRobotConfig.ELEVATION_CANCODER
-                .getBus()); // creates CANCoder, which should be connected to the motor electrically
 
     // I should probably set up these constants in like RobotConfig, but I just want to try and
     // complete this out
 
-    encoderConfig = new CANcoderConfiguration();
-    encoderConfig
-        .MagnetSensor
-        .withMagnetOffset(
-            ((-(Constants.ShooterConstants.ELEVATION_DEFAULT_ENCODER_READING_AT_SHALLOWEST_ANGLE)))
-                + (Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS
-                    / Constants.ShooterConstants.ELEVATION_ENCODER_POSITION_COEFFICIENT))
-        // 0.0)
-        .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive);
-    elevationEncoder.getConfigurator().apply(encoderConfig);
     elevationConfig = new TalonFXConfiguration();
     elevationConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     elevationConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -70,6 +52,8 @@ public class ElevationIOCTRE implements ElevationIO {
     elevationConfig.Slot0.kD = bruinRobotConfig.getShooterConfig().elevationKd;
     elevationConfig.Slot0.kS = bruinRobotConfig.getShooterConfig().elevationKs;
     elevationConfig.Slot0.kV = bruinRobotConfig.getShooterConfig().elevationKv;
+    elevationConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+    elevationConfig.Slot0.kG = -0.3; // change
     elevationConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     elevationConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
@@ -125,22 +109,29 @@ public class ElevationIOCTRE implements ElevationIO {
 
   @Override
   public void setElevationAngle(Rotation2d angle) {
+    angle =
+        Rotation2d.fromRadians(
+            MathUtil.clamp(
+                angle.getRadians(),
+                Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS,
+                Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS));
 
-    if (angle.getRadians() > Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS) {
-      angle =
-          Rotation2d.fromRadians(
-              Constants.ShooterConstants.STEEPEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
-    }
-    if (angle.getRadians()
-        < Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS) {
-      angle =
-          Rotation2d.fromRadians(
-              Constants.ShooterConstants.SHALLOWEST_POSSIBLE_ELEVATION_ANGLE_RADIANS);
-    }
+    double wantedAngle =
+        angle.getRadians() / Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT;
 
-    elevationMotor.setControl(
-        motionMagicVoltage.withPosition(
-            angle.getRadians() / Constants.ShooterConstants.ELEVATION_POSITION_COEFFICIENT));
+    elevationMotor.setControl(motionMagicVoltage.withPosition(wantedAngle));
+
+    // angle = Rotation2d.fromRadians(MathUtil.clamp(angle.getRadians(), 0.02, 4.3)); // fill
+
+    // double wantedAngle = angle.getRadians();
+    // double error = wantedAngle - elevationMotor.getPosition().getValueAsDouble();
+    // double kP = 1.5;
+    // double kS = 0.41;
+    // setVoltage(error * kP + kS);
+
+    // System.out.println(wantedAngle);
+    // System.out.println(error);
+    // System.out.println("Voltage: " + (error * kP + kS));
   }
 
   @Override
@@ -148,12 +139,40 @@ public class ElevationIOCTRE implements ElevationIO {
     elevationMotor.setVoltage(volts);
   }
 
-  public static double mapRange(double value) {
-    // Check to prevent division by zero if the old range is invalid
+  @Override
+  public void adjustElevationKSlotValue(double value, String slot) {
+    System.out.print("Elevation k" + slot + " value: ");
+    switch (slot) {
+      case "P":
+        elevationConfig.Slot0.kP += value;
+        System.out.println(elevationConfig.Slot0.kP);
+        break;
 
-    // Perform the linear mapping
-    double oldRange = 2.3643 - 1.3024;
-    double newRange = 1.3788 - 0.7505;
-    return 0.7505 + ((value - 1.3024) * newRange / oldRange);
+      case "I":
+        elevationConfig.Slot0.kI += value;
+        System.out.println(elevationConfig.Slot0.kI);
+        break;
+
+      case "D":
+        elevationConfig.Slot0.kD += value;
+        System.out.println(elevationConfig.Slot0.kD);
+        break;
+
+      case "S":
+        elevationConfig.Slot0.kS += value;
+        System.out.println(elevationConfig.Slot0.kS);
+        break;
+
+      case "V":
+        elevationConfig.Slot0.kV += value;
+        System.out.println(elevationConfig.Slot0.kV);
+        break;
+
+      default:
+        System.out.println("Invalid slot!!!!!");
+        break;
+    }
+
+    Phoenix6Util.applyAndCheckConfiguration(elevationMotor, elevationConfig, 5);
   }
 }
